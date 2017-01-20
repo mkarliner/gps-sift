@@ -1,0 +1,28 @@
+{
+  "name": "hello-vue",
+  "version": "1.0.0",
+  "description": "Hello World Red Sift",
+  "main": "index.js",
+  "dependencies": {
+    "babel-runtime": "^6.20.0",
+    "lodash": "^4.17.4",
+    "marker-clusterer-plus": "^2.1.4",
+    "q": "^1.4.1",
+    "vue": "^2.1.10",
+    "vue2-google-maps": "^0.5.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mkarliner/hello-sift.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mkarliner/hello-sift/issues"
+  },
+  "homepage": "https://github.com/mkarliner/hello-sift#readme"
+}
