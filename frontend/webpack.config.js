@@ -1,69 +1,67 @@
-var path = require('path')
-var webpack = require('webpack')
+'use strict';
+
+var webpack = require('webpack'),
+  path = require('path'),
+  pkg = { version: '0.1.0' };
+
+var siftRootPath = path.resolve('./');
 
 module.exports = {
-  module: {
-    rules: [
-      {
-        test: /\.vue$/,
-        loader: 'vue-loader',
-        options: {
-          loaders: {
-            // Since sass-loader (weirdly) has SCSS as its default parse mode, we map
-            // the "scss" and "sass" values for the lang attribute to the right configs here.
-            // other preprocessors should work out of the box, no loader config like this nessessary.
-            'scss': 'vue-style-loader!css-loader!sass-loader',
-            'sass': 'vue-style-loader!css-loader!sass-loader?indentedSyntax'
-          }
-          // other vue-loader options go here
-        }
-      },
-      {
-        test: /\.js$/,
-        loader: 'babel-loader',
-        exclude: /node_modules/
-      },
-      {
-        test: /\.(png|jpg|gif|svg)$/,
-        loader: 'file-loader',
-        options: {
-          name: '[name].[ext]?[hash]'
-        }
-      }
-    ]
-  },
+  cache: true,
   resolve: {
-    alias: {
+   // NOTE: resolves to $PROJECT_ROOT/ and allows to include files from there. E.g., to include a file from
+   // $PROJECT_ROOT/server use 'import settings from "server/settings.js"'.
+   root: [ siftRootPath ],
+   extensions: [ '', '.js', '.jsx', '.json', '.tmpl', '.vue' ],
+   alias: {
       'vue$': 'vue/dist/vue.common.js'
     }
   },
-  devServer: {
-    historyApiFallback: true,
-    noInfo: true
+  // NOTE: keeping that here in case it is necessary in the future (see https://webpack.github.io/docs/configuration.html#module-loaders):
+  // resolveLoader: {
+  //   root: [path.resolve('./node_modules')]
+  // },
+  module: {
+    loaders: [
+      { test: /\.vue$/, loader: "vue" },
+      {
+        test: /\.jsx?$/,
+        exclude: /node_modules/,
+        loader: 'babel-loader',
+        query: {
+          presets: [
+            // NOTE: use 'require.resolve' here as the presets are located in redsift-bundler's node_modules. If only
+            // listing the presets as ['es2015', 'react'] they would be resolved from $PROJECT_ROOT, which fails if
+            // they are not explicitly installed there.
+            // See https://github.com/babel/babel-loader/issues/149 for a discussion on the topic.
+            require.resolve('babel-preset-es2015'),
+            require.resolve('babel-preset-react'),
+            require.resolve('babel-preset-stage-0'),
+          ]
+        }
+      },
+      { test: /\.json$/, loader: 'json-loader' },
+      { test: /\.tmpl$/, loader: 'html-loader' },
+    ],
   },
-  performance: {
-    hints: false
-  },
-  devtool: '#eval-source-map'
-}
-
-if (process.env.NODE_ENV === 'production') {
-  module.exports.devtool = '#source-map'
-  // http://vue-loader.vuejs.org/en/workflow/production.html
-  module.exports.plugins = (module.exports.plugins || []).concat([
+  plugins: [
     new webpack.DefinePlugin({
-      'process.env': {
-        NODE_ENV: '"production"'
-      }
+      'process.env.NODE_ENV': JSON.stringify('production'),
+      VERSION: JSON.stringify(pkg.version)
     }),
-    new webpack.optimize.UglifyJsPlugin({
-      sourceMap: true,
-      compress: {
-        warnings: false
-      }
-    }),
-    new webpack.LoaderOptionsPlugin({
-      minimize: true
-    })
-  ])
-}
+    new webpack.NoErrorsPlugin(),
+    // new webpack.optimize.UglifyJsPlugin({
+    //   compress: {
+    //     warnings: false
+    //   }
+    // }),
+    new webpack.optimize.OccurenceOrderPlugin()
+  ],
+  devtool: 'source-map',
+  node: {
+    console: true,
+    fs: 'empty',
+    net: 'empty',
+    tls: 'empty'
+  }
+};

@@ -2,12 +2,10 @@
  * Hello Sift Sift. Frontend view entry point.
  */
 import { SiftView, registerSiftView } from '@redsift/sift-sdk-web';
-import * as VueGoogleMaps from 'vue2-google-maps';
 
 import Vue from 'vue';
-
-
-
+import VueRouter from 'vue-router';
+import * as VueGoogleMaps from 'vue2-google-maps';
 
 let app;
 
@@ -58,7 +56,7 @@ export default class MyView extends SiftView {
   willPresentView(value) {
     console.log('hello-sift: willPresentView: ', value);
   };
-  
+
   onHello(data) {
     console.log('tutorial-sift: onHello: ', data);
     // Object.keys(data).forEach((k) => {
