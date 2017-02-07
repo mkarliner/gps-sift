@@ -5,30 +5,17 @@
     <link rel="stylesheet" href="dist/css/style.min.css">
   </head>
   <body id="home">
-	<script src="https://unpkg.com/vue/dist/vue.js"></script>
-	<script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
-	<script src="https://unpkg.com/vue2-google-maps/dist/vue-router.js"></script>
 
 	<div id="app">
-	  <h1>Hello App!</h1>
-	  <p>
 	    <!-- use router-link component for navigation. -->
 	    <!-- specify the link by passing the `to` prop. -->
 	    <!-- <router-link> will be rendered as an `<a>` tag by default -->
-	    <router-link to="/foo">Go to Foo</router-link>
-	    <router-link to="/bar">Go to Bar</router-link>
+
+	    <router-link to="/devices">Device List</router-link>
+      <router-link to="/map">Map</router-link>
+      <router-link to="/register">Register Device</router-link>
+
 		<div id="app">
-		  {{ message }}
-		</div>
-		<div id="hook-uri">{{hook_uri}}</div>
-		
-		<!-- <gmap-map
-		  :center="{lat:10, lng:10}"
-		  map-type-id="terrain"
-		  :zoom="7"
-		  style="width: 500px; height: 300px"
-		></gmap-map> -->
-	  </p>
 	  <!-- route outlet -->
 	  <!-- component matched by the route will render here -->
 	  <router-view></router-view>

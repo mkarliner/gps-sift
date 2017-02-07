@@ -13,14 +13,10 @@ module.exports = {
    // $PROJECT_ROOT/server use 'import settings from "server/settings.js"'.
    root: [ siftRootPath ],
    extensions: [ '', '.js', '.jsx', '.json', '.tmpl', '.vue' ],
-   alias: {
-      'vue$': 'vue/dist/vue.common.js'
-    }
+  //  alias: {
+  //     'vue$': 'vue/dist/vue.common.js'
+  //   }
   },
-  // NOTE: keeping that here in case it is necessary in the future (see https://webpack.github.io/docs/configuration.html#module-loaders):
-  // resolveLoader: {
-  //   root: [path.resolve('./node_modules')]
-  // },
   module: {
     loaders: [
       { test: /\.vue$/, loader: "vue" },
@@ -42,20 +38,14 @@ module.exports = {
       },
       { test: /\.json$/, loader: 'json-loader' },
       { test: /\.tmpl$/, loader: 'html-loader' },
-    ],
+    ]
   },
   plugins: [
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify('production'),
       VERSION: JSON.stringify(pkg.version)
     }),
-    new webpack.NoErrorsPlugin(),
-    // new webpack.optimize.UglifyJsPlugin({
-    //   compress: {
-    //     warnings: false
-    //   }
-    // }),
-    new webpack.optimize.OccurenceOrderPlugin()
+    new webpack.NoErrorsPlugin()
   ],
   devtool: 'source-map',
   node: {

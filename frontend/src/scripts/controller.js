@@ -15,10 +15,10 @@ export default class MyController extends SiftController {
     console.log('hello-sift: loadView', state);
     // Register for storage update events on the "x" bucket so we can update the UI
     this.storage.subscribe(['who'], this._suHandler);
-	
+
 	return {
 		html: 'summary.html',
-		data: this.getWebhook().then(x => ({ name: 'no-one', hook_uri: x}))
+		data: this.getWebhooks().then(x => ({ name: 'no-one', hook_uri: x[0].value, owntracksUri: x[1].value}))
 	}
     // switch (state.type) {
 //       case 'email-thread':
@@ -33,7 +33,7 @@ export default class MyController extends SiftController {
 //       default:
 //         console.error('hello-sift: unknown Sift type: ', state.type);
 //     }
-	
+
   }
 
   // Event: storage update
@@ -45,12 +45,12 @@ export default class MyController extends SiftController {
       this.publish('name', xe);
     });
   }
-  
-  getWebhook() {
+
+  getWebhooks() {
      return this.storage.get({
        bucket: '_redsift',
-       keys: [ 'webhooks/curl_input' ]
-     }).then(d => d[0].value);    
+       keys: [ 'webhooks/curl_input', 'webhooks/owntracks' ]
+     });
    }
 
    getName() {
