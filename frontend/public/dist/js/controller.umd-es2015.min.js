@@ -94,14 +94,18 @@
 	  (0, _createClass3.default)(MyController, [{
 	    key: 'loadView',
 	    value: function loadView(state) {
+	      var _this2 = this;
+	
 	      console.log('hello-sift: loadView', state);
 	      // Register for storage update events on the "x" bucket so we can update the UI
-	      this.storage.subscribe(['who'], this._suHandler);
+	      this.storage.subscribe(['devices'], this._suHandler);
 	
 	      return {
 	        html: 'summary.html',
 	        data: this.getWebhooks().then(function (x) {
-	          return { name: 'no-one', hook_uri: x[0].value, owntracksUri: x[1].value };
+	          return _this2.getDevices().then(function (d) {
+	            return { passiveeyeUri: x[0].value, owntracksUri: x[1].value, devices: d.devices };
+	          });
 	        })
 	      };
 	      // switch (state.type) {
@@ -124,13 +128,13 @@
 	  }, {
 	    key: 'onStorageUpdate',
 	    value: function onStorageUpdate(value) {
-	      var _this2 = this;
+	      var _this3 = this;
 	
 	      console.log('hello-sift: onStorageUpdate: ', value);
-	      return this.getName().then(function (xe) {
+	      return this.getDevices().then(function (xe) {
 	        // Publish events from 'who' to view
 	        console.log("OSU: ", xe);
-	        _this2.publish('name', xe);
+	        _this3.publish('devices', xe);
 	      });
 	    }
 	  }, {
@@ -138,19 +142,18 @@
 	    value: function getWebhooks() {
 	      return this.storage.get({
 	        bucket: '_redsift',
-	        keys: ['webhooks/curl_input', 'webhooks/owntracks']
+	        keys: ['webhooks/passiveeye', 'webhooks/owntracks']
 	      });
 	    }
 	  }, {
-	    key: 'getName',
-	    value: function getName() {
+	    key: 'getDevices',
+	    value: function getDevices() {
 	      return this.storage.getAll({
-	        bucket: 'who',
-	        keys: ['whoname']
+	        bucket: 'devices'
 	      }).then(function (values) {
-	        console.log('hello-sift: getName returned:', values);
+	        console.log('hello-sift: GETALLDEVICES returned:', values);
 	        return {
-	          name: values[0].value
+	          devices: values
 	        };
 	      });
 	    }

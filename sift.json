@@ -23,9 +23,10 @@
 			"emails": {},
 			"slack-bot": {},
 			"webhooks": {
-				"curl_input": {
+				"passiveeye": {
 					"inbound": {
-						"uri": "{key}/{value}"
+						"uri": "pe",
+						"jsonPath": "{\"key\": \"$.body.device\", \"value\": $.body}"
 					}
 				},
 				"owntracks": {
@@ -40,15 +41,16 @@
 
 
 		"nodes": [{
-			"#": "JS Node",
+			"#": "PassiveEye",
 			"input": {
-				"bucket": "curl_input"
+				"bucket": "passiveeye"
 			},
 			"implementation": {
 				"javascript": "server/node1.js"
 			},
 			"outputs": {
-				"llevents": {}
+				"llevents": {},
+				"devices": {}
 			}
 		},
 		{
@@ -83,6 +85,9 @@
 		"outputs": {
 			"exports": {
 				"who": {
+					"key$schema": "string"
+				},
+				"devices": {
 					"key$schema": "string"
 				}
 			}

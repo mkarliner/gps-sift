@@ -14,11 +14,16 @@ export default class MyController extends SiftController {
   loadView(state) {
     console.log('hello-sift: loadView', state);
     // Register for storage update events on the "x" bucket so we can update the UI
-    this.storage.subscribe(['who'], this._suHandler);
+    this.storage.subscribe(['devices'], this._suHandler);
+
+
 
 	return {
 		html: 'summary.html',
-		data: this.getWebhooks().then(x => ({ name: 'no-one', hook_uri: x[0].value, owntracksUri: x[1].value}))
+		data: this.getWebhooks().then(x => ( this.getDevices().then(d=>(
+
+
+    {passiveeyeUri: x[0].value, owntracksUri: x[1].value, devices: d.devices}))))
 	}
     // switch (state.type) {
 //       case 'email-thread':
@@ -39,28 +44,27 @@ export default class MyController extends SiftController {
   // Event: storage update
   onStorageUpdate(value) {
     console.log('hello-sift: onStorageUpdate: ', value);
-    return this.getName().then(xe => {
+    return this.getDevices().then(xe => {
       // Publish events from 'who' to view
 	  console.log("OSU: ", xe)
-      this.publish('name', xe);
+      this.publish('devices', xe);
     });
   }
 
   getWebhooks() {
      return this.storage.get({
        bucket: '_redsift',
-       keys: [ 'webhooks/curl_input', 'webhooks/owntracks' ]
+       keys: [ 'webhooks/passiveeye', 'webhooks/owntracks' ]
      });
    }
 
-   getName() {
+   getDevices() {
     return this.storage.getAll({
-      bucket: 'who',
-		keys: ['whoname']
+      bucket: 'devices'
     }).then((values) => {
-      console.log('hello-sift: getName returned:', values);
+      console.log('hello-sift: GETALLDEVICES returned:', values);
       return {
-		  name: values[0].value
+		      devices: values
       };
     });
   }

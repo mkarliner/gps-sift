@@ -15,8 +15,8 @@
 module.exports = function (got) {
   const inData = got.in;
 
-  console.log('hello-sift: node1.js: data received:', inData);
-  
+  console.log('hello-sift: PassiveEye: data received:', inData);
+
   console.log("RX: ", inData.data[0].key, inData.data[0].value.toString())
 
   // const json = inData.data.map(d => JSON.parse(d.value));
@@ -26,8 +26,8 @@ module.exports = function (got) {
  //  })
 
   return [{
-	  name: 'hello',
-    key: 'NAME',
+	  name: 'devices',
+    key:  inData.data[0].key,
     value: inData.data[0].value.toString()
   }];
 };

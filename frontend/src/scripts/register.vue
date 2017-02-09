@@ -7,6 +7,9 @@
     <h1>Registering your device</h1>
     <div>Register your device by scanning the following code into the Owntracks app</div>
     <div id="placeHolder" v-html="qrcode"></div>
+
+    <div>PassiveEye devices should send data to this uri</div>
+    <div v-html="passiveeyeUri"></div>
   </div>
 </template>
 
@@ -35,7 +38,8 @@ export default {
   // document.getElementById('placeHolder').innerHTML = qr.createImgTag();
     return {
         foo: "asdfa",
-        qrcode: qr.createImgTag()
+        qrcode: qr.createImgTag(),
+        passiveeyeUri: this.$store.state.passiveeyeUri
     }
   }
 }

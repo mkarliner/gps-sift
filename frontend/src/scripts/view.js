@@ -11,6 +11,7 @@ import Vuex from 'vuex'
 import * as VueGoogleMaps from 'vue2-google-maps';
 import Map from './map.vue'
 import Register from './register.vue'
+import Devices from './devices.vue'
 import qrcode from 'qrcode-generator'
 
 Vue.use(VueRouter);
@@ -23,31 +24,31 @@ var app;
 
 Vue.config.devtools = true
 
-console.log("FOOOO")
+// console.log("FOOOO")
 
 // export  {[
 //   app]
 // };
 
 // const Register = { template: '<div>foo</div>' }
-const Devices = { template: '<div>bar {{owntracksUri}}</div>', props: ['owntracksUri']}
+// const Devices = { template: '<div>bar {{owntracksUri}}</div>', props: ['owntracksUri']}
 
-let Foo = Vue.component('rs-foo', {
-  props: ['foople'],
-  template: '<p>props {{foople}} here<p>',
-  data: function(){
-    return {
-      foople: this.$store.state.owntracksUri
-    }
-  }
-})
+// let Foo = Vue.component('rs-foo', {
+//   props: ['foople'],
+//   template: '<p>props {{foople}} here<p>',
+//   data: function(){
+//     return {
+//       foople: this.$store.state.owntracksUri
+//     }
+//   }
+// })
 
 
 const routes = [
   { path: '/map', component: Map },
   { path: '/devices', component: Devices },
-  { path: '/register', component: Register, props: {owntracksUri: "asdfad"}},
-  { path: '/foo', component:  Foo, props: {foople: "dddddd"}}
+  { path: '/register', component: Register},
+  // { path: '/foo', component:  Foo, props: {foople: "dddddd"}}
 ]
 
 const router = new VueRouter({
@@ -57,12 +58,22 @@ const router = new VueRouter({
 
 const store = new Vuex.Store({
   state: {
-    owntracksUri: "nouriyet"
+    owntracksUri: "nouriyet",
+    passiveeyeUri: "nopeyet",
+    devices: []
   },
   mutations: {
     setOwntracksUri(state, uri){
       console.log("SOTURI", uri);
       state.owntracksUri = uri;
+    },
+    setPassiveEyeUri(state, uri){
+      console.log("SPEURI", uri);
+      state.passiveeyeUri = uri;
+    },
+    setDevices(state, devices){
+      console.log("SPEDEV", devices);
+      state.devices = devices;
     }
   }
 });
@@ -71,7 +82,7 @@ export default class MyView extends SiftView {
   constructor() {
     // You have to call the super() method to initialize the base class.
     super();
-	this.controller.subscribe('name', this.onHello.bind(this));
+	this.controller.subscribe('devices', this.onDevices.bind(this));
 
 	Vue.use(VueGoogleMaps, {
 	    load: {
@@ -84,12 +95,11 @@ app = new Vue({
     store,
 	  el: '#app',
 	    data: function() {
-        console.log("DATA: ", "owntracks")
         return{
-          message: 'Hello Mike Vue!',
-        hook_uri: 'adsadf',
-        owntracksUri: "none",
-        foople: "averynice tings"
+        //   message: 'Hello Mike Vue!',
+        // hook_uri: 'adsadf',
+        // owntracksUri: "none",
+        // foople: "averynice tings"
         }
 	    }
 	}).$mount('#app')
@@ -98,11 +108,13 @@ app = new Vue({
   // for more info: http://docs.redsift.com/docs/client-code-siftview
   presentView(value) {
     console.log('hello-sift: presentView: ', value);
-	app.message = value.data.name;
+	// app.message = value.data.name;
 	// app.hook_uri = value.data.hook_uri;
   store.commit('setOwntracksUri', value.data.owntracksUri);
-  this.owntracksUri = value.data.owntracksUri;
-	app.owntracksUri = value.data.owntracksUri;
+  store.commit('setPassiveEyeUri', value.data.passiveeyeUri);
+  store.commit('setDevices', value.data.devices);
+  // this.owntracksUri = value.data.owntracksUri;
+	// app.owntracksUri = value.data.owntracksUri;
 //   var typeNumber = 4;
 // var errorCorrectionLevel = 'L';
 // var qr = qrcode(typeNumber, errorCorrectionLevel);
@@ -117,12 +129,13 @@ app = new Vue({
     console.log('hello-sift: willPresentView: ', value);
   };
 
-  onHello(data) {
-    console.log('tutorial-sift: onHello: ', data);
+  onDevices(data) {
+    console.log('DEVICE DATA: ', data);
+    store.commit('setDevices', data);
     // Object.keys(data).forEach((k) => {
     //   document.getElementById(k).textContent = data[k];
     // });
-	app.message = data['name']
+	// app.message = data['devices']
   }
 
 }

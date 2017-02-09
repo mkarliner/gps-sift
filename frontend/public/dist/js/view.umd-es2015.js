@@ -96,6 +96,10 @@
 	
 	var _register2 = _interopRequireDefault(_register);
 	
+	var _devices = __webpack_require__(175);
+	
+	var _devices2 = _interopRequireDefault(_devices);
+	
 	var _qrcodeGenerator = __webpack_require__(173);
 	
 	var _qrcodeGenerator2 = _interopRequireDefault(_qrcodeGenerator);
@@ -104,36 +108,37 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	/**
-	 * Hello Sift Sift. Frontend view entry point.
-	 */
-	_vue2.default.use(_vueRouter2.default);
+	_vue2.default.use(_vueRouter2.default); /**
+	                                         * Hello Sift Sift. Frontend view entry point.
+	                                         */
+	
 	_vue2.default.use(_vuex2.default);
 	
 	var app;
 	
 	_vue2.default.config.devtools = true;
 	
-	console.log("FOOOO");
+	// console.log("FOOOO")
 	
 	// export  {[
 	//   app]
 	// };
 	
 	// const Register = { template: '<div>foo</div>' }
-	var Devices = { template: '<div>bar {{owntracksUri}}</div>', props: ['owntracksUri'] };
+	// const Devices = { template: '<div>bar {{owntracksUri}}</div>', props: ['owntracksUri']}
 	
-	var Foo = _vue2.default.component('rs-foo', {
-	  props: ['foople'],
-	  template: '<p>props {{foople}} here<p>',
-	  data: function data() {
-	    return {
-	      foople: this.$store.state.owntracksUri
-	    };
-	  }
-	});
+	// let Foo = Vue.component('rs-foo', {
+	//   props: ['foople'],
+	//   template: '<p>props {{foople}} here<p>',
+	//   data: function(){
+	//     return {
+	//       foople: this.$store.state.owntracksUri
+	//     }
+	//   }
+	// })
 	
-	var routes = [{ path: '/map', component: _map2.default }, { path: '/devices', component: Devices }, { path: '/register', component: _register2.default, props: { owntracksUri: "asdfad" } }, { path: '/foo', component: Foo, props: { foople: "dddddd" } }];
+	
+	var routes = [{ path: '/map', component: _map2.default }, { path: '/devices', component: _devices2.default }, { path: '/register', component: _register2.default }];
 	
 	var router = new _vueRouter2.default({
 	  mode: 'history',
@@ -142,12 +147,22 @@
 	
 	var store = new _vuex2.default.Store({
 	  state: {
-	    owntracksUri: "nouriyet"
+	    owntracksUri: "nouriyet",
+	    passiveeyeUri: "nopeyet",
+	    devices: []
 	  },
 	  mutations: {
 	    setOwntracksUri: function setOwntracksUri(state, uri) {
 	      console.log("SOTURI", uri);
 	      state.owntracksUri = uri;
+	    },
+	    setPassiveEyeUri: function setPassiveEyeUri(state, uri) {
+	      console.log("SPEURI", uri);
+	      state.passiveeyeUri = uri;
+	    },
+	    setDevices: function setDevices(state, devices) {
+	      console.log("SPEDEV", devices);
+	      state.devices = devices;
 	    }
 	  }
 	});
@@ -162,7 +177,7 @@
 	    // You have to call the super() method to initialize the base class.
 	
 	
-	    _this.controller.subscribe('name', _this.onHello.bind(_this));
+	    _this.controller.subscribe('devices', _this.onDevices.bind(_this));
 	
 	    _vue2.default.use(VueGoogleMaps, {
 	      load: {
@@ -174,12 +189,11 @@
 	      store: store,
 	      el: '#app',
 	      data: function data() {
-	        console.log("DATA: ", "owntracks");
 	        return {
-	          message: 'Hello Mike Vue!',
-	          hook_uri: 'adsadf',
-	          owntracksUri: "none",
-	          foople: "averynice tings"
+	          //   message: 'Hello Mike Vue!',
+	          // hook_uri: 'adsadf',
+	          // owntracksUri: "none",
+	          // foople: "averynice tings"
 	        };
 	      }
 	    }).$mount('#app');
@@ -193,11 +207,13 @@
 	    key: 'presentView',
 	    value: function presentView(value) {
 	      console.log('hello-sift: presentView: ', value);
-	      app.message = value.data.name;
+	      // app.message = value.data.name;
 	      // app.hook_uri = value.data.hook_uri;
 	      store.commit('setOwntracksUri', value.data.owntracksUri);
-	      this.owntracksUri = value.data.owntracksUri;
-	      app.owntracksUri = value.data.owntracksUri;
+	      store.commit('setPassiveEyeUri', value.data.passiveeyeUri);
+	      store.commit('setDevices', value.data.devices);
+	      // this.owntracksUri = value.data.owntracksUri;
+	      // app.owntracksUri = value.data.owntracksUri;
 	      //   var typeNumber = 4;
 	      // var errorCorrectionLevel = 'L';
 	      // var qr = qrcode(typeNumber, errorCorrectionLevel);
@@ -213,13 +229,14 @@
 	      console.log('hello-sift: willPresentView: ', value);
 	    }
 	  }, {
-	    key: 'onHello',
-	    value: function onHello(data) {
-	      console.log('tutorial-sift: onHello: ', data);
+	    key: 'onDevices',
+	    value: function onDevices(data) {
+	      console.log('DEVICE DATA: ', data);
+	      store.commit('setDevices', data);
 	      // Object.keys(data).forEach((k) => {
 	      //   document.getElementById(k).textContent = data[k];
 	      // });
-	      app.message = data['name'];
+	      // app.message = data['devices']
 	    }
 	  }]);
 	  return MyView;
@@ -36983,7 +37000,7 @@
 	
 	
 	// module
-	exports.push([module.id, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"register.vue","sourceRoot":"webpack://"}]);
+	exports.push([module.id, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"register.vue","sourceRoot":"webpack://"}]);
 	
 	// exports
 
@@ -37027,10 +37044,14 @@
 	    // document.getElementById('placeHolder').innerHTML = qr.createImgTag();
 	    return {
 	      foo: "asdfa",
-	      qrcode: qr.createImgTag()
+	      qrcode: qr.createImgTag(),
+	      passiveeyeUri: this.$store.state.passiveeyeUri
 	    };
 	  }
 	}; //
+	//
+	//
+	//
 	//
 	//
 	//
@@ -39121,6 +39142,10 @@
 	    domProps: {
 	      "innerHTML": _vm._s(_vm.qrcode)
 	    }
+	  }), _vm._v(" "), _c('div', [_vm._v("PassiveEye devices should send data to this uri")]), _vm._v(" "), _c('div', {
+	    domProps: {
+	      "innerHTML": _vm._s(_vm.passiveeyeUri)
+	    }
 	  })])
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
@@ -39128,6 +39153,161 @@
 	  module.hot.accept()
 	  if (module.hot.data) {
 	     require("vue-hot-reload-api").rerender("data-v-203fd193", module.exports)
+	  }
+	}
+
+/***/ },
+/* 175 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(console) {var __vue_exports__, __vue_options__
+	var __vue_styles__ = {}
+	
+	/* styles */
+	__webpack_require__(176)
+	
+	/* script */
+	__vue_exports__ = __webpack_require__(178)
+	
+	/* template */
+	var __vue_template__ = __webpack_require__(179)
+	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
+	if (
+	  typeof __vue_exports__.default === "object" ||
+	  typeof __vue_exports__.default === "function"
+	) {
+	if (Object.keys(__vue_exports__).some(function (key) { return key !== "default" && key !== "__esModule" })) {console.error("named exports are not supported in *.vue files.")}
+	__vue_options__ = __vue_exports__ = __vue_exports__.default
+	}
+	if (typeof __vue_options__ === "function") {
+	  __vue_options__ = __vue_options__.options
+	}
+	__vue_options__.__file = "/root/sift/frontend/src/scripts/devices.vue"
+	__vue_options__.render = __vue_template__.render
+	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
+	
+	/* hot reload */
+	if (false) {(function () {
+	  var hotAPI = require("vue-hot-reload-api")
+	  hotAPI.install(require("vue"), false)
+	  if (!hotAPI.compatible) return
+	  module.hot.accept()
+	  if (!module.hot.data) {
+	    hotAPI.createRecord("data-v-2536141d", __vue_options__)
+	  } else {
+	    hotAPI.reload("data-v-2536141d", __vue_options__)
+	  }
+	})()}
+	if (__vue_options__.functional) {console.error("[vue-loader] devices.vue: functional components are not supported and should be defined in plain js files using render functions.")}
+	
+	module.exports = __vue_exports__
+	
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
+
+/***/ },
+/* 176 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+	
+	// load the styles
+	var content = __webpack_require__(177);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(131)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../node_modules/css-loader/index.js?sourceMap!./../../node_modules/vue-loader/lib/style-rewriter.js?id=data-v-2536141d!./../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./devices.vue", function() {
+				var newContent = require("!!./../../node_modules/css-loader/index.js?sourceMap!./../../node_modules/vue-loader/lib/style-rewriter.js?id=data-v-2536141d!./../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./devices.vue");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 177 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(130)();
+	// imports
+	
+	
+	// module
+	exports.push([module.id, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"devices.vue","sourceRoot":"webpack://"}]);
+	
+	// exports
+
+
+/***/ },
+/* 178 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(console) {"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	
+	
+	exports.default = {
+	  data: function data() {
+	    console.log("DEVS: ", this.$store.state.devices);
+	    return {
+	      devices: this.$store.state.devices.map(function (dev) {
+	        return {
+	          key: dev.key,
+	          value: JSON.parse(dev.value)
+	        };
+	      })
+	    };
+	  }
+	};
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
+
+/***/ },
+/* 179 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+	  return _c('div', [_c('h1', [_vm._v("Device List")]), _vm._v(" "), _c('ul', {
+	    attrs: {
+	      "id": "device-list"
+	    }
+	  }, _vm._l((_vm.devices), function(dev) {
+	    return _c('li', [_vm._v("\n      id: " + _vm._s(dev.key) + "\n      rssi: " + _vm._s(dev.value.rssi) + "\n      lat: " + _vm._s(dev.value.lat) + "\n      long: " + _vm._s(dev.value.lng) + "\n      seqNum: " + _vm._s(dev.value.seqNumber) + "\n      " + _vm._s(new Date(dev.value.time * 1000).toString()) + "\n  ")])
+	  }))])
+	},staticRenderFns: []}
+	module.exports.render._withStripped = true
+	if (false) {
+	  module.hot.accept()
+	  if (module.hot.data) {
+	     require("vue-hot-reload-api").rerender("data-v-2536141d", module.exports)
 	  }
 	}
 
