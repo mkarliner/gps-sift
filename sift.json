@@ -62,7 +62,8 @@
 						"javascript": "server/owntracks.js"
 					},
 					"outputs": {
-						"llevents": {}
+						"llevents": {},
+						"devices": {}
 					}
 				},
 		{

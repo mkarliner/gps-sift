@@ -15,19 +15,28 @@
 module.exports = function (got) {
   const inData = got.in;
 
-  console.log('hello-sift: PassiveEye: data received:', inData);
 
-  console.log("RX: ", inData.data[0].key, inData.data[0].value.toString())
+  console.log("PERX: ", inData.data[0].key, inData.data[0].value.toString())
 
-  // const json = inData.data.map(d => JSON.parse(d.value));
- //
- //  json.forEach(function(value, i){
- //    console.log('datum#', i, 'value:', value)
- //  })
+  const hookData = inData.data.map(d => JSON.parse(d.value));
 
-  return [{
-	  name: 'devices',
-    key:  inData.data[0].key,
-    value: inData.data[0].value.toString()
-  }];
+ //Normalize the data from Owntracks to the internal device format
+  let devData = hookData.map((d)=>{
+    console.log("DMAP: ", d);
+    console.log("LL: ", d.data.substr(4,6), d.data.substr(11,6))
+    return {
+      name: "devices",
+      key: d.device,
+      value: {
+        lat: `${d.data.substr(4,2)}.${d.data.substr(6,6)}`,
+        lng: `-${d.data.substr(12,2)}.${d.data.substr(14,6)}`,
+        time: d.time,
+        rssi: d.rssi
+      }
+    }
+  })
+
+  console.log("DDD ", devData )
+
+  return  devData;
 };

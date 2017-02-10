@@ -15,19 +15,27 @@
 module.exports = function (got) {
   const inData = got.in;
 
-  console.log('hello-sift: node1.js: data received:', inData);
-  
-  console.log("RX: ", inData.data[0].key, inData.data[0].value.toString())
+  console.log('OTRACKS: data received:', inData);
 
-  // const json = inData.data.map(d => JSON.parse(d.value));
- //
- //  json.forEach(function(value, i){
- //    console.log('datum#', i, 'value:', value)
- //  })
+  console.log("OTRX: ", inData.data[0].key, inData.data[0].value.toString())
 
-  return [{
-	  name: 'hello',
-    key: 'NAME',
-    value: inData.data[0].value.toString()
-  }];
+  const hookData = inData.data.map(d => JSON.parse(d.value));
+
+ //Normalize the data from Owntracks to the internal device format
+  let devData = hookData.map((d)=>{
+    console.log("DMAP: ", d);
+    return {
+      name: "devices",
+      key: d.tid,
+      value: {
+        lat: d.lat,
+        lng: d.lon,
+        time: d.tst
+      }
+    }
+  })
+
+  console.log("DDD ", devData )
+
+  return  devData;
 };

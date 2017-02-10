@@ -104,39 +104,25 @@
 	
 	var _qrcodeGenerator2 = _interopRequireDefault(_qrcodeGenerator);
 	
+	var _vuexRouterSync = __webpack_require__(180);
+	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	_vue2.default.use(_vueRouter2.default); /**
-	                                         * Hello Sift Sift. Frontend view entry point.
-	                                         */
+	//import store from './vuex/store' // vuex store instance
+	//import router from './router' // vue-router instance
 	
+	
+	/**
+	 * Hello Sift Sift. Frontend view entry point.
+	 */
+	_vue2.default.use(_vueRouter2.default);
 	_vue2.default.use(_vuex2.default);
 	
 	var app;
 	
 	_vue2.default.config.devtools = true;
-	
-	// console.log("FOOOO")
-	
-	// export  {[
-	//   app]
-	// };
-	
-	// const Register = { template: '<div>foo</div>' }
-	// const Devices = { template: '<div>bar {{owntracksUri}}</div>', props: ['owntracksUri']}
-	
-	// let Foo = Vue.component('rs-foo', {
-	//   props: ['foople'],
-	//   template: '<p>props {{foople}} here<p>',
-	//   data: function(){
-	//     return {
-	//       foople: this.$store.state.owntracksUri
-	//     }
-	//   }
-	// })
-	
 	
 	var routes = [{ path: '/map', component: _map2.default }, { path: '/devices', component: _devices2.default }, { path: '/register', component: _register2.default }];
 	
@@ -149,7 +135,8 @@
 	  state: {
 	    owntracksUri: "nouriyet",
 	    passiveeyeUri: "nopeyet",
-	    devices: []
+	    devices: [],
+	    clock: new Date()
 	  },
 	  mutations: {
 	    setOwntracksUri: function setOwntracksUri(state, uri) {
@@ -163,9 +150,18 @@
 	    setDevices: function setDevices(state, devices) {
 	      console.log("SPEDEV", devices);
 	      state.devices = devices;
+	    },
+	    setClock: function setClock(state, now) {
+	      console.log("CLOCK", now);
+	      state.clock = now;
 	    }
 	  }
 	});
+	(0, _vuexRouterSync.sync)(store, router); // done.
+	setInterval(function () {
+	  console.log("FO");
+	  store.commit('setClock', new Date());
+	}, 20 * 1000);
 	
 	var MyView = function (_SiftView) {
 	  (0, _inherits3.default)(MyView, _SiftView);
@@ -206,7 +202,7 @@
 	  (0, _createClass3.default)(MyView, [{
 	    key: 'presentView',
 	    value: function presentView(value) {
-	      console.log('hello-sift: presentView: ', value);
+	      console.log('PRESENTVIEW: ', value);
 	      // app.message = value.data.name;
 	      // app.hook_uri = value.data.hook_uri;
 	      store.commit('setOwntracksUri', value.data.owntracksUri);
@@ -231,8 +227,8 @@
 	  }, {
 	    key: 'onDevices',
 	    value: function onDevices(data) {
-	      console.log('DEVICE DATA: ', data);
-	      store.commit('setDevices', data);
+	      console.log('DEVICE DATA: ', data.devices);
+	      store.commit('setDevices', data.devices);
 	      // Object.keys(data).forEach((k) => {
 	      //   document.getElementById(k).textContent = data[k];
 	      // });
@@ -36831,20 +36827,28 @@
 	
 	
 	// module
-	exports.push([module.id, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"map.vue","sourceRoot":"webpack://"}]);
+	exports.push([module.id, "\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"map.vue","sourceRoot":"webpack://"}]);
 	
 	// exports
 
 
 /***/ },
 /* 167 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
-	'use strict';
+	/* WEBPACK VAR INJECTION */(function(console) {"use strict";
 	
 	Object.defineProperty(exports, "__esModule", {
-	  value: true
+	    value: true
 	});
+	
+	var _typeof2 = __webpack_require__(40);
+	
+	var _typeof3 = _interopRequireDefault(_typeof2);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	//
 	//
 	//
 	//
@@ -36863,14 +36867,45 @@
 	//
 	//
 	
+	
 	exports.default = {
-	  data: function data() {
-	    return {
-	      center: { lat: 51.556002, lng: -0.224031 },
-	      msg: 'Hello Mikey'
-	    };
-	  }
+	    data: function data() {},
+	
+	    computed: {
+	        center: function center() {
+	            var firstDev = this.$store.state.devices[0].value;
+	            var d = JSON.parse(firstDev);
+	            return { lat: parseFloat(d.lat), lng: parseFloat(d.lng) };
+	        },
+	        markers: function markers() {
+	            console.log("Before big bang", (0, _typeof3.default)(this.$store.state.devices));
+	            // if(typeof this.$store.state.devices.map === "undefined") {
+	            //   return [];
+	            // }
+	            var devs = this.$store.state.devices.map(function (dev) {
+	                var d = JSON.parse(dev.value);
+	                return { lat: parseFloat(d.lat), lng: parseFloat(d.lng) };
+	            });
+	            console.log("DEVS: ", this.$store.state.devices);
+	            return devs;
+	        },
+	        devices: function devices() {
+	            console.log("Before big bang", (0, _typeof3.default)(this.$store.state.devices));
+	            // if(typeof this.$store.state.devices.map === "undefined") {
+	            //   return [];
+	            // }
+	            var devs = this.$store.state.devices.map(function (dev) {
+	                return {
+	                    key: dev.key,
+	                    value: JSON.parse(dev.value)
+	                };
+	            });
+	            console.log("DEVS: ", this.$store.state.devices);
+	            return devs;
+	        }
+	    }
 	};
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ },
 /* 168 */
@@ -36887,27 +36922,23 @@
 	      "map-type-id": "terrain",
 	      "zoom": 15
 	    }
-	  }, [_c('gmap-marker', {
-	    attrs: {
-	      "enabled": true,
-	      "opacity": 1,
-	      "position": {
-	        lat: 51.556002,
-	        lng: -0.224031
+	  }, [_vm._l((_vm.markers), function(m) {
+	    return _c('gmap-marker', {
+	      attrs: {
+	        "position": m,
+	        "clickable": true,
+	        "draggable": false
 	      }
-	    }
-	  }, [_c('gmap-circle', {
+	    })
+	  }), _vm._v(" "), _c('gmap-circle', {
 	    attrs: {
-	      "center": {
-	        lat: 51.556002,
-	        lng: -0.224031
-	      },
+	      "center": _vm.center,
 	      "radius": 100,
 	      "options": {
 	        editable: true
 	      }
 	    }
-	  })], 1)], 1)
+	  })], 2)
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 	if (false) {
@@ -37000,7 +37031,7 @@
 	
 	
 	// module
-	exports.push([module.id, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"register.vue","sourceRoot":"webpack://"}]);
+	exports.push([module.id, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"register.vue","sourceRoot":"webpack://"}]);
 	
 	// exports
 
@@ -37009,7 +37040,7 @@
 /* 172 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function(console) {'use strict';
+	/* WEBPACK VAR INJECTION */(function(console) {"use strict";
 	
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
@@ -37033,6 +37064,9 @@
 	      default: "nomessage"
 	    }
 	  },
+	  destroyed: function destroyed() {
+	    console.log("DESTROYED: ", this);
+	  },
 	  data: function data() {
 	    var typeNumber = 4;
 	    var errorCorrectionLevel = 'L';
@@ -37045,10 +37079,12 @@
 	    return {
 	      foo: "asdfa",
 	      qrcode: qr.createImgTag(),
-	      passiveeyeUri: this.$store.state.passiveeyeUri
+	      passiveeyeUri: this.$store.state.passiveeyeUri,
+	      owntracksUri: this.$store.state.owntracksUri
 	    };
 	  }
 	}; //
+	//
 	//
 	//
 	//
@@ -39135,7 +39171,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return _c('div', [_c('h1', [_vm._v("Registering your device")]), _vm._v(" "), _c('div', [_vm._v("Register your device by scanning the following code into the Owntracks app")]), _vm._v(" "), _c('div', {
+	  return _c('div', [_c('h1', [_vm._v("Registering your device")]), _vm._v(" "), _c('div', [_vm._v("Register your device by scanning the following code into the Owntracks app")]), _vm._v(" "), _c('div', [_vm._v(_vm._s(_vm.owntracksUri))]), _vm._v(" "), _c('div', {
 	    attrs: {
 	      "id": "placeHolder"
 	    },
@@ -39239,7 +39275,7 @@
 	
 	
 	// module
-	exports.push([module.id, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"devices.vue","sourceRoot":"webpack://"}]);
+	exports.push([module.id, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"devices.vue","sourceRoot":"webpack://"}]);
 	
 	// exports
 
@@ -39253,6 +39289,15 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
+	
+	var _typeof2 = __webpack_require__(40);
+	
+	var _typeof3 = _interopRequireDefault(_typeof2);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	//
+	//
 	//
 	//
 	//
@@ -39276,16 +39321,35 @@
 	
 	
 	exports.default = {
-	  data: function data() {
-	    console.log("DEVS: ", this.$store.state.devices);
-	    return {
-	      devices: this.$store.state.devices.map(function (dev) {
+	  data: function data() {},
+	
+	  beforeDestroy: function beforeDestroy() {
+	    console.log("DESTROYED: ", this);
+	    this.$store.state == {};
+	  },
+	  created: function created() {
+	    // `this` points to the vm instance
+	    console.log('CREATED:  ' + this);
+	  },
+	  computed: {
+	    devices: function devices() {
+	      console.log("Before big bang", (0, _typeof3.default)(this.$store.state.devices));
+	      // if(typeof this.$store.state.devices.map === "undefined") {
+	      //   return [];
+	      // }
+	      var devs = this.$store.state.devices.map(function (dev) {
+	        console.log("MAP: ", dev);
 	        return {
 	          key: dev.key,
 	          value: JSON.parse(dev.value)
 	        };
-	      })
-	    };
+	      });
+	      console.log("DEVS: ", this.$store.state.devices);
+	      return devs;
+	    },
+	    clock: function clock() {
+	      return this.$store.state.clock.toString();
+	    }
 	  }
 	};
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
@@ -39301,7 +39365,7 @@
 	    }
 	  }, _vm._l((_vm.devices), function(dev) {
 	    return _c('li', [_vm._v("\n      id: " + _vm._s(dev.key) + "\n      rssi: " + _vm._s(dev.value.rssi) + "\n      lat: " + _vm._s(dev.value.lat) + "\n      long: " + _vm._s(dev.value.lng) + "\n      seqNum: " + _vm._s(dev.value.seqNumber) + "\n      " + _vm._s(new Date(dev.value.time * 1000).toString()) + "\n  ")])
-	  }))])
+	  })), _vm._v(" "), _c('div', [_vm._v(" CLOCK" + _vm._s(_vm.clock))])])
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 	if (false) {
@@ -39310,6 +39374,67 @@
 	     require("vue-hot-reload-api").rerender("data-v-2536141d", module.exports)
 	  }
 	}
+
+/***/ },
+/* 180 */
+/***/ function(module, exports) {
+
+	exports.sync = function (store, router, options) {
+	  var moduleName = (options || {}).moduleName || 'route'
+	
+	  store.registerModule(moduleName, {
+	    state: cloneRoute(router.currentRoute),
+	    mutations: {
+	      'router/ROUTE_CHANGED': function (state, transition) {
+	        store.state[moduleName] = cloneRoute(transition.to, transition.from)
+	      }
+	    }
+	  })
+	
+	  var isTimeTraveling = false
+	  var currentPath
+	
+	  // sync router on store change
+	  store.watch(
+	    function (state) { return state[moduleName] },
+	    function (route) {
+	      if (route.fullPath === currentPath) {
+	        return
+	      }
+	      isTimeTraveling = true
+	      currentPath = route.fullPath
+	      router.push(route)
+	    },
+	    { sync: true }
+	  )
+	
+	  // sync store on router navigation
+	  router.afterEach(function (to, from) {
+	    if (isTimeTraveling) {
+	      isTimeTraveling = false
+	      return
+	    }
+	    currentPath = to.fullPath
+	    store.commit('router/ROUTE_CHANGED', { to: to, from: from })
+	  })
+	}
+	
+	function cloneRoute (to, from) {
+	  var clone = {
+	    name: to.name,
+	    path: to.path,
+	    hash: to.hash,
+	    query: to.query,
+	    params: to.params,
+	    fullPath: to.fullPath,
+	    meta: to.meta
+	  }
+	  if (from) {
+	    clone.from = cloneRoute(from)
+	  }
+	  return Object.freeze(clone)
+	}
+
 
 /***/ }
 /******/ ]);

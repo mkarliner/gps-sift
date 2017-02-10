@@ -14,6 +14,12 @@ import Register from './register.vue'
 import Devices from './devices.vue'
 import qrcode from 'qrcode-generator'
 
+import { sync } from 'vuex-router-sync'
+//import store from './vuex/store' // vuex store instance
+//import router from './router' // vue-router instance
+
+
+
 Vue.use(VueRouter);
 Vue.use(Vuex);
 
@@ -24,24 +30,6 @@ var app;
 
 Vue.config.devtools = true
 
-// console.log("FOOOO")
-
-// export  {[
-//   app]
-// };
-
-// const Register = { template: '<div>foo</div>' }
-// const Devices = { template: '<div>bar {{owntracksUri}}</div>', props: ['owntracksUri']}
-
-// let Foo = Vue.component('rs-foo', {
-//   props: ['foople'],
-//   template: '<p>props {{foople}} here<p>',
-//   data: function(){
-//     return {
-//       foople: this.$store.state.owntracksUri
-//     }
-//   }
-// })
 
 
 const routes = [
@@ -56,11 +44,12 @@ const router = new VueRouter({
   routes // short for routes: routes
 });
 
-const store = new Vuex.Store({
+ const store = new Vuex.Store({
   state: {
     owntracksUri: "nouriyet",
     passiveeyeUri: "nopeyet",
-    devices: []
+    devices: [],
+    clock: new Date()
   },
   mutations: {
     setOwntracksUri(state, uri){
@@ -74,9 +63,19 @@ const store = new Vuex.Store({
     setDevices(state, devices){
       console.log("SPEDEV", devices);
       state.devices = devices;
+    },
+    setClock(state, now){
+      console.log("CLOCK", now);
+      state.clock = now;
     }
   }
 });
+sync(store, router) // done.
+setInterval(function(){
+  console.log("FO")
+  store.commit('setClock', new Date())
+}, 20 * 1000);
+
 
 export default class MyView extends SiftView {
   constructor() {
@@ -107,7 +106,7 @@ app = new Vue({
 
   // for more info: http://docs.redsift.com/docs/client-code-siftview
   presentView(value) {
-    console.log('hello-sift: presentView: ', value);
+    console.log('PRESENTVIEW: ', value);
 	// app.message = value.data.name;
 	// app.hook_uri = value.data.hook_uri;
   store.commit('setOwntracksUri', value.data.owntracksUri);
@@ -130,8 +129,8 @@ app = new Vue({
   };
 
   onDevices(data) {
-    console.log('DEVICE DATA: ', data);
-    store.commit('setDevices', data);
+    console.log('DEVICE DATA: ', data.devices);
+    store.commit('setDevices', data.devices);
     // Object.keys(data).forEach((k) => {
     //   document.getElementById(k).textContent = data[k];
     // });

@@ -6,6 +6,7 @@
   <div>
     <h1>Registering your device</h1>
     <div>Register your device by scanning the following code into the Owntracks app</div>
+    <div>{{owntracksUri}}</div>
     <div id="placeHolder" v-html="qrcode"></div>
 
     <div>PassiveEye devices should send data to this uri</div>
@@ -27,6 +28,9 @@ export default {
       default: "nomessage"
     }
   },
+  destroyed(){
+    console.log("DESTROYED: ", this)
+  },
   data() {
     var typeNumber = 4;
   var errorCorrectionLevel = 'L';
@@ -39,7 +43,8 @@ export default {
     return {
         foo: "asdfa",
         qrcode: qr.createImgTag(),
-        passiveeyeUri: this.$store.state.passiveeyeUri
+        passiveeyeUri: this.$store.state.passiveeyeUri,
+        owntracksUri: this.$store.state.owntracksUri
     }
   }
 }
