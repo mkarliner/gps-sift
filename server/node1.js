@@ -20,22 +20,28 @@ module.exports = function (got) {
 
   const hookData = inData.data.map(d => JSON.parse(d.value));
 
- //Normalize the data from Owntracks to the internal device format
+ //Normalize the data from PassiveEye to the internal device format
   let devData = hookData.map((d)=>{
     console.log("DMAP: ", d);
-    let lat_ns = d.data.substr(11,1);
-    let lng_ew = d.data.substr(19,1);
+    let lat_ns = d.data.substr(11,1) == 1 ? '-' : '';
+    let lng_ew = d.data.substr(19,1) == 1 ? '-' : '';
     let lat_deg = d.data.substr(4,2);
     let lat_mins = d.data.substr(6,5);
     let lng_deg = d.data.substr(12,2);
     let lng_mins = d.data.substr(14,5);
-    console.log("EXLL ", lat_ns, lat_deg, parseFloat(lat_mins)/60000, lng_ew, lng_deg, parseFloat(lng_mins)/60000);
+    //let lat_deg = parseFloat(d.data.substr(4,2));
+    //let lat_mins = parseFloat(d.data.substr(6,5))/60000;
+    //let lng_deg = parseFloat(d.data.substr(12,2));
+    //let lng_mins = parseFloat(d.data.substr(14,5))/60000;
+    //let lat = lat_deg + lat_mins;
+    //let lng = lng_deg + lng_mins;
+    console.log("EXLL ", lat_ns, lat_deg, lat_mins, lng_ew, lng_deg, lng_mins);
     return {
       name: "devices",
       key: d.device,
       value: {
-        lat: `${d.data.substr(4,2)}.${d.data.substr(6,6)}`,
-        lng: `-${d.data.substr(12,2)}.${d.data.substr(14,6)}`,
+        lat: `${lat_ns}${lat_deg}.${lat_mins}`,
+        lng: `${lng_ew}${lng_deg}.${lng_mins}`,
         time: d.time,
         rssi: d.rssi
       }
