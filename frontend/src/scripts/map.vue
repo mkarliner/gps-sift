@@ -22,9 +22,13 @@ export default {
     data() {},
         computed: {
             center() {
-              let firstDev = this.$store.state.devices[0].value;
-              let d = JSON.parse(firstDev)
-              return {lat: parseFloat(d.lat), lng: parseFloat(d.lng)}
+	      if(this.$store.state.devices.length > 0) {
+              	let firstDev = this.$store.state.devices[0].value;
+              	let d = JSON.parse(firstDev)
+              	return {lat: parseFloat(d.lat), lng: parseFloat(d.lng)}
+     	      } else {
+		return {lat: 51.556230, lng: -0.223796}
+	      }
             },
             markers() {
                     console.log("Before big bang", typeof this.$store.state.devices)
