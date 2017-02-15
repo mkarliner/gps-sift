@@ -7,12 +7,12 @@
     <h1>Device List</h1>
     <ul id="device-list">
       <li v-for="dev in devices">
-      id: {{ dev.key}}
-      rssi: {{dev.value.rssi}}
-      lat: {{dev.value.lat}}
-      long: {{dev.value.lng}}
-      seqNum: {{dev.value.seqNumber}}
-      {{new Date(dev.value.time*1000).toString()}}
+        id: <router-link :to="'/device/' + dev.key">{{ dev.key}}</router-link>
+        rssi: {{dev.value.rssi}}
+        lat: {{dev.value.lat}}
+        long: {{dev.value.lng}}
+        seqNum: {{dev.value.seqNumber}}
+        {{new Date(dev.value.time*1000).toString()}}
   </li>
 </ul>
   <div> CLOCK{{clock}}</div>
@@ -35,7 +35,7 @@ export default {
 },
   computed: {
     devices() {
-            console.log("Before big bang", typeof this.$store.state.devices)
+            console.log("Before big bang",  this.$store.state)
             // if(typeof this.$store.state.devices.map === "undefined") {
             //   return [];
             // }

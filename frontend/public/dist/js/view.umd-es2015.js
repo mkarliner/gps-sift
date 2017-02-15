@@ -100,11 +100,15 @@
 	
 	var _devices2 = _interopRequireDefault(_devices);
 	
+	var _device_detail = __webpack_require__(180);
+	
+	var _device_detail2 = _interopRequireDefault(_device_detail);
+	
 	var _qrcodeGenerator = __webpack_require__(173);
 	
 	var _qrcodeGenerator2 = _interopRequireDefault(_qrcodeGenerator);
 	
-	var _vuexRouterSync = __webpack_require__(180);
+	var _vuexRouterSync = __webpack_require__(185);
 	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
@@ -114,17 +118,19 @@
 	//import router from './router' // vue-router instance
 	
 	
-	/**
-	 * Hello Sift Sift. Frontend view entry point.
-	 */
-	_vue2.default.use(_vueRouter2.default);
+	_vue2.default.use(_vueRouter2.default); /**
+	                                         * Hello Sift Sift. Frontend view entry point.
+	                                         */
+	
 	_vue2.default.use(_vuex2.default);
 	
 	var app;
 	
 	_vue2.default.config.devtools = true;
 	
-	var routes = [{ path: '/map', component: _map2.default }, { path: '/devices', component: _devices2.default }, { path: '/register', component: _register2.default }];
+	var routes = [{ path: '/map', component: _map2.default }, { path: '/devices', component: _devices2.default }, { path: '/register', component: _register2.default }, { path: '/device/:id', component: _device_detail2.default }
+	// { path: '/foo', component:  Foo, props: {foople: "dddddd"}}
+	];
 	
 	var router = new _vueRouter2.default({
 	  mode: 'history',
@@ -39289,13 +39295,6 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	
-	var _typeof2 = __webpack_require__(40);
-	
-	var _typeof3 = _interopRequireDefault(_typeof2);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
 	//
 	//
 	//
@@ -39333,7 +39332,7 @@
 	  },
 	  computed: {
 	    devices: function devices() {
-	      console.log("Before big bang", (0, _typeof3.default)(this.$store.state.devices));
+	      console.log("Before big bang", this.$store.state);
 	      // if(typeof this.$store.state.devices.map === "undefined") {
 	      //   return [];
 	      // }
@@ -39364,7 +39363,11 @@
 	      "id": "device-list"
 	    }
 	  }, _vm._l((_vm.devices), function(dev) {
-	    return _c('li', [_vm._v("\n      id: " + _vm._s(dev.key) + "\n      rssi: " + _vm._s(dev.value.rssi) + "\n      lat: " + _vm._s(dev.value.lat) + "\n      long: " + _vm._s(dev.value.lng) + "\n      seqNum: " + _vm._s(dev.value.seqNumber) + "\n      " + _vm._s(new Date(dev.value.time * 1000).toString()) + "\n  ")])
+	    return _c('li', [_vm._v("\n        id: "), _c('router-link', {
+	      attrs: {
+	        "to": '/device/' + dev.key
+	      }
+	    }, [_vm._v(_vm._s(dev.key))]), _vm._v("\n        rssi: " + _vm._s(dev.value.rssi) + "\n        lat: " + _vm._s(dev.value.lat) + "\n        long: " + _vm._s(dev.value.lng) + "\n        seqNum: " + _vm._s(dev.value.seqNumber) + "\n        " + _vm._s(new Date(dev.value.time * 1000).toString()) + "\n  ")], 1)
 	  })), _vm._v(" "), _c('div', [_vm._v(" CLOCK" + _vm._s(_vm.clock))])])
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
@@ -39377,6 +39380,157 @@
 
 /***/ },
 /* 180 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(console) {var __vue_exports__, __vue_options__
+	var __vue_styles__ = {}
+	
+	/* styles */
+	__webpack_require__(181)
+	
+	/* script */
+	__vue_exports__ = __webpack_require__(183)
+	
+	/* template */
+	var __vue_template__ = __webpack_require__(184)
+	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
+	if (
+	  typeof __vue_exports__.default === "object" ||
+	  typeof __vue_exports__.default === "function"
+	) {
+	if (Object.keys(__vue_exports__).some(function (key) { return key !== "default" && key !== "__esModule" })) {console.error("named exports are not supported in *.vue files.")}
+	__vue_options__ = __vue_exports__ = __vue_exports__.default
+	}
+	if (typeof __vue_options__ === "function") {
+	  __vue_options__ = __vue_options__.options
+	}
+	__vue_options__.__file = "/root/sift/frontend/src/scripts/device_detail.vue"
+	__vue_options__.render = __vue_template__.render
+	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
+	
+	/* hot reload */
+	if (false) {(function () {
+	  var hotAPI = require("vue-hot-reload-api")
+	  hotAPI.install(require("vue"), false)
+	  if (!hotAPI.compatible) return
+	  module.hot.accept()
+	  if (!module.hot.data) {
+	    hotAPI.createRecord("data-v-6a3bad1a", __vue_options__)
+	  } else {
+	    hotAPI.reload("data-v-6a3bad1a", __vue_options__)
+	  }
+	})()}
+	if (__vue_options__.functional) {console.error("[vue-loader] device_detail.vue: functional components are not supported and should be defined in plain js files using render functions.")}
+	
+	module.exports = __vue_exports__
+	
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
+
+/***/ },
+/* 181 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+	
+	// load the styles
+	var content = __webpack_require__(182);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(131)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../node_modules/css-loader/index.js?sourceMap!./../../node_modules/vue-loader/lib/style-rewriter.js?id=data-v-6a3bad1a!./../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./device_detail.vue", function() {
+				var newContent = require("!!./../../node_modules/css-loader/index.js?sourceMap!./../../node_modules/vue-loader/lib/style-rewriter.js?id=data-v-6a3bad1a!./../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./device_detail.vue");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 182 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(130)();
+	// imports
+	
+	
+	// module
+	exports.push([module.id, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"device_detail.vue","sourceRoot":"webpack://"}]);
+	
+	// exports
+
+
+/***/ },
+/* 183 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(console) {"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	
+	
+	exports.default = {
+	  data: function data() {},
+	
+	
+	  computed: {
+	    device_detail: function device_detail() {
+	      var id = this.$store.state.route.params;
+	
+	      var details = this.$store.state.devices;
+	      console.log("DEVDET: ", id, details, details);
+	    }
+	  }
+	};
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
+
+/***/ },
+/* 184 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+	  return _c('div', [_c('h1', [_vm._v("Device Detail")]), _vm._v(" "), _vm._v("\n  " + _vm._s(_vm.device_detail) + "\n  ")])
+	},staticRenderFns: []}
+	module.exports.render._withStripped = true
+	if (false) {
+	  module.hot.accept()
+	  if (module.hot.data) {
+	     require("vue-hot-reload-api").rerender("data-v-6a3bad1a", module.exports)
+	  }
+	}
+
+/***/ },
+/* 185 */
 /***/ function(module, exports) {
 
 	exports.sync = function (store, router, options) {

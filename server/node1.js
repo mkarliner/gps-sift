@@ -23,7 +23,13 @@ module.exports = function (got) {
  //Normalize the data from Owntracks to the internal device format
   let devData = hookData.map((d)=>{
     console.log("DMAP: ", d);
-    console.log("LL: ", d.data.substr(4,6), d.data.substr(11,6))
+    let lat_ns = d.data.substr(11,1);
+    let lng_ew = d.data.substr(19,1);
+    let lat_deg = d.data.substr(4,2);
+    let lat_mins = d.data.substr(6,5);
+    let lng_deg = d.data.substr(12,2);
+    let lng_mins = d.data.substr(14,5);
+    console.log("EXLL ", lat_ns, lat_deg, parseFloat(lat_mins)/60000, lng_ew, lng_deg, parseFloat(lng_mins)/60000);
     return {
       name: "devices",
       key: d.device,

@@ -12,6 +12,7 @@ import * as VueGoogleMaps from 'vue2-google-maps';
 import Map from './map.vue'
 import Register from './register.vue'
 import Devices from './devices.vue'
+import DeviceDetail from './device_detail.vue' 
 import qrcode from 'qrcode-generator'
 
 import { sync } from 'vuex-router-sync'
@@ -36,6 +37,7 @@ const routes = [
   { path: '/map', component: Map },
   { path: '/devices', component: Devices },
   { path: '/register', component: Register},
+  { path: '/device/:id', component: DeviceDetail}
   // { path: '/foo', component:  Foo, props: {foople: "dddddd"}}
 ]
 

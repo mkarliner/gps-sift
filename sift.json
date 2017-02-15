@@ -49,7 +49,7 @@
 				"javascript": "server/node1.js"
 			},
 			"outputs": {
-				"llevents": {},
+				"positions": {},
 				"devices": {}
 			}
 		},
@@ -62,34 +62,40 @@
 						"javascript": "server/owntracks.js"
 					},
 					"outputs": {
-						"llevents": {},
+						"positions": {},
 						"devices": {}
 					}
 				},
 		{
 			"#": "Python Node",
-			"input": {
-				"bucket": "llevents"
-			},
+
 			"implementation": {
 				"python": "server/node2.python"
 			},
+			"input": {
+				"bucket": "raw_positions"
+			},
 			"outputs": {
-				"who": {}
+				"bounding": {}
 			}
 		}],
 		"stores": {
-			"llevents": {
-				"key$schema": "string"
+			"raw_positions": {
+				"key$schema": "string",
+				"ttl": 86400
 			}
 		},
 		"outputs": {
 			"exports": {
-				"who": {
+				"bounding": {
 					"key$schema": "string"
 				},
 				"devices": {
 					"key$schema": "string"
+				},
+				"positions": {
+					"key$schema": "string",
+					"ttl": 86400
 				}
 			}
 		}
