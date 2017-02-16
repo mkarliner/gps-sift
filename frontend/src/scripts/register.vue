@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import qrcode from 'qrcode-generator'
+//import qrcode from 'qrcode-generator'
 //import app from './view.js'
 // console.log("VIEW: ", this.$app)
 export default {

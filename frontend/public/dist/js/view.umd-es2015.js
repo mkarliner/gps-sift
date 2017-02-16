@@ -96,15 +96,15 @@
 	
 	var _register2 = _interopRequireDefault(_register);
 	
-	var _devices = __webpack_require__(175);
+	var _devices = __webpack_require__(174);
 	
 	var _devices2 = _interopRequireDefault(_devices);
 	
-	var _device_detail = __webpack_require__(180);
+	var _device_detail = __webpack_require__(179);
 	
 	var _device_detail2 = _interopRequireDefault(_device_detail);
 	
-	var _qrcodeGenerator = __webpack_require__(173);
+	var _qrcodeGenerator = __webpack_require__(184);
 	
 	var _qrcodeGenerator2 = _interopRequireDefault(_qrcodeGenerator);
 	
@@ -36972,7 +36972,7 @@
 	__vue_exports__ = __webpack_require__(172)
 	
 	/* template */
-	var __vue_template__ = __webpack_require__(174)
+	var __vue_template__ = __webpack_require__(173)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -37055,13 +37055,24 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
 	
-	var _qrcodeGenerator = __webpack_require__(173);
-	
-	var _qrcodeGenerator2 = _interopRequireDefault(_qrcodeGenerator);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
+	//import qrcode from 'qrcode-generator'
 	//import app from './view.js'
 	// console.log("VIEW: ", this.$app)
 	exports.default = {
@@ -37080,39 +37091,381 @@
 	  data: function data() {
 	    var typeNumber = 4;
 	    var errorCorrectionLevel = 'L';
-	    var qr = (0, _qrcodeGenerator2.default)(typeNumber, errorCorrectionLevel);
-	    //qr.addData(app.owntracksUri);
+	    //var qr = qrcode(typeNumber, errorCorrectionLevel);
 	    console.log("REGISTER: ", this.$store.state.owntracksUri);
-	    qr.addData(this.$store.state.owntracksUri);
-	    qr.make();
+	    //qr.addData(this.$store.state.owntracksUri);
+	    //qr.make();
 	    //document.getElementById('placeHolder').innerHTML = qr.createImgTag();
 	    return {
 	      foo: "asdfa",
-	      qrcode: qr.createImgTag(),
+	      //qrcode: qr.createImgTag(),
+	      qrcode: "adsf",
 	      passiveeyeUri: this.$store.state.passiveeyeUri,
 	      owntracksUri: this.$store.state.owntracksUri
 	    };
 	  }
-	}; //
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
+	};
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ },
 /* 173 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+	  return _c('div', [_c('h1', [_vm._v("Registering your device")]), _vm._v(" "), _c('div', [_vm._v("Register your device by scanning the following code into the Owntracks app")]), _vm._v(" "), _c('div', [_vm._v(_vm._s(_vm.owntracksUri))]), _vm._v(" "), _c('div', {
+	    attrs: {
+	      "id": "placeHolder"
+	    },
+	    domProps: {
+	      "innerHTML": _vm._s(_vm.qrcode)
+	    }
+	  }), _vm._v(" "), _c('div', [_vm._v("PassiveEye devices should send data to this uri")]), _vm._v(" "), _c('div', {
+	    domProps: {
+	      "innerHTML": _vm._s(_vm.passiveeyeUri)
+	    }
+	  })])
+	},staticRenderFns: []}
+	module.exports.render._withStripped = true
+	if (false) {
+	  module.hot.accept()
+	  if (module.hot.data) {
+	     require("vue-hot-reload-api").rerender("data-v-203fd193", module.exports)
+	  }
+	}
+
+/***/ },
+/* 174 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(console) {var __vue_exports__, __vue_options__
+	var __vue_styles__ = {}
+	
+	/* styles */
+	__webpack_require__(175)
+	
+	/* script */
+	__vue_exports__ = __webpack_require__(177)
+	
+	/* template */
+	var __vue_template__ = __webpack_require__(178)
+	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
+	if (
+	  typeof __vue_exports__.default === "object" ||
+	  typeof __vue_exports__.default === "function"
+	) {
+	if (Object.keys(__vue_exports__).some(function (key) { return key !== "default" && key !== "__esModule" })) {console.error("named exports are not supported in *.vue files.")}
+	__vue_options__ = __vue_exports__ = __vue_exports__.default
+	}
+	if (typeof __vue_options__ === "function") {
+	  __vue_options__ = __vue_options__.options
+	}
+	__vue_options__.__file = "/root/sift/frontend/src/scripts/devices.vue"
+	__vue_options__.render = __vue_template__.render
+	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
+	
+	/* hot reload */
+	if (false) {(function () {
+	  var hotAPI = require("vue-hot-reload-api")
+	  hotAPI.install(require("vue"), false)
+	  if (!hotAPI.compatible) return
+	  module.hot.accept()
+	  if (!module.hot.data) {
+	    hotAPI.createRecord("data-v-2536141d", __vue_options__)
+	  } else {
+	    hotAPI.reload("data-v-2536141d", __vue_options__)
+	  }
+	})()}
+	if (__vue_options__.functional) {console.error("[vue-loader] devices.vue: functional components are not supported and should be defined in plain js files using render functions.")}
+	
+	module.exports = __vue_exports__
+	
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
+
+/***/ },
+/* 175 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+	
+	// load the styles
+	var content = __webpack_require__(176);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(131)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../node_modules/css-loader/index.js?sourceMap!./../../node_modules/vue-loader/lib/style-rewriter.js?id=data-v-2536141d!./../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./devices.vue", function() {
+				var newContent = require("!!./../../node_modules/css-loader/index.js?sourceMap!./../../node_modules/vue-loader/lib/style-rewriter.js?id=data-v-2536141d!./../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./devices.vue");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 176 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(130)();
+	// imports
+	
+	
+	// module
+	exports.push([module.id, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"devices.vue","sourceRoot":"webpack://"}]);
+	
+	// exports
+
+
+/***/ },
+/* 177 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(console) {"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	
+	
+	exports.default = {
+	  data: function data() {},
+	
+	  beforeDestroy: function beforeDestroy() {
+	    console.log("DESTROYED: ", this);
+	    this.$store.state == {};
+	  },
+	  created: function created() {
+	    // `this` points to the vm instance
+	    console.log('CREATED:  ' + this);
+	  },
+	  computed: {
+	    devices: function devices() {
+	      console.log("Before big bang", this.$store.state);
+	      // if(typeof this.$store.state.devices.map === "undefined") {
+	      //   return [];
+	      // }
+	      var devs = this.$store.state.devices.map(function (dev) {
+	        console.log("MAP: ", dev);
+	        return {
+	          key: dev.key,
+	          value: JSON.parse(dev.value)
+	        };
+	      });
+	      console.log("DEVS: ", this.$store.state.devices);
+	      return devs;
+	    },
+	    clock: function clock() {
+	      return this.$store.state.clock.toString();
+	    }
+	  }
+	};
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
+
+/***/ },
+/* 178 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+	  return _c('div', [_c('h1', [_vm._v("Device List")]), _vm._v(" "), _c('ul', {
+	    attrs: {
+	      "id": "device-list"
+	    }
+	  }, _vm._l((_vm.devices), function(dev) {
+	    return _c('li', [_vm._v("\n        id: "), _c('router-link', {
+	      attrs: {
+	        "to": '/device/' + dev.key
+	      }
+	    }, [_vm._v(_vm._s(dev.key))]), _vm._v("\n        rssi: " + _vm._s(dev.value.rssi) + "\n        lat: " + _vm._s(dev.value.lat) + "\n        long: " + _vm._s(dev.value.lng) + "\n        seqNum: " + _vm._s(dev.value.seqNumber) + "\n        " + _vm._s(new Date(dev.value.time * 1000).toString()) + "\n  ")], 1)
+	  })), _vm._v(" "), _c('div', [_vm._v(" CLOCK" + _vm._s(_vm.clock))])])
+	},staticRenderFns: []}
+	module.exports.render._withStripped = true
+	if (false) {
+	  module.hot.accept()
+	  if (module.hot.data) {
+	     require("vue-hot-reload-api").rerender("data-v-2536141d", module.exports)
+	  }
+	}
+
+/***/ },
+/* 179 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(console) {var __vue_exports__, __vue_options__
+	var __vue_styles__ = {}
+	
+	/* styles */
+	__webpack_require__(180)
+	
+	/* script */
+	__vue_exports__ = __webpack_require__(182)
+	
+	/* template */
+	var __vue_template__ = __webpack_require__(183)
+	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
+	if (
+	  typeof __vue_exports__.default === "object" ||
+	  typeof __vue_exports__.default === "function"
+	) {
+	if (Object.keys(__vue_exports__).some(function (key) { return key !== "default" && key !== "__esModule" })) {console.error("named exports are not supported in *.vue files.")}
+	__vue_options__ = __vue_exports__ = __vue_exports__.default
+	}
+	if (typeof __vue_options__ === "function") {
+	  __vue_options__ = __vue_options__.options
+	}
+	__vue_options__.__file = "/root/sift/frontend/src/scripts/device_detail.vue"
+	__vue_options__.render = __vue_template__.render
+	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
+	
+	/* hot reload */
+	if (false) {(function () {
+	  var hotAPI = require("vue-hot-reload-api")
+	  hotAPI.install(require("vue"), false)
+	  if (!hotAPI.compatible) return
+	  module.hot.accept()
+	  if (!module.hot.data) {
+	    hotAPI.createRecord("data-v-6a3bad1a", __vue_options__)
+	  } else {
+	    hotAPI.reload("data-v-6a3bad1a", __vue_options__)
+	  }
+	})()}
+	if (__vue_options__.functional) {console.error("[vue-loader] device_detail.vue: functional components are not supported and should be defined in plain js files using render functions.")}
+	
+	module.exports = __vue_exports__
+	
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
+
+/***/ },
+/* 180 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+	
+	// load the styles
+	var content = __webpack_require__(181);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(131)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../node_modules/css-loader/index.js?sourceMap!./../../node_modules/vue-loader/lib/style-rewriter.js?id=data-v-6a3bad1a!./../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./device_detail.vue", function() {
+				var newContent = require("!!./../../node_modules/css-loader/index.js?sourceMap!./../../node_modules/vue-loader/lib/style-rewriter.js?id=data-v-6a3bad1a!./../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./device_detail.vue");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 181 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(130)();
+	// imports
+	
+	
+	// module
+	exports.push([module.id, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"device_detail.vue","sourceRoot":"webpack://"}]);
+	
+	// exports
+
+
+/***/ },
+/* 182 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(console) {"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	
+	
+	exports.default = {
+	  data: function data() {},
+	
+	
+	  computed: {
+	    device_detail: function device_detail() {
+	      var id = this.$store.state.route.params;
+	
+	      var details = this.$store.state.devices;
+	      console.log("DEVDET: ", id, details, details);
+	    }
+	  }
+	};
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
+
+/***/ },
+/* 183 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+	  return _c('div', [_c('h1', [_vm._v("Device Detail")]), _vm._v(" "), _vm._v("\n  " + _vm._s(_vm.device_detail) + "\n  ")])
+	},staticRenderFns: []}
+	module.exports.render._withStripped = true
+	if (false) {
+	  module.hot.accept()
+	  if (module.hot.data) {
+	     require("vue-hot-reload-api").rerender("data-v-6a3bad1a", module.exports)
+	  }
+	}
+
+/***/ },
+/* 184 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;//---------------------------------------------------------------------
@@ -39175,363 +39528,6 @@
 	    return qrcode;
 	}));
 
-
-/***/ },
-/* 174 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return _c('div', [_c('h1', [_vm._v("Registering your device")]), _vm._v(" "), _c('div', [_vm._v("Register your device by scanning the following code into the Owntracks app")]), _vm._v(" "), _c('div', [_vm._v(_vm._s(_vm.owntracksUri))]), _vm._v(" "), _c('div', {
-	    attrs: {
-	      "id": "placeHolder"
-	    },
-	    domProps: {
-	      "innerHTML": _vm._s(_vm.qrcode)
-	    }
-	  }), _vm._v(" "), _c('div', [_vm._v("PassiveEye devices should send data to this uri")]), _vm._v(" "), _c('div', {
-	    domProps: {
-	      "innerHTML": _vm._s(_vm.passiveeyeUri)
-	    }
-	  })])
-	},staticRenderFns: []}
-	module.exports.render._withStripped = true
-	if (false) {
-	  module.hot.accept()
-	  if (module.hot.data) {
-	     require("vue-hot-reload-api").rerender("data-v-203fd193", module.exports)
-	  }
-	}
-
-/***/ },
-/* 175 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function(console) {var __vue_exports__, __vue_options__
-	var __vue_styles__ = {}
-	
-	/* styles */
-	__webpack_require__(176)
-	
-	/* script */
-	__vue_exports__ = __webpack_require__(178)
-	
-	/* template */
-	var __vue_template__ = __webpack_require__(179)
-	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
-	if (
-	  typeof __vue_exports__.default === "object" ||
-	  typeof __vue_exports__.default === "function"
-	) {
-	if (Object.keys(__vue_exports__).some(function (key) { return key !== "default" && key !== "__esModule" })) {console.error("named exports are not supported in *.vue files.")}
-	__vue_options__ = __vue_exports__ = __vue_exports__.default
-	}
-	if (typeof __vue_options__ === "function") {
-	  __vue_options__ = __vue_options__.options
-	}
-	__vue_options__.__file = "/root/sift/frontend/src/scripts/devices.vue"
-	__vue_options__.render = __vue_template__.render
-	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
-	
-	/* hot reload */
-	if (false) {(function () {
-	  var hotAPI = require("vue-hot-reload-api")
-	  hotAPI.install(require("vue"), false)
-	  if (!hotAPI.compatible) return
-	  module.hot.accept()
-	  if (!module.hot.data) {
-	    hotAPI.createRecord("data-v-2536141d", __vue_options__)
-	  } else {
-	    hotAPI.reload("data-v-2536141d", __vue_options__)
-	  }
-	})()}
-	if (__vue_options__.functional) {console.error("[vue-loader] devices.vue: functional components are not supported and should be defined in plain js files using render functions.")}
-	
-	module.exports = __vue_exports__
-	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
-
-/***/ },
-/* 176 */
-/***/ function(module, exports, __webpack_require__) {
-
-	// style-loader: Adds some css to the DOM by adding a <style> tag
-	
-	// load the styles
-	var content = __webpack_require__(177);
-	if(typeof content === 'string') content = [[module.id, content, '']];
-	// add the styles to the DOM
-	var update = __webpack_require__(131)(content, {});
-	if(content.locals) module.exports = content.locals;
-	// Hot Module Replacement
-	if(false) {
-		// When the styles change, update the <style> tags
-		if(!content.locals) {
-			module.hot.accept("!!./../../node_modules/css-loader/index.js?sourceMap!./../../node_modules/vue-loader/lib/style-rewriter.js?id=data-v-2536141d!./../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./devices.vue", function() {
-				var newContent = require("!!./../../node_modules/css-loader/index.js?sourceMap!./../../node_modules/vue-loader/lib/style-rewriter.js?id=data-v-2536141d!./../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./devices.vue");
-				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-				update(newContent);
-			});
-		}
-		// When the module is disposed, remove the <style> tags
-		module.hot.dispose(function() { update(); });
-	}
-
-/***/ },
-/* 177 */
-/***/ function(module, exports, __webpack_require__) {
-
-	exports = module.exports = __webpack_require__(130)();
-	// imports
-	
-	
-	// module
-	exports.push([module.id, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"devices.vue","sourceRoot":"webpack://"}]);
-	
-	// exports
-
-
-/***/ },
-/* 178 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function(console) {"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	
-	
-	exports.default = {
-	  data: function data() {},
-	
-	  beforeDestroy: function beforeDestroy() {
-	    console.log("DESTROYED: ", this);
-	    this.$store.state == {};
-	  },
-	  created: function created() {
-	    // `this` points to the vm instance
-	    console.log('CREATED:  ' + this);
-	  },
-	  computed: {
-	    devices: function devices() {
-	      console.log("Before big bang", this.$store.state);
-	      // if(typeof this.$store.state.devices.map === "undefined") {
-	      //   return [];
-	      // }
-	      var devs = this.$store.state.devices.map(function (dev) {
-	        console.log("MAP: ", dev);
-	        return {
-	          key: dev.key,
-	          value: JSON.parse(dev.value)
-	        };
-	      });
-	      console.log("DEVS: ", this.$store.state.devices);
-	      return devs;
-	    },
-	    clock: function clock() {
-	      return this.$store.state.clock.toString();
-	    }
-	  }
-	};
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
-
-/***/ },
-/* 179 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return _c('div', [_c('h1', [_vm._v("Device List")]), _vm._v(" "), _c('ul', {
-	    attrs: {
-	      "id": "device-list"
-	    }
-	  }, _vm._l((_vm.devices), function(dev) {
-	    return _c('li', [_vm._v("\n        id: "), _c('router-link', {
-	      attrs: {
-	        "to": '/device/' + dev.key
-	      }
-	    }, [_vm._v(_vm._s(dev.key))]), _vm._v("\n        rssi: " + _vm._s(dev.value.rssi) + "\n        lat: " + _vm._s(dev.value.lat) + "\n        long: " + _vm._s(dev.value.lng) + "\n        seqNum: " + _vm._s(dev.value.seqNumber) + "\n        " + _vm._s(new Date(dev.value.time * 1000).toString()) + "\n  ")], 1)
-	  })), _vm._v(" "), _c('div', [_vm._v(" CLOCK" + _vm._s(_vm.clock))])])
-	},staticRenderFns: []}
-	module.exports.render._withStripped = true
-	if (false) {
-	  module.hot.accept()
-	  if (module.hot.data) {
-	     require("vue-hot-reload-api").rerender("data-v-2536141d", module.exports)
-	  }
-	}
-
-/***/ },
-/* 180 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function(console) {var __vue_exports__, __vue_options__
-	var __vue_styles__ = {}
-	
-	/* styles */
-	__webpack_require__(181)
-	
-	/* script */
-	__vue_exports__ = __webpack_require__(183)
-	
-	/* template */
-	var __vue_template__ = __webpack_require__(184)
-	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
-	if (
-	  typeof __vue_exports__.default === "object" ||
-	  typeof __vue_exports__.default === "function"
-	) {
-	if (Object.keys(__vue_exports__).some(function (key) { return key !== "default" && key !== "__esModule" })) {console.error("named exports are not supported in *.vue files.")}
-	__vue_options__ = __vue_exports__ = __vue_exports__.default
-	}
-	if (typeof __vue_options__ === "function") {
-	  __vue_options__ = __vue_options__.options
-	}
-	__vue_options__.__file = "/root/sift/frontend/src/scripts/device_detail.vue"
-	__vue_options__.render = __vue_template__.render
-	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
-	
-	/* hot reload */
-	if (false) {(function () {
-	  var hotAPI = require("vue-hot-reload-api")
-	  hotAPI.install(require("vue"), false)
-	  if (!hotAPI.compatible) return
-	  module.hot.accept()
-	  if (!module.hot.data) {
-	    hotAPI.createRecord("data-v-6a3bad1a", __vue_options__)
-	  } else {
-	    hotAPI.reload("data-v-6a3bad1a", __vue_options__)
-	  }
-	})()}
-	if (__vue_options__.functional) {console.error("[vue-loader] device_detail.vue: functional components are not supported and should be defined in plain js files using render functions.")}
-	
-	module.exports = __vue_exports__
-	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
-
-/***/ },
-/* 181 */
-/***/ function(module, exports, __webpack_require__) {
-
-	// style-loader: Adds some css to the DOM by adding a <style> tag
-	
-	// load the styles
-	var content = __webpack_require__(182);
-	if(typeof content === 'string') content = [[module.id, content, '']];
-	// add the styles to the DOM
-	var update = __webpack_require__(131)(content, {});
-	if(content.locals) module.exports = content.locals;
-	// Hot Module Replacement
-	if(false) {
-		// When the styles change, update the <style> tags
-		if(!content.locals) {
-			module.hot.accept("!!./../../node_modules/css-loader/index.js?sourceMap!./../../node_modules/vue-loader/lib/style-rewriter.js?id=data-v-6a3bad1a!./../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./device_detail.vue", function() {
-				var newContent = require("!!./../../node_modules/css-loader/index.js?sourceMap!./../../node_modules/vue-loader/lib/style-rewriter.js?id=data-v-6a3bad1a!./../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./device_detail.vue");
-				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-				update(newContent);
-			});
-		}
-		// When the module is disposed, remove the <style> tags
-		module.hot.dispose(function() { update(); });
-	}
-
-/***/ },
-/* 182 */
-/***/ function(module, exports, __webpack_require__) {
-
-	exports = module.exports = __webpack_require__(130)();
-	// imports
-	
-	
-	// module
-	exports.push([module.id, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"device_detail.vue","sourceRoot":"webpack://"}]);
-	
-	// exports
-
-
-/***/ },
-/* 183 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function(console) {"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	
-	
-	exports.default = {
-	  data: function data() {},
-	
-	
-	  computed: {
-	    device_detail: function device_detail() {
-	      var id = this.$store.state.route.params;
-	
-	      var details = this.$store.state.devices;
-	      console.log("DEVDET: ", id, details, details);
-	    }
-	  }
-	};
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
-
-/***/ },
-/* 184 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return _c('div', [_c('h1', [_vm._v("Device Detail")]), _vm._v(" "), _vm._v("\n  " + _vm._s(_vm.device_detail) + "\n  ")])
-	},staticRenderFns: []}
-	module.exports.render._withStripped = true
-	if (false) {
-	  module.hot.accept()
-	  if (module.hot.data) {
-	     require("vue-hot-reload-api").rerender("data-v-6a3bad1a", module.exports)
-	  }
-	}
 
 /***/ },
 /* 185 */
