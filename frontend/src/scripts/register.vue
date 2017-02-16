@@ -39,7 +39,7 @@ export default {
   console.log("REGISTER: ", this.$store.state.owntracksUri)
   qr.addData(this.$store.state.owntracksUri);
   qr.make();
-  // document.getElementById('placeHolder').innerHTML = qr.createImgTag();
+   //document.getElementById('placeHolder').innerHTML = qr.createImgTag();
     return {
         foo: "asdfa",
         qrcode: qr.createImgTag(),
