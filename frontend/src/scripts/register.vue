@@ -34,15 +34,15 @@ export default {
   data() {
     var typeNumber = 4;
   var errorCorrectionLevel = 'L';
-  var qr = qrcode(typeNumber, errorCorrectionLevel);
-  //qr.addData(app.owntracksUri);
+  //var qr = qrcode(typeNumber, errorCorrectionLevel);
   console.log("REGISTER: ", this.$store.state.owntracksUri)
-  qr.addData(this.$store.state.owntracksUri);
-  qr.make();
+  //qr.addData(this.$store.state.owntracksUri);
+  //qr.make();
    //document.getElementById('placeHolder').innerHTML = qr.createImgTag();
     return {
         foo: "asdfa",
-        qrcode: qr.createImgTag(),
+        //qrcode: qr.createImgTag(),
+        qrcode:  "adsf";
         passiveeyeUri: this.$store.state.passiveeyeUri,
         owntracksUri: this.$store.state.owntracksUri
     }
