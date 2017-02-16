@@ -42,7 +42,7 @@ export default {
     return {
         foo: "asdfa",
         //qrcode: qr.createImgTag(),
-        qrcode:  "adsf";
+        qrcode:  "adsf",
         passiveeyeUri: this.$store.state.passiveeyeUri,
         owntracksUri: this.$store.state.owntracksUri
     }
