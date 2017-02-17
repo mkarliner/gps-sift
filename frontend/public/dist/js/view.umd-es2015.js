@@ -37041,7 +37041,7 @@
 	
 	
 	// module
-	exports.push([module.id, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"register.vue","sourceRoot":"webpack://"}]);
+	exports.push([module.id, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"register.vue","sourceRoot":"webpack://"}]);
 	
 	// exports
 
@@ -37067,15 +37067,14 @@
 	exports.default = {
 	  props: {},
 	  data: function data() {
-	    var typeNumber = 4;
+	    var typeNumber = 15;
 	    var errorCorrectionLevel = 'L';
-	    //var qr = qrcode(typeNumber, errorCorrectionLevel);
+	    var qr = (0, _qrcodeGenerator2.default)(typeNumber, errorCorrectionLevel);
 	    console.log("REGISTER: ", this.$store.state.owntracksUri);
-	    //qr.addData(this.$store.state.owntracksUri);
-	    //qr.make();
+	    qr.addData(this.$store.state.owntracksUri);
+	    qr.make();
 	    return {
-	      //qrcode: qr.createImgTag(),
-	      qrcode: "adfafds",
+	      qrcode: qr.createImgTag(),
 	      passiveeyeUri: this.$store.state.passiveeyeUri,
 	      owntracksUri: this.$store.state.owntracksUri
 	    };
