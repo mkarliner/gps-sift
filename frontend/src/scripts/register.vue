@@ -15,36 +15,27 @@
 </template>
 
 <script>
-//import qrcode from 'qrcode-generator'
-//import app from './view.js'
-// console.log("VIEW: ", this.$app)
+import qrcode from 'qrcode-generator'
+
 export default {
   props: {
-    // owntracksUri: {
-    //   type: String, default: "notyet"
-    // },
-    message: {
-      type: String,
-      default: "nomessage"
-    }
+
   },
   destroyed(){
     console.log("DESTROYED: ", this)
   },
   data() {
-    var typeNumber = 4;
-  var errorCorrectionLevel = 'L';
-  //var qr = qrcode(typeNumber, errorCorrectionLevel);
-  console.log("REGISTER: ", this.$store.state.owntracksUri)
-  //qr.addData(this.$store.state.owntracksUri);
-  //qr.make();
-   //document.getElementById('placeHolder').innerHTML = qr.createImgTag();
+    var typeNumber = 14;
+    var errorCorrectionLevel = 'L';
+    var qr = qrcode(typeNumber, errorCorrectionLevel);
+
+    qr.addData(this.$store.state.owntracksUri);
+    qr.make();
+
     return {
-        foo: "asdfa",
-        //qrcode: qr.createImgTag(),
-        qrcode:  "adsf",
-        passiveeyeUri: this.$store.state.passiveeyeUri,
-        owntracksUri: this.$store.state.owntracksUri
+      qrcode: qr.createImgTag(),
+      passiveeyeUri: this.$store.state.passiveeyeUri,
+      owntracksUri: this.$store.state.owntracksUri
     }
   }
 }
