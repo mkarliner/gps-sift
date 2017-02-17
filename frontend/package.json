@@ -7,11 +7,12 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "@redsift/ui-rs-core": "^0.9.1",
     "babel-plugin-transform-runtime": "^6.22.0",
     "babel-runtime": "^6.20.0",
+    "bootstrap": "^3.3.7",
     "lodash": "^4.17.4",
     "marker-clusterer-plus": "^2.1.4",
+    "moment": "^2.17.1",
     "q": "^1.4.1",
     "qrcode-generator": "^1.1.0",
     "vue": "^2.1.10",
