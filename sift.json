@@ -70,7 +70,7 @@
 			"#": "Python Node",
 
 			"implementation": {
-				"python": "server/node2.python"
+				"javascript": "server/node1.js"
 			},
 			"input": {
 				"bucket": "raw_positions"
