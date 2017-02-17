@@ -39541,7 +39541,9 @@
 	var format = function format(values) {
 	  var result = {};
 	  (0, _keys2.default)(values).forEach(function (key) {
-	    result[key] = parse[key](values[key]);
+	    result[key] = (parse[key] || function (i) {
+	      return i;
+	    })(values[key]);
 	  });
 	  return result;
 	};

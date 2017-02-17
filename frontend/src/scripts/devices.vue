@@ -33,7 +33,7 @@ const parse = {
 const format = values => {
   const result = {};
   Object.keys(values).forEach(key => {
-    result[key] = parse[key](values[key])
+    result[key] = (parse[key] || (i => i))(values[key])
   });
   return result;
 };
