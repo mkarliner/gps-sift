@@ -39329,10 +39329,10 @@
 	    return (0, _moment2.default)(val * 1000).fromNow();
 	  },
 	  lat: function lat(val) {
-	    return typeof val === 'number' && val.toFixed(5);
+	    return Number(val).toFixed(5);
 	  },
 	  lng: function lng(val) {
-	    return typeof val === 'number' && val.toFixed(5);
+	    return Number(val).toFixed(5);
 	  }
 	}; //
 	//
@@ -54315,7 +54315,7 @@
 	          _vm.route('/device/' + dev.key)
 	        }
 	      }
-	    }, [_c('td', [_vm._v(_vm._s(dev.key))]), _vm._v(" "), _c('td', [_vm._v(_vm._s(dev.value.lat))]), _vm._v(" "), _c('td', [_vm._v(_vm._s(dev.value.lng))]), _vm._v(" "), _c('td', [_vm._v(_vm._s(dev.value.time))])])
+	    }, [_c('td', [_c('router-link', [_vm._v(_vm._s(dev.key))])], 1), _vm._v(" "), _c('td', [_vm._v(_vm._s(dev.value.lat))]), _vm._v(" "), _c('td', [_vm._v(_vm._s(dev.value.lng))]), _vm._v(" "), _c('td', [_vm._v(_vm._s(dev.value.time))])])
 	  }))])])
 	},staticRenderFns: [function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
 	  return _c('thead', [_c('tr', [_c('th', [_vm._v("Device ID")]), _vm._v(" "), _c('th', [_vm._v("Latitude")]), _vm._v(" "), _c('th', [_vm._v("Longitude")]), _vm._v(" "), _c('th', [_vm._v("Last Update")])])])
