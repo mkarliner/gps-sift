@@ -27,8 +27,8 @@ import moment from 'moment'
 
 const parse = {
   time: val => moment(val * 1000).fromNow(),
-  lat: val => (typeof val === 'number') && val.toFixed(5),
-  lng: val => (typeof val === 'number') && val.toFixed(5)
+  lat: val => Number(val).toFixed(5),
+  lng: val => Number(val).toFixed(5)
 };
 const format = values => {
   const result = {};
