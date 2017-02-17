@@ -1,56 +1,76 @@
-
-
-
-
 <template>
-  <div>
+  <div class="page devices">
     <h1>Device List</h1>
-    <ul id="device-list">
-      <li v-for="dev in devices">
-        id: <router-link :to="'/device/' + dev.key">{{ dev.key}}</router-link>
-        rssi: {{dev.value.rssi}}
-        lat: {{dev.value.lat}}
-        long: {{dev.value.lng}}
-        seqNum: {{dev.value.seqNumber}}
-        {{new Date(dev.value.time*1000).toString()}}
-  </li>
-</ul>
-  <div> CLOCK{{clock}}</div>
+    <table class="table table-responsive table-bordered table-striped table-hover">
+      <thead>
+        <tr>
+          <th>Device ID</th>
+          <th>Latitude</th>
+          <th>Longitude</th>
+          <th>Last Update</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="dev in devices" v-on:click="route('/device/' + dev.key)">
+          <td>{{ dev.key}}</router-link></td>
+          <td>{{dev.value.lat}}</td>
+          <td>{{dev.value.lng}}</td>
+          <td>{{dev.value.time}}</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
-
 </template>
 
 <script>
+import moment from 'moment'
+
+const parse = {
+  time: val => moment(val * 1000).fromNow(),
+  lat: val => (typeof val === 'number') && val.toFixed(5),
+  lng: val => (typeof val === 'number') && val.toFixed(5)
+};
+const format = values => {
+  const result = {};
+  Object.keys(values).forEach(key => {
+    result[key] = parse[key](values[key])
+  });
+  return result;
+};
 
 export default {
-  data() {
-  },
-  beforeDestroy: function(){
+  data () {},
+  beforeDestroy: function () {
     console.log("DESTROYED: ", this)
     this.$store.state =={};
+    clearIntervall(this.timeUpdates)
   },
   created: function () {
-  // `this` points to the vm instance
-  console.log('CREATED:  ' + this)
-},
+    // `this` points to the vm instance
+    console.log('CREATED:  ' + this)
+  },
+  mounted () {
+    this.timeUpdates = setInterval(() => {
+      this.updateTimes();
+    }, 60 * 1000);
+  },
+  methods: {
+    updateTimes () {
+      this.devices = this.$store.state.devices.map(dev => ({
+        key: dev.key,
+        value: format(JSON.parse(dev.value))
+      }));
+    },
+    route (path) {
+      this.$router.push(path);
+    }
+  },
   computed: {
-    devices() {
-            console.log("Before big bang",  this.$store.state)
-            // if(typeof this.$store.state.devices.map === "undefined") {
-            //   return [];
-            // }
-            let devs = this.$store.state.devices.map(function(dev){
-            console.log("MAP: ", dev)
-            return {
-            key: dev.key,
-            value: JSON.parse(dev.value)
-        }
-      })
-        console.log("DEVS: ", this.$store.state.devices)
-        return devs
-      },
-    clock() {
-      return this.$store.state.clock.toString()
+    devices () {
+      return this.$store.state.devices.map(dev => ({
+        key: dev.key,
+        value: format(JSON.parse(dev.value))
+      }));
     }
   }
 }

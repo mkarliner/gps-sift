@@ -1,9 +1,5 @@
-
-
-
-
 <template>
-  <div>
+  <div class="page">
     <h1>Device Detail</h1>
     <!-- <ul id="device-list">
       <li v-for="dev in devices">

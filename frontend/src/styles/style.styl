@@ -3,6 +3,56 @@
  */
 @import "bootstrap/dist/css/bootstrap.min.css"
 
-body, html {
+body, html, #app {
   height: 100%;
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  table {
+    max-width: 1000px;
+    a {
+      width: 100%;
+    }
+  }
+  background-color: aliceblue;
+  height: 100%;
+  padding: 1em;
+
+  .panel {
+    width: 100%;
+    max-width: 1000px;
+  }
+
+  .panel-body {
+    flex-direction: column;
+    display: flex;
+    align-items: center;
+    text-align: center;
+  }
+
+  .panel-header {
+    flex-direction: column;
+    display: flex;
+    align-items: center;
+  }
+
+  h1 {
+    margin-bottom: 2em;
+  }
+
+  .map {
+    max-width: 1000px;
+    max-height: 500px;
+    width: 100%;
+    height: 50vw;
+  }
+}
+
+.copy-uri {
+  user-select: all;
+  background-color: blanchedalmond;
 }

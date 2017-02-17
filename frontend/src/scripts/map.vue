@@ -5,15 +5,15 @@
 </style>
 
 <template>
-
-<gmap-map :center="center" map-type-id="terrain" :zoom="15" style="width: 800px; height: 400px">
-    <gmap-marker v-for="m in markers" :position="m" :clickable="true" :draggable="false"></gmap-marker>
-
-    <gmap-circle :center="center" :radius="100" :options="{editable: true}">
-        </circle>
-
-</gmap-map>
-
+  <div class="page">
+    <h1>Device Map</h1>
+      <div class="map">
+        <gmap-map :center="center" map-type-id="terrain" :zoom="15" style="width: 100%; height: 100%">
+          <gmap-marker v-for="m in markers" :position="m" :clickable="true" :draggable="false"></gmap-marker>
+          <gmap-circle :center="center" :radius="100" :options="{editable: true}"></gmapcircle>
+        </gmap-map>
+      </div>
+  </div>
 </template>
 
 <script>

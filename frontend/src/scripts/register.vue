@@ -3,14 +3,32 @@
 
 
 <template>
-  <div>
+  <div class="page">
     <h1>Registering your device</h1>
-    <div>Register your device by scanning the following code into the Owntracks app</div>
-    <div>{{owntracksUri}}</div>
-    <div id="placeHolder" v-html="qrcode"></div>
-
-    <div>PassiveEye devices should send data to this uri</div>
-    <div v-html="passiveeyeUri"></div>
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">Owntracks</h3>
+      </div>
+      <div class="panel-body">
+        <h5>Register your device by scanning the QR code into the Owntracks app or use the uri below:</h5>
+        <br/>
+        <div id="placeHolder" v-html="qrcode"></div>
+        <br/>
+        <div class="copy-uri">{{owntracksUri}}</div>
+        <br/>
+      </div>
+    </div>
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">PassiveEye</h3>
+      </div>
+      <div class="panel-body">
+        <h5>PassiveEye devices should send data to this uri:</h5>
+        <br/>
+        <div v-html="passiveeyeUri" class="copy-uri"></div>
+        <br/>
+      </div>
+    </div>
   </div>
 </template>
 

@@ -3,6 +3,8 @@
   <head>
     <meta charset="utf-8">
     <link rel="stylesheet" href="dist/css/style.min.css">
+    <script src="dist/js/jquery.min.js"></script>
+    <script src="dist/js/bootstrap.min.js"></script>
   </head>
   <body id="home">
 
@@ -11,10 +13,11 @@
 	    <!-- specify the link by passing the `to` prop. -->
 	    <!-- <router-link> will be rendered as an `<a>` tag by default -->
 
-	    <router-link to="/devices">Device List</router-link>
-      <router-link to="/map">Map</router-link>
-      <router-link to="/register">Register Device</router-link>
-
+    <ul class="nav nav-tabs nav-justified">
+      <li><router-link to="/">Device List</router-link></li>
+      <li><router-link to="/map">Device Map</router-link></li>
+      <li><router-link to="/register">Register Device</router-link></li>
+    </ul>
 		<div id="app">
 	  <!-- route outlet -->
 	  <!-- component matched by the route will render here -->
