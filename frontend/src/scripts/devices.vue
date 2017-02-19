@@ -12,7 +12,7 @@
       </thead>
       <tbody>
         <tr v-for="dev in devices" v-on:click="route('/device/' + dev.key)">
-          <td>{{ dev.key}}</router-link></td>
+          <td><router-link :to="'/device/' + dev.key">{{ dev.key}}</router-link></td>
           <td>{{dev.value.lat}}</td>
           <td>{{dev.value.lng}}</td>
           <td>{{dev.value.time}}</td>
@@ -67,10 +67,14 @@ export default {
   },
   computed: {
     devices () {
-      return this.$store.state.devices.map(dev => ({
-        key: dev.key,
-        value: format(JSON.parse(dev.value))
-      }));
+      return this.$store.state.devices.map((dev) => {
+        return {
+          key: dev.key,
+          value: format(JSON.parse(dev.value))
+        }
+
+
+      });
     }
   }
 }

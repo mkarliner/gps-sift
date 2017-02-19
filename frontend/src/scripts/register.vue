@@ -7,6 +7,17 @@
     <h1>Registering your device</h1>
     <div class="panel panel-default">
       <div class="panel-heading">
+        <h3 class="panel-title">PassiveEye</h3>
+      </div>
+      <div class="panel-body">
+        <h5>PassiveEye devices should send data to this uri:</h5>
+        <br/>
+        <div v-html="passiveeyeUri" class="copy-uri"></div>
+        <br/>
+      </div>
+    </div>
+    <div class="panel panel-default">
+      <div class="panel-heading">
         <h3 class="panel-title">Owntracks</h3>
       </div>
       <div class="panel-body">
@@ -18,17 +29,7 @@
         <br/>
       </div>
     </div>
-    <div class="panel panel-default">
-      <div class="panel-heading">
-        <h3 class="panel-title">PassiveEye</h3>
-      </div>
-      <div class="panel-body">
-        <h5>PassiveEye devices should send data to this uri:</h5>
-        <br/>
-        <div v-html="passiveeyeUri" class="copy-uri"></div>
-        <br/>
-      </div>
-    </div>
+
   </div>
 </template>
 

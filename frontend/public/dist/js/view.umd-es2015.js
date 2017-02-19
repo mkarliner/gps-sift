@@ -37024,7 +37024,7 @@
 	
 	
 	// module
-	exports.push([module.id, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"register.vue","sourceRoot":"webpack://"}]);
+	exports.push([module.id, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"register.vue","sourceRoot":"webpack://"}]);
 	
 	// exports
 
@@ -37065,6 +37065,7 @@
 	    };
 	  }
 	}; //
+	//
 	//
 	//
 	//
@@ -39176,6 +39177,15 @@
 	    staticClass: "panel panel-default"
 	  }, [_vm._m(0), _vm._v(" "), _c('div', {
 	    staticClass: "panel-body"
+	  }, [_c('h5', [_vm._v("PassiveEye devices should send data to this uri:")]), _vm._v(" "), _c('br'), _vm._v(" "), _c('div', {
+	    staticClass: "copy-uri",
+	    domProps: {
+	      "innerHTML": _vm._s(_vm.passiveeyeUri)
+	    }
+	  }), _vm._v(" "), _c('br')])]), _vm._v(" "), _c('div', {
+	    staticClass: "panel panel-default"
+	  }, [_vm._m(1), _vm._v(" "), _c('div', {
+	    staticClass: "panel-body"
 	  }, [_c('h5', [_vm._v("Register your device by scanning the QR code into the Owntracks app or use the uri below:")]), _vm._v(" "), _c('br'), _vm._v(" "), _c('div', {
 	    attrs: {
 	      "id": "placeHolder"
@@ -39185,28 +39195,19 @@
 	    }
 	  }), _vm._v(" "), _c('br'), _vm._v(" "), _c('div', {
 	    staticClass: "copy-uri"
-	  }, [_vm._v(_vm._s(_vm.owntracksUri))]), _vm._v(" "), _c('br')])]), _vm._v(" "), _c('div', {
-	    staticClass: "panel panel-default"
-	  }, [_vm._m(1), _vm._v(" "), _c('div', {
-	    staticClass: "panel-body"
-	  }, [_c('h5', [_vm._v("PassiveEye devices should send data to this uri:")]), _vm._v(" "), _c('br'), _vm._v(" "), _c('div', {
-	    staticClass: "copy-uri",
-	    domProps: {
-	      "innerHTML": _vm._s(_vm.passiveeyeUri)
-	    }
-	  }), _vm._v(" "), _c('br')])])])
+	  }, [_vm._v(_vm._s(_vm.owntracksUri))]), _vm._v(" "), _c('br')])])])
 	},staticRenderFns: [function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
 	  return _c('div', {
 	    staticClass: "panel-heading"
 	  }, [_c('h3', {
 	    staticClass: "panel-title"
-	  }, [_vm._v("Owntracks")])])
+	  }, [_vm._v("PassiveEye")])])
 	},function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
 	  return _c('div', {
 	    staticClass: "panel-heading"
 	  }, [_c('h3', {
 	    staticClass: "panel-title"
-	  }, [_vm._v("PassiveEye")])])
+	  }, [_vm._v("Owntracks")])])
 	}]}
 	module.exports.render._withStripped = true
 	if (false) {
@@ -39299,7 +39300,7 @@
 	
 	
 	// module
-	exports.push([module.id, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"devices.vue","sourceRoot":"webpack://"}]);
+	exports.push([module.id, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"devices.vue","sourceRoot":"webpack://"}]);
 	
 	// exports
 
@@ -54315,7 +54316,11 @@
 	          _vm.route('/device/' + dev.key)
 	        }
 	      }
-	    }, [_c('td', [_c('router-link', [_vm._v(_vm._s(dev.key))])], 1), _vm._v(" "), _c('td', [_vm._v(_vm._s(dev.value.lat))]), _vm._v(" "), _c('td', [_vm._v(_vm._s(dev.value.lng))]), _vm._v(" "), _c('td', [_vm._v(_vm._s(dev.value.time))])])
+	    }, [_c('td', [_c('router-link', {
+	      attrs: {
+	        "to": '/device/' + dev.key
+	      }
+	    }, [_vm._v(_vm._s(dev.key))])], 1), _vm._v(" "), _c('td', [_vm._v(_vm._s(dev.value.lat))]), _vm._v(" "), _c('td', [_vm._v(_vm._s(dev.value.lng))]), _vm._v(" "), _c('td', [_vm._v(_vm._s(dev.value.time))])])
 	  }))])])
 	},staticRenderFns: [function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
 	  return _c('thead', [_c('tr', [_c('th', [_vm._v("Device ID")]), _vm._v(" "), _c('th', [_vm._v("Latitude")]), _vm._v(" "), _c('th', [_vm._v("Longitude")]), _vm._v(" "), _c('th', [_vm._v("Last Update")])])])
@@ -54411,7 +54416,7 @@
 	
 	
 	// module
-	exports.push([module.id, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"device_detail.vue","sourceRoot":"webpack://"}]);
+	exports.push([module.id, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"device_detail.vue","sourceRoot":"webpack://"}]);
 	
 	// exports
 
@@ -54425,7 +54430,13 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	//
+	
+	var _getIterator2 = __webpack_require__(143);
+	
+	var _getIterator3 = _interopRequireDefault(_getIterator2);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
 	//
 	//
 	//
@@ -54451,10 +54462,42 @@
 	
 	  computed: {
 	    device_detail: function device_detail() {
-	      var id = this.$store.state.route.params;
+	      var id = this.$store.state.route.params.id;
 	
-	      var details = this.$store.state.devices;
-	      console.log("DEVDET: ", id, details, details);
+	      var devs = this.$store.state.devices;
+	      var details = {};
+	
+	      var _iteratorNormalCompletion = true;
+	      var _didIteratorError = false;
+	      var _iteratorError = undefined;
+	
+	      try {
+	        for (var _iterator = (0, _getIterator3.default)(devs), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	          var i = _step.value;
+	
+	          if (i.key == id) {
+	            details = JSON.parse(i.value);
+	            details.id = i.key;
+	            break;
+	          }
+	        }
+	      } catch (err) {
+	        _didIteratorError = true;
+	        _iteratorError = err;
+	      } finally {
+	        try {
+	          if (!_iteratorNormalCompletion && _iterator.return) {
+	            _iterator.return();
+	          }
+	        } finally {
+	          if (_didIteratorError) {
+	            throw _iteratorError;
+	          }
+	        }
+	      }
+	
+	      console.log("DEVDET: ", id, details);
+	      return details;
 	    }
 	  }
 	};
@@ -54467,7 +54510,9 @@
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
 	  return _c('div', {
 	    staticClass: "page"
-	  }, [_c('h1', [_vm._v("Device Detail")]), _vm._v(" "), _vm._v("\n  " + _vm._s(_vm.device_detail) + "\n  ")])
+	  }, [_c('h1', [_vm._v("Device Detail")]), _vm._v(" "), _c('table', {
+	    staticClass: "table table-responsive table-bordered table-striped table-hover"
+	  }, [_c('tbody', [_c('tr', [_c('td', [_vm._v("ID")]), _vm._v(_vm._s(_vm.device_detail.id))]), _vm._v(" "), _c('tr', [_c('td', [_vm._v("LAT")]), _c('td', [_vm._v(_vm._s(_vm.device_detail.lat))])]), _vm._v(" "), _c('tr', [_c('td', [_vm._v("LNG")]), _c('td', [_vm._v(_vm._s(_vm.device_detail.lng))])]), _vm._v(" "), _c('tr', [_c('td', [_vm._v("TIMESTAMP")]), _c('td', [_vm._v(_vm._s(_vm.device_detail.time))])]), _vm._v(" "), _c('tr', [_c('td', [_vm._v("RSSI")]), _c('td', [_vm._v(_vm._s(_vm.device_detail.rssi))])])])]), _vm._v("\n" + _vm._s(_vm.device_detail) + "\n")])
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 	if (false) {
