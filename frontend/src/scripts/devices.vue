@@ -17,6 +17,8 @@
           <td>{{dev.value.lng}}</td>
           <td>{{dev.value.time}}</td>
         </tr>
+        <tr v-for="dev in dummy">
+        </tr>
       </tbody>
     </table>
   </div>
@@ -39,7 +41,11 @@ const format = values => {
 };
 
 export default {
-  data () {},
+  data () {
+    return {
+      devices: []
+    }
+  },
   beforeDestroy: function () {
     console.log("DESTROYED: ", this)
     this.$store.state =={};
@@ -50,31 +56,28 @@ export default {
     console.log('CREATED:  ' + this)
   },
   mounted () {
+    this.updateTimes();
     this.timeUpdates = setInterval(() => {
       this.updateTimes();
     }, 60 * 1000);
   },
   methods: {
     updateTimes () {
-      this.devices = this.$store.state.devices.map(dev => ({
-        key: dev.key,
-        value: format(JSON.parse(dev.value))
-      }));
+      if (this.$store.state.devices) {
+        this.devices = this.$store.state.devices.map(dev => ({
+          key: dev.key,
+          value: format(JSON.parse(dev.value))
+        }));
+      }
     },
     route (path) {
       this.$router.push(path);
     }
   },
   computed: {
-    devices () {
-      return this.$store.state.devices.map((dev) => {
-        return {
-          key: dev.key,
-          value: format(JSON.parse(dev.value))
-        }
-
-
-      });
+    dummy () {
+      this.updateTimes();
+      return this.$store.state.devices && [];
     }
   }
 }

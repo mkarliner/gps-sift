@@ -88,27 +88,27 @@
 	
 	var VueGoogleMaps = _interopRequireWildcard(_vue2GoogleMaps);
 	
-	var _map = __webpack_require__(164);
+	var _map = __webpack_require__(166);
 	
 	var _map2 = _interopRequireDefault(_map);
 	
-	var _register = __webpack_require__(169);
+	var _register = __webpack_require__(171);
 	
 	var _register2 = _interopRequireDefault(_register);
 	
-	var _devices = __webpack_require__(175);
+	var _devices = __webpack_require__(177);
 	
 	var _devices2 = _interopRequireDefault(_devices);
 	
-	var _device_detail = __webpack_require__(290);
+	var _device_detail = __webpack_require__(292);
 	
 	var _device_detail2 = _interopRequireDefault(_device_detail);
 	
-	var _qrcodeGenerator = __webpack_require__(173);
+	var _qrcodeGenerator = __webpack_require__(175);
 	
 	var _qrcodeGenerator2 = _interopRequireDefault(_qrcodeGenerator);
 	
-	var _vuexRouterSync = __webpack_require__(295);
+	var _vuexRouterSync = __webpack_require__(297);
 	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
@@ -11387,11 +11387,25 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(console) {/**
-	  * vue-router v2.1.3
+	  * vue-router v2.2.1
 	  * (c) 2017 Evan You
 	  * @license MIT
 	  */
 	'use strict';
+	
+	/*  */
+	
+	function assert (condition, message) {
+	  if (!condition) {
+	    throw new Error(("[vue-router] " + message))
+	  }
+	}
+	
+	function warn (condition, message) {
+	  if (!condition) {
+	    typeof console !== 'undefined' && console.warn(("[vue-router] " + message));
+	  }
+	}
 	
 	var View = {
 	  name: 'router-view',
@@ -11408,77 +11422,91 @@
 	    var parent = ref.parent;
 	    var data = ref.data;
 	
-	    data.routerView = true
+	    data.routerView = true;
 	
-	    var name = props.name
-	    var route = parent.$route
-	    var cache = parent._routerViewCache || (parent._routerViewCache = {})
+	    var name = props.name;
+	    var route = parent.$route;
+	    var cache = parent._routerViewCache || (parent._routerViewCache = {});
 	
 	    // determine current view depth, also check to see if the tree
 	    // has been toggled inactive but kept-alive.
-	    var depth = 0
-	    var inactive = false
+	    var depth = 0;
+	    var inactive = false;
 	    while (parent) {
 	      if (parent.$vnode && parent.$vnode.data.routerView) {
-	        depth++
+	        depth++;
 	      }
 	      if (parent._inactive) {
-	        inactive = true
+	        inactive = true;
 	      }
-	      parent = parent.$parent
+	      parent = parent.$parent;
 	    }
-	    data.routerViewDepth = depth
+	    data.routerViewDepth = depth;
 	
 	    // render previous view if the tree is inactive and kept-alive
 	    if (inactive) {
 	      return h(cache[name], data, children)
 	    }
 	
-	    var matched = route.matched[depth]
+	    var matched = route.matched[depth];
 	    // render empty node if no matched route
 	    if (!matched) {
-	      cache[name] = null
+	      cache[name] = null;
 	      return h()
 	    }
 	
-	    var component = cache[name] = matched.components[name]
+	    var component = cache[name] = matched.components[name];
 	
 	    // inject instance registration hooks
-	    var hooks = data.hook || (data.hook = {})
+	    var hooks = data.hook || (data.hook = {});
 	    hooks.init = function (vnode) {
-	      matched.instances[name] = vnode.child
-	    }
+	      matched.instances[name] = vnode.child;
+	    };
 	    hooks.prepatch = function (oldVnode, vnode) {
-	      matched.instances[name] = vnode.child
-	    }
+	      matched.instances[name] = vnode.child;
+	    };
 	    hooks.destroy = function (vnode) {
 	      if (matched.instances[name] === vnode.child) {
-	        matched.instances[name] = undefined
+	        matched.instances[name] = undefined;
 	      }
-	    }
+	    };
+	
+	    // resolve props
+	    data.props = resolveProps(route, matched.props && matched.props[name]);
 	
 	    return h(component, data, children)
 	  }
+	};
+	
+	function resolveProps (route, config) {
+	  switch (typeof config) {
+	    case 'undefined':
+	      return
+	    case 'object':
+	      return config
+	    case 'function':
+	      return config(route)
+	    case 'boolean':
+	      return config ? route.params : undefined
+	    default:
+	      warn(false, ("props in \"" + (route.path) + "\" is a " + (typeof config) + ", expecting an object, function or boolean."));
+	  }
 	}
 	
 	/*  */
 	
-	function assert (condition, message) {
-	  if (!condition) {
-	    throw new Error(("[vue-router] " + message))
-	  }
-	}
+	var encodeReserveRE = /[!'()*]/g;
+	var encodeReserveReplacer = function (c) { return '%' + c.charCodeAt(0).toString(16); };
+	var commaRE = /%2C/g;
 	
-	function warn (condition, message) {
-	  if (!condition) {
-	    typeof console !== 'undefined' && console.warn(("[vue-router] " + message))
-	  }
-	}
+	// fixed encodeURIComponent which is more comformant to RFC3986:
+	// - escapes [!'()*]
+	// - preserve commas
+	var encode = function (str) { return encodeURIComponent(str)
+	  .replace(encodeReserveRE, encodeReserveReplacer)
+	  .replace(commaRE, ','); };
 	
-	/*  */
-	
-	var encode = encodeURIComponent
-	var decode = decodeURIComponent
+	var decode = decodeURIComponent;
 	
 	function resolveQuery (
 	  query,
@@ -11487,15 +11515,15 @@
 	  if ( extraQuery === void 0 ) extraQuery = {};
 	
 	  if (query) {
-	    var parsedQuery
+	    var parsedQuery;
 	    try {
-	      parsedQuery = parseQuery(query)
+	      parsedQuery = parseQuery(query);
 	    } catch (e) {
-	      ("production") !== 'production' && warn(false, e.message)
-	      parsedQuery = {}
+	      ("production") !== 'production' && warn(false, e.message);
+	      parsedQuery = {};
 	    }
 	    for (var key in extraQuery) {
-	      parsedQuery[key] = extraQuery[key]
+	      parsedQuery[key] = extraQuery[key];
 	    }
 	    return parsedQuery
 	  } else {
@@ -11504,36 +11532,36 @@
 	}
 	
 	function parseQuery (query) {
-	  var res = {}
+	  var res = {};
 	
-	  query = query.trim().replace(/^(\?|#|&)/, '')
+	  query = query.trim().replace(/^(\?|#|&)/, '');
 	
 	  if (!query) {
 	    return res
 	  }
 	
 	  query.split('&').forEach(function (param) {
-	    var parts = param.replace(/\+/g, ' ').split('=')
-	    var key = decode(parts.shift())
+	    var parts = param.replace(/\+/g, ' ').split('=');
+	    var key = decode(parts.shift());
 	    var val = parts.length > 0
 	      ? decode(parts.join('='))
-	      : null
+	      : null;
 	
 	    if (res[key] === undefined) {
-	      res[key] = val
+	      res[key] = val;
 	    } else if (Array.isArray(res[key])) {
-	      res[key].push(val)
+	      res[key].push(val);
 	    } else {
-	      res[key] = [res[key], val]
+	      res[key] = [res[key], val];
 	    }
-	  })
+	  });
 	
 	  return res
 	}
 	
 	function stringifyQuery (obj) {
 	  var res = obj ? Object.keys(obj).map(function (key) {
-	    var val = obj[key]
+	    var val = obj[key];
 	
 	    if (val === undefined) {
 	      return ''
@@ -11544,28 +11572,28 @@
 	    }
 	
 	    if (Array.isArray(val)) {
-	      var result = []
+	      var result = [];
 	      val.slice().forEach(function (val2) {
 	        if (val2 === undefined) {
 	          return
 	        }
 	        if (val2 === null) {
-	          result.push(encode(key))
+	          result.push(encode(key));
 	        } else {
-	          result.push(encode(key) + '=' + encode(val2))
+	          result.push(encode(key) + '=' + encode(val2));
 	        }
-	      })
+	      });
 	      return result.join('&')
 	    }
 	
 	    return encode(key) + '=' + encode(val)
-	  }).filter(function (x) { return x.length > 0; }).join('&') : null
+	  }).filter(function (x) { return x.length > 0; }).join('&') : null;
 	  return res ? ("?" + res) : ''
 	}
 	
 	/*  */
 	
-	var trailingSlashRE = /\/?$/
+	var trailingSlashRE = /\/?$/;
 	
 	function createRoute (
 	  record,
@@ -11581,9 +11609,9 @@
 	    params: location.params || {},
 	    fullPath: getFullPath(location),
 	    matched: record ? formatMatch(record) : []
-	  }
+	  };
 	  if (redirectedFrom) {
-	    route.redirectedFrom = getFullPath(redirectedFrom)
+	    route.redirectedFrom = getFullPath(redirectedFrom);
 	  }
 	  return Object.freeze(route)
 	}
@@ -11591,13 +11619,13 @@
 	// the starting route that represents the initial state
 	var START = createRoute(null, {
 	  path: '/'
-	})
+	});
 	
 	function formatMatch (record) {
-	  var res = []
+	  var res = [];
 	  while (record) {
-	    res.unshift(record)
-	    record = record.parent
+	    res.unshift(record);
+	    record = record.parent;
 	  }
 	  return res
 	}
@@ -11637,8 +11665,8 @@
 	  if ( a === void 0 ) a = {};
 	  if ( b === void 0 ) b = {};
 	
-	  var aKeys = Object.keys(a)
-	  var bKeys = Object.keys(b)
+	  var aKeys = Object.keys(a);
+	  var bKeys = Object.keys(b);
 	  if (aKeys.length !== bKeys.length) {
 	    return false
 	  }
@@ -11667,7 +11695,8 @@
 	/*  */
 	
 	// work around weird flow bug
-	var toTypes = [String, Object]
+	var toTypes = [String, Object];
+	var eventTypes = [String, Array];
 	
 	var Link = {
 	  name: 'router-link',
@@ -11685,97 +11714,95 @@
 	    replace: Boolean,
 	    activeClass: String,
 	    event: {
-	      type: [String, Array],
+	      type: eventTypes,
 	      default: 'click'
 	    }
 	  },
 	  render: function render (h) {
 	    var this$1 = this;
 	
-	    var router = this.$router
-	    var current = this.$route
+	    var router = this.$router;
+	    var current = this.$route;
 	    var ref = router.resolve(this.to, current, this.append);
-	    var normalizedTo = ref.normalizedTo;
-	    var resolved = ref.resolved;
+	    var location = ref.location;
+	    var route = ref.route;
 	    var href = ref.href;
-	    var classes = {}
-	    var activeClass = this.activeClass || router.options.linkActiveClass || 'router-link-active'
-	    var compareTarget = normalizedTo.path ? createRoute(null, normalizedTo) : resolved
+	    var classes = {};
+	    var activeClass = this.activeClass || router.options.linkActiveClass || 'router-link-active';
+	    var compareTarget = location.path ? createRoute(null, location) : route;
 	    classes[activeClass] = this.exact
 	      ? isSameRoute(current, compareTarget)
-	      : isIncludedRoute(current, compareTarget)
+	      : isIncludedRoute(current, compareTarget);
 	
 	    var handler = function (e) {
 	      if (guardEvent(e)) {
 	        if (this$1.replace) {
-	          router.replace(normalizedTo)
+	          router.replace(location);
 	        } else {
-	          router.push(normalizedTo)
+	          router.push(location);
 	        }
 	      }
-	    }
+	    };
 	
-	    var on = { click: guardEvent }
+	    var on = { click: guardEvent };
 	    if (Array.isArray(this.event)) {
-	      this.event.forEach(function (e) { on[e] = handler })
+	      this.event.forEach(function (e) { on[e] = handler; });
 	    } else {
-	      on[this.event] = handler
+	      on[this.event] = handler;
 	    }
 	
 	    var data = {
 	      class: classes
-	    }
+	    };
 	
 	    if (this.tag === 'a') {
-	      data.on = on
-	      data.attrs = { href: href }
+	      data.on = on;
+	      data.attrs = { href: href };
 	    } else {
 	      // find the first <a> child and apply listener and href
-	      var a = findAnchor(this.$slots.default)
+	      var a = findAnchor(this.$slots.default);
 	      if (a) {
 	        // in case the <a> is a static node
-	        a.isStatic = false
-	        var extend = _Vue.util.extend
-	        var aData = a.data = extend({}, a.data)
-	        aData.on = on
-	        var aAttrs = a.data.attrs = extend({}, a.data.attrs)
-	        aAttrs.href = href
+	        a.isStatic = false;
+	        var extend = _Vue.util.extend;
+	        var aData = a.data = extend({}, a.data);
+	        aData.on = on;
+	        var aAttrs = a.data.attrs = extend({}, a.data.attrs);
+	        aAttrs.href = href;
 	      } else {
 	        // doesn't have <a> child, apply listener to self
-	        data.on = on
+	        data.on = on;
 	      }
 	    }
 	
 	    return h(this.tag, data, this.$slots.default)
 	  }
-	}
+	};
 	
 	function guardEvent (e) {
 	  // don't redirect with control keys
-	  /* istanbul ignore if */
 	  if (e.metaKey || e.ctrlKey || e.shiftKey) { return }
 	  // don't redirect when preventDefault called
-	  /* istanbul ignore if */
 	  if (e.defaultPrevented) { return }
 	  // don't redirect on right click
-	  /* istanbul ignore if */
 	  if (e.button !== undefined && e.button !== 0) { return }
 	  // don't redirect if `target="_blank"`
-	  /* istanbul ignore if */
 	  if (e.target && e.target.getAttribute) {
-	    var target = e.target.getAttribute('target')
+	    var target = e.target.getAttribute('target');
 	    if (/\b_blank\b/i.test(target)) { return }
 	  }
-	
-	  e.preventDefault()
+	  // this may be a Weex event which doesn't have this method
+	  if (e.preventDefault) {
+	    e.preventDefault();
+	  }
 	  return true
 	}
 	
 	function findAnchor (children) {
 	  if (children) {
-	    var child
+	    var child;
 	    for (var i = 0; i < children.length; i++) {
-	      child = children[i]
+	      child = children[i];
 	      if (child.tag === 'a') {
 	        return child
 	      }
@@ -11786,39 +11813,43 @@
 	  }
 	}
 	
-	var _Vue
+	var _Vue;
 	
 	function install (Vue) {
 	  if (install.installed) { return }
-	  install.installed = true
+	  install.installed = true;
 	
-	  _Vue = Vue
+	  _Vue = Vue;
 	
 	  Object.defineProperty(Vue.prototype, '$router', {
 	    get: function get () { return this.$root._router }
-	  })
+	  });
 	
 	  Object.defineProperty(Vue.prototype, '$route', {
-	    get: function get$1 () { return this.$root._route }
-	  })
+	    get: function get () { return this.$root._route }
+	  });
 	
 	  Vue.mixin({
 	    beforeCreate: function beforeCreate () {
 	      if (this.$options.router) {
-	        this._router = this.$options.router
-	        this._router.init(this)
-	        Vue.util.defineReactive(this, '_route', this._router.history.current)
+	        this._router = this.$options.router;
+	        this._router.init(this);
+	        Vue.util.defineReactive(this, '_route', this._router.history.current);
 	      }
 	    }
-	  })
+	  });
 	
-	  Vue.component('router-view', View)
-	  Vue.component('router-link', Link)
+	  Vue.component('router-view', View);
+	  Vue.component('router-link', Link);
 	
-	  var strats = Vue.config.optionMergeStrategies
+	  var strats = Vue.config.optionMergeStrategies;
 	  // use the same hook merging strategy for route hooks
-	  strats.beforeRouteEnter = strats.beforeRouteLeave = strats.created
+	  strats.beforeRouteEnter = strats.beforeRouteLeave = strats.created;
 	}
+	
+	/*  */
+	
+	var inBrowser = typeof window !== 'undefined';
 	
 	/*  */
 	
@@ -11835,50 +11866,50 @@
 	    return base + relative
 	  }
 	
-	  var stack = base.split('/')
+	  var stack = base.split('/');
 	
 	  // remove trailing segment if:
 	  // - not appending
 	  // - appending to trailing slash (last segment is empty)
 	  if (!append || !stack[stack.length - 1]) {
-	    stack.pop()
+	    stack.pop();
 	  }
 	
 	  // resolve relative path
-	  var segments = relative.replace(/^\//, '').split('/')
+	  var segments = relative.replace(/^\//, '').split('/');
 	  for (var i = 0; i < segments.length; i++) {
-	    var segment = segments[i]
+	    var segment = segments[i];
 	    if (segment === '.') {
 	      continue
 	    } else if (segment === '..') {
-	      stack.pop()
+	      stack.pop();
 	    } else {
-	      stack.push(segment)
+	      stack.push(segment);
 	    }
 	  }
 	
 	  // ensure leading slash
 	  if (stack[0] !== '') {
-	    stack.unshift('')
+	    stack.unshift('');
 	  }
 	
 	  return stack.join('/')
 	}
 	
 	function parsePath (path) {
-	  var hash = ''
-	  var query = ''
+	  var hash = '';
+	  var query = '';
 	
-	  var hashIndex = path.indexOf('#')
+	  var hashIndex = path.indexOf('#');
 	  if (hashIndex >= 0) {
-	    hash = path.slice(hashIndex)
-	    path = path.slice(0, hashIndex)
+	    hash = path.slice(hashIndex);
+	    path = path.slice(0, hashIndex);
 	  }
 	
-	  var queryIndex = path.indexOf('?')
+	  var queryIndex = path.indexOf('?');
 	  if (queryIndex >= 0) {
-	    query = path.slice(queryIndex + 1)
-	    path = path.slice(0, queryIndex)
+	    query = path.slice(queryIndex + 1);
+	    path = path.slice(0, queryIndex);
 	  }
 	
 	  return {
@@ -11894,13 +11925,17 @@
 	
 	/*  */
 	
-	function createRouteMap (routes) {
-	  var pathMap = Object.create(null)
-	  var nameMap = Object.create(null)
+	function createRouteMap (
+	  routes,
+	  oldPathMap,
+	  oldNameMap
+	) {
+	  var pathMap = oldPathMap || Object.create(null);
+	  var nameMap = oldNameMap || Object.create(null);
 	
 	  routes.forEach(function (route) {
-	    addRouteRecord(pathMap, nameMap, route)
-	  })
+	    addRouteRecord(pathMap, nameMap, route);
+	  });
 	
 	  return {
 	    pathMap: pathMap,
@@ -11918,12 +11953,12 @@
 	  var path = route.path;
 	  var name = route.name;
 	  if (false) {
-	    assert(path != null, "\"path\" is required in a route configuration.")
+	    assert(path != null, "\"path\" is required in a route configuration.");
 	    assert(
 	      typeof route.component !== 'string',
 	      "route config \"component\" for path: " + (String(path || name)) + " cannot be a " +
 	      "string id. Use an actual component instead."
-	    )
+	    );
 	  }
 	
 	  var record = {
@@ -11935,8 +11970,13 @@
 	    matchAs: matchAs,
 	    redirect: route.redirect,
 	    beforeEnter: route.beforeEnter,
-	    meta: route.meta || {}
-	  }
+	    meta: route.meta || {},
+	    props: route.props == null
+	      ? {}
+	      : route.components
+	        ? route.props
+	        : { default: route.props }
+	  };
 	
 	  if (route.children) {
 	    // Warn if route is named and has a default child route.
@@ -11951,15 +11991,15 @@
 	          "the default child route will not be rendered. Remove the name from " +
 	          "this route and use the name of the default child route for named " +
 	          "links instead."
-	        )
+	        );
 	      }
 	    }
 	    route.children.forEach(function (child) {
 	      var childMatchAs = matchAs
 	        ? cleanPath((matchAs + "/" + (child.path)))
-	        : undefined
-	      addRouteRecord(pathMap, nameMap, child, record, childMatchAs)
-	    })
+	        : undefined;
+	      addRouteRecord(pathMap, nameMap, child, record, childMatchAs);
+	    });
 	  }
 	
 	  if (route.alias !== undefined) {
@@ -11968,56 +12008,56 @@
 	        var aliasRoute = {
 	          path: alias,
 	          children: route.children
-	        }
-	        addRouteRecord(pathMap, nameMap, aliasRoute, parent, record.path)
-	      })
+	        };
+	        addRouteRecord(pathMap, nameMap, aliasRoute, parent, record.path);
+	      });
 	    } else {
 	      var aliasRoute = {
 	        path: route.alias,
 	        children: route.children
-	      }
-	      addRouteRecord(pathMap, nameMap, aliasRoute, parent, record.path)
+	      };
+	      addRouteRecord(pathMap, nameMap, aliasRoute, parent, record.path);
 	    }
 	  }
 	
 	  if (!pathMap[record.path]) {
-	    pathMap[record.path] = record
+	    pathMap[record.path] = record;
 	  }
 	
 	  if (name) {
 	    if (!nameMap[name]) {
-	      nameMap[name] = record
+	      nameMap[name] = record;
 	    } else if (false) {
 	      warn(
 	        false,
 	        "Duplicate named routes definition: " +
 	        "{ name: \"" + name + "\", path: \"" + (record.path) + "\" }"
-	      )
+	      );
 	    }
 	  }
 	}
 	
 	function normalizePath (path, parent) {
-	  path = path.replace(/\/$/, '')
+	  path = path.replace(/\/$/, '');
 	  if (path[0] === '/') { return path }
 	  if (parent == null) { return path }
 	  return cleanPath(((parent.path) + "/" + path))
 	}
 	
-	var __moduleExports = Array.isArray || function (arr) {
+	var index$1 = Array.isArray || function (arr) {
 	  return Object.prototype.toString.call(arr) == '[object Array]';
 	};
 	
-	var isarray = __moduleExports
+	var isarray = index$1;
 	
 	/**
 	 * Expose `pathToRegexp`.
 	 */
-	var index = pathToRegexp
-	var parse_1 = parse
-	var compile_1 = compile
-	var tokensToFunction_1 = tokensToFunction
-	var tokensToRegExp_1 = tokensToRegExp
+	var index = pathToRegexp;
+	var parse_1 = parse;
+	var compile_1 = compile;
+	var tokensToFunction_1 = tokensToFunction;
+	var tokensToRegExp_1 = tokensToRegExp;
 	
 	/**
 	 * The main path matching regexp utility.
@@ -12035,7 +12075,7 @@
 	  // "/route(\\d+)"  => [undefined, undefined, undefined, "\d+", undefined, undefined]
 	  // "/*"            => ["/", undefined, undefined, undefined, undefined, "*"]
 	  '([\\/.])?(?:(?:\\:(\\w+)(?:\\(((?:\\\\.|[^\\\\()])+)\\))?|\\(((?:\\\\.|[^\\\\()])+)\\))([+*?])?|(\\*))'
-	].join('|'), 'g')
+	].join('|'), 'g');
 	
 	/**
 	 * Parse a string for the raw tokens.
@@ -12045,45 +12085,45 @@
 	 * @return {!Array}
 	 */
 	function parse (str, options) {
-	  var tokens = []
-	  var key = 0
-	  var index = 0
-	  var path = ''
-	  var defaultDelimiter = options && options.delimiter || '/'
-	  var res
+	  var tokens = [];
+	  var key = 0;
+	  var index = 0;
+	  var path = '';
+	  var defaultDelimiter = options && options.delimiter || '/';
+	  var res;
 	
 	  while ((res = PATH_REGEXP.exec(str)) != null) {
-	    var m = res[0]
-	    var escaped = res[1]
-	    var offset = res.index
-	    path += str.slice(index, offset)
-	    index = offset + m.length
+	    var m = res[0];
+	    var escaped = res[1];
+	    var offset = res.index;
+	    path += str.slice(index, offset);
+	    index = offset + m.length;
 	
 	    // Ignore already escaped sequences.
 	    if (escaped) {
-	      path += escaped[1]
+	      path += escaped[1];
 	      continue
 	    }
 	
-	    var next = str[index]
-	    var prefix = res[2]
-	    var name = res[3]
-	    var capture = res[4]
-	    var group = res[5]
-	    var modifier = res[6]
-	    var asterisk = res[7]
+	    var next = str[index];
+	    var prefix = res[2];
+	    var name = res[3];
+	    var capture = res[4];
+	    var group = res[5];
+	    var modifier = res[6];
+	    var asterisk = res[7];
 	
 	    // Push the current path onto the tokens.
 	    if (path) {
-	      tokens.push(path)
-	      path = ''
+	      tokens.push(path);
+	      path = '';
 	    }
 	
-	    var partial = prefix != null && next != null && next !== prefix
-	    var repeat = modifier === '+' || modifier === '*'
-	    var optional = modifier === '?' || modifier === '*'
-	    var delimiter = res[2] || defaultDelimiter
-	    var pattern = capture || group
+	    var partial = prefix != null && next != null && next !== prefix;
+	    var repeat = modifier === '+' || modifier === '*';
+	    var optional = modifier === '?' || modifier === '*';
+	    var delimiter = res[2] || defaultDelimiter;
+	    var pattern = capture || group;
 	
 	    tokens.push({
 	      name: name || key++,
@@ -12094,17 +12134,17 @@
 	      partial: partial,
 	      asterisk: !!asterisk,
 	      pattern: pattern ? escapeGroup(pattern) : (asterisk ? '.*' : '[^' + escapeString(delimiter) + ']+?')
-	    })
+	    });
 	  }
 	
 	  // Match any characters still remaining.
 	  if (index < str.length) {
-	    path += str.substr(index)
+	    path += str.substr(index);
 	  }
 	
 	  // If the path exists, push it onto the end.
 	  if (path) {
-	    tokens.push(path)
+	    tokens.push(path);
 	  }
 	
 	  return tokens
@@ -12150,38 +12190,38 @@
 	 */
 	function tokensToFunction (tokens) {
 	  // Compile all the tokens into regexps.
-	  var matches = new Array(tokens.length)
+	  var matches = new Array(tokens.length);
 	
 	  // Compile all the patterns before compilation.
 	  for (var i = 0; i < tokens.length; i++) {
 	    if (typeof tokens[i] === 'object') {
-	      matches[i] = new RegExp('^(?:' + tokens[i].pattern + ')$')
+	      matches[i] = new RegExp('^(?:' + tokens[i].pattern + ')$');
 	    }
 	  }
 	
 	  return function (obj, opts) {
-	    var path = ''
-	    var data = obj || {}
-	    var options = opts || {}
-	    var encode = options.pretty ? encodeURIComponentPretty : encodeURIComponent
+	    var path = '';
+	    var data = obj || {};
+	    var options = opts || {};
+	    var encode = options.pretty ? encodeURIComponentPretty : encodeURIComponent;
 	
 	    for (var i = 0; i < tokens.length; i++) {
-	      var token = tokens[i]
+	      var token = tokens[i];
 	
 	      if (typeof token === 'string') {
-	        path += token
+	        path += token;
 	
 	        continue
 	      }
 	
-	      var value = data[token.name]
-	      var segment
+	      var value = data[token.name];
+	      var segment;
 	
 	      if (value == null) {
 	        if (token.optional) {
 	          // Prepend partial segment prefixes.
 	          if (token.partial) {
-	            path += token.prefix
+	            path += token.prefix;
 	          }
 	
 	          continue
@@ -12204,25 +12244,25 @@
 	        }
 	
 	        for (var j = 0; j < value.length; j++) {
-	          segment = encode(value[j])
+	          segment = encode(value[j]);
 	
 	          if (!matches[i].test(segment)) {
 	            throw new TypeError('Expected all "' + token.name + '" to match "' + token.pattern + '", but received `' + JSON.stringify(segment) + '`')
 	          }
 	
-	          path += (j === 0 ? token.prefix : token.delimiter) + segment
+	          path += (j === 0 ? token.prefix : token.delimiter) + segment;
 	        }
 	
 	        continue
 	      }
 	
-	      segment = token.asterisk ? encodeAsterisk(value) : encode(value)
+	      segment = token.asterisk ? encodeAsterisk(value) : encode(value);
 	
 	      if (!matches[i].test(segment)) {
 	        throw new TypeError('Expected "' + token.name + '" to match "' + token.pattern + '", but received "' + segment + '"')
 	      }
 	
-	      path += token.prefix + segment
+	      path += token.prefix + segment;
 	    }
 	
 	    return path
@@ -12257,7 +12297,7 @@
 	 * @return {!RegExp}
 	 */
 	function attachKeys (re, keys) {
-	  re.keys = keys
+	  re.keys = keys;
 	  return re
 	}
 	
@@ -12280,7 +12320,7 @@
 	 */
 	function regexpToRegexp (path, keys) {
 	  // Use a negative lookahead to match only capturing groups.
-	  var groups = path.source.match(/\((?!\?)/g)
+	  var groups = path.source.match(/\((?!\?)/g);
 	
 	  if (groups) {
 	    for (var i = 0; i < groups.length; i++) {
@@ -12293,7 +12333,7 @@
 	        partial: false,
 	        asterisk: false,
 	        pattern: null
-	      })
+	      });
 	    }
 	  }
 	
@@ -12309,13 +12349,13 @@
 	 * @return {!RegExp}
 	 */
 	function arrayToRegexp (path, keys, options) {
-	  var parts = []
+	  var parts = [];
 	
 	  for (var i = 0; i < path.length; i++) {
-	    parts.push(pathToRegexp(path[i], keys, options).source)
+	    parts.push(pathToRegexp(path[i], keys, options).source);
 	  }
 	
-	  var regexp = new RegExp('(?:' + parts.join('|') + ')', flags(options))
+	  var regexp = new RegExp('(?:' + parts.join('|') + ')', flags(options));
 	
 	  return attachKeys(regexp, keys)
 	}
@@ -12342,63 +12382,63 @@
 	 */
 	function tokensToRegExp (tokens, keys, options) {
 	  if (!isarray(keys)) {
-	    options = /** @type {!Object} */ (keys || options)
-	    keys = []
+	    options = /** @type {!Object} */ (keys || options);
+	    keys = [];
 	  }
 	
-	  options = options || {}
+	  options = options || {};
 	
-	  var strict = options.strict
-	  var end = options.end !== false
-	  var route = ''
+	  var strict = options.strict;
+	  var end = options.end !== false;
+	  var route = '';
 	
 	  // Iterate over the tokens and create our regexp string.
 	  for (var i = 0; i < tokens.length; i++) {
-	    var token = tokens[i]
+	    var token = tokens[i];
 	
 	    if (typeof token === 'string') {
-	      route += escapeString(token)
+	      route += escapeString(token);
 	    } else {
-	      var prefix = escapeString(token.prefix)
-	      var capture = '(?:' + token.pattern + ')'
+	      var prefix = escapeString(token.prefix);
+	      var capture = '(?:' + token.pattern + ')';
 	
-	      keys.push(token)
+	      keys.push(token);
 	
 	      if (token.repeat) {
-	        capture += '(?:' + prefix + capture + ')*'
+	        capture += '(?:' + prefix + capture + ')*';
 	      }
 	
 	      if (token.optional) {
 	        if (!token.partial) {
-	          capture = '(?:' + prefix + '(' + capture + '))?'
+	          capture = '(?:' + prefix + '(' + capture + '))?';
 	        } else {
-	          capture = prefix + '(' + capture + ')?'
+	          capture = prefix + '(' + capture + ')?';
 	        }
 	      } else {
-	        capture = prefix + '(' + capture + ')'
+	        capture = prefix + '(' + capture + ')';
 	      }
 	
-	      route += capture
+	      route += capture;
 	    }
 	  }
 	
-	  var delimiter = escapeString(options.delimiter || '/')
-	  var endsWithDelimiter = route.slice(-delimiter.length) === delimiter
+	  var delimiter = escapeString(options.delimiter || '/');
+	  var endsWithDelimiter = route.slice(-delimiter.length) === delimiter;
 	
 	  // In non-strict mode we allow a slash at the end of match. If the path to
 	  // match already ends with a slash, we remove it for consistency. The slash
 	  // is valid at the end of a path match, not in the middle. This is important
 	  // in non-ending mode, where "/test/" shouldn't match "/test//route".
 	  if (!strict) {
-	    route = (endsWithDelimiter ? route.slice(0, -delimiter.length) : route) + '(?:' + delimiter + '(?=$))?'
+	    route = (endsWithDelimiter ? route.slice(0, -delimiter.length) : route) + '(?:' + delimiter + '(?=$))?';
 	  }
 	
 	  if (end) {
-	    route += '$'
+	    route += '$';
 	  } else {
 	    // In non-ending mode, we need the capturing groups to match as much as
 	    // possible by using a positive lookahead to the end or next path segment.
-	    route += strict && endsWithDelimiter ? '' : '(?=' + delimiter + '|$)'
+	    route += strict && endsWithDelimiter ? '' : '(?=' + delimiter + '|$)';
 	  }
 	
 	  return attachKeys(new RegExp('^' + route, flags(options)), keys)
@@ -12418,11 +12458,11 @@
 	 */
 	function pathToRegexp (path, keys, options) {
 	  if (!isarray(keys)) {
-	    options = /** @type {!Object} */ (keys || options)
-	    keys = []
+	    options = /** @type {!Object} */ (keys || options);
+	    keys = [];
 	  }
 	
-	  options = options || {}
+	  options = options || {};
 	
 	  if (path instanceof RegExp) {
 	    return regexpToRegexp(path, /** @type {!Array} */ (keys))
@@ -12442,25 +12482,25 @@
 	
 	/*  */
 	
-	var regexpCache = Object.create(null)
+	var regexpCache = Object.create(null);
 	
 	function getRouteRegex (path) {
-	  var hit = regexpCache[path]
-	  var keys, regexp
+	  var hit = regexpCache[path];
+	  var keys, regexp;
 	
 	  if (hit) {
-	    keys = hit.keys
-	    regexp = hit.regexp
+	    keys = hit.keys;
+	    regexp = hit.regexp;
 	  } else {
-	    keys = []
-	    regexp = index(path, keys)
-	    regexpCache[path] = { keys: keys, regexp: regexp }
+	    keys = [];
+	    regexp = index(path, keys);
+	    regexpCache[path] = { keys: keys, regexp: regexp };
 	  }
 	
 	  return { keys: keys, regexp: regexp }
 	}
 	
-	var regexpCompileCache = Object.create(null)
+	var regexpCompileCache = Object.create(null);
 	
 	function fillParams (
 	  path,
@@ -12470,11 +12510,11 @@
 	  try {
 	    var filler =
 	      regexpCompileCache[path] ||
-	      (regexpCompileCache[path] = index.compile(path))
+	      (regexpCompileCache[path] = index.compile(path));
 	    return filler(params || {}, { pretty: true })
 	  } catch (e) {
 	    if (false) {
-	      warn(false, ("missing param for " + routeMsg + ": " + (e.message)))
+	      warn(false, ("missing param for " + routeMsg + ": " + (e.message)));
 	    }
 	    return ''
 	  }
@@ -12487,7 +12527,7 @@
 	  current,
 	  append
 	) {
-	  var next = typeof raw === 'string' ? { path: raw } : raw
+	  var next = typeof raw === 'string' ? { path: raw } : raw;
 	  // named target
 	  if (next.name || next._normalized) {
 	    return next
@@ -12495,30 +12535,30 @@
 	
 	  // relative params
 	  if (!next.path && next.params && current) {
-	    next = assign({}, next)
-	    next._normalized = true
-	    var params = assign(assign({}, current.params), next.params)
+	    next = assign({}, next);
+	    next._normalized = true;
+	    var params = assign(assign({}, current.params), next.params);
 	    if (current.name) {
-	      next.name = current.name
-	      next.params = params
+	      next.name = current.name;
+	      next.params = params;
 	    } else if (current.matched) {
-	      var rawPath = current.matched[current.matched.length - 1].path
-	      next.path = fillParams(rawPath, params, ("path " + (current.path)))
+	      var rawPath = current.matched[current.matched.length - 1].path;
+	      next.path = fillParams(rawPath, params, ("path " + (current.path)));
 	    } else if (false) {
-	      warn(false, "relative params navigation requires a current route.")
+	      warn(false, "relative params navigation requires a current route.");
 	    }
 	    return next
 	  }
 	
-	  var parsedPath = parsePath(next.path || '')
-	  var basePath = (current && current.path) || '/'
+	  var parsedPath = parsePath(next.path || '');
+	  var basePath = (current && current.path) || '/';
 	  var path = parsedPath.path
 	    ? resolvePath(parsedPath.path, basePath, append || next.append)
-	    : (current && current.path) || '/'
-	  var query = resolveQuery(parsedPath.query, next.query)
-	  var hash = next.hash || parsedPath.hash
+	    : (current && current.path) || '/';
+	  var query = resolveQuery(parsedPath.query, next.query);
+	  var hash = next.hash || parsedPath.hash;
 	  if (hash && hash.charAt(0) !== '#') {
-	    hash = "#" + hash
+	    hash = "#" + hash;
 	  }
 	
 	  return {
@@ -12531,7 +12571,7 @@
 	
 	function assign (a, b) {
 	  for (var key in b) {
-	    a[key] = b[key]
+	    a[key] = b[key];
 	  }
 	  return a
 	}
@@ -12543,41 +12583,45 @@
 	  var pathMap = ref.pathMap;
 	  var nameMap = ref.nameMap;
 	
+	  function addRoutes (routes) {
+	    createRouteMap(routes, pathMap, nameMap);
+	  }
+	
 	  function match (
 	    raw,
 	    currentRoute,
 	    redirectedFrom
 	  ) {
-	    var location = normalizeLocation(raw, currentRoute)
+	    var location = normalizeLocation(raw, currentRoute);
 	    var name = location.name;
 	
 	    if (name) {
-	      var record = nameMap[name]
+	      var record = nameMap[name];
 	      if (false) {
-	        warn(record, ("Route with name '" + name + "' does not exist"))
+	        warn(record, ("Route with name '" + name + "' does not exist"));
 	      }
 	      var paramNames = getRouteRegex(record.path).keys
 	        .filter(function (key) { return !key.optional; })
-	        .map(function (key) { return key.name; })
+	        .map(function (key) { return key.name; });
 	
 	      if (typeof location.params !== 'object') {
-	        location.params = {}
+	        location.params = {};
 	      }
 	
 	      if (currentRoute && typeof currentRoute.params === 'object') {
 	        for (var key in currentRoute.params) {
 	          if (!(key in location.params) && paramNames.indexOf(key) > -1) {
-	            location.params[key] = currentRoute.params[key]
+	            location.params[key] = currentRoute.params[key];
 	          }
 	        }
 	      }
 	
 	      if (record) {
-	        location.path = fillParams(record.path, location.params, ("named route \"" + name + "\""))
+	        location.path = fillParams(record.path, location.params, ("named route \"" + name + "\""));
 	        return _createRoute(record, location, redirectedFrom)
 	      }
 	    } else if (location.path) {
-	      location.params = {}
+	      location.params = {};
 	      for (var path in pathMap) {
 	        if (matchRoute(path, location.params, location.path)) {
 	          return _createRoute(pathMap[path], location, redirectedFrom)
@@ -12592,37 +12636,37 @@
 	    record,
 	    location
 	  ) {
-	    var originalRedirect = record.redirect
+	    var originalRedirect = record.redirect;
 	    var redirect = typeof originalRedirect === 'function'
 	        ? originalRedirect(createRoute(record, location))
-	        : originalRedirect
+	        : originalRedirect;
 	
 	    if (typeof redirect === 'string') {
-	      redirect = { path: redirect }
+	      redirect = { path: redirect };
 	    }
 	
 	    if (!redirect || typeof redirect !== 'object') {
 	      ("production") !== 'production' && warn(
 	        false, ("invalid redirect option: " + (JSON.stringify(redirect)))
-	      )
+	      );
 	      return _createRoute(null, location)
 	    }
 	
-	    var re = redirect
+	    var re = redirect;
 	    var name = re.name;
 	    var path = re.path;
 	    var query = location.query;
 	    var hash = location.hash;
 	    var params = location.params;
-	    query = re.hasOwnProperty('query') ? re.query : query
-	    hash = re.hasOwnProperty('hash') ? re.hash : hash
-	    params = re.hasOwnProperty('params') ? re.params : params
+	    query = re.hasOwnProperty('query') ? re.query : query;
+	    hash = re.hasOwnProperty('hash') ? re.hash : hash;
+	    params = re.hasOwnProperty('params') ? re.params : params;
 	
 	    if (name) {
 	      // resolved named direct
-	      var targetRecord = nameMap[name]
+	      var targetRecord = nameMap[name];
 	      if (false) {
-	        assert(targetRecord, ("redirect failed: named route \"" + name + "\" not found."))
+	        assert(targetRecord, ("redirect failed: named route \"" + name + "\" not found."));
 	      }
 	      return match({
 	        _normalized: true,
@@ -12633,9 +12677,9 @@
 	      }, undefined, location)
 	    } else if (path) {
 	      // 1. resolve relative redirect
-	      var rawPath = resolveRecordPath(path, record)
+	      var rawPath = resolveRecordPath(path, record);
 	      // 2. resolve params
-	      var resolvedPath = fillParams(rawPath, params, ("redirect route with path \"" + rawPath + "\""))
+	      var resolvedPath = fillParams(rawPath, params, ("redirect route with path \"" + rawPath + "\""));
 	      // 3. rematch with existing query and hash
 	      return match({
 	        _normalized: true,
@@ -12644,7 +12688,7 @@
 	        hash: hash
 	      }, undefined, location)
 	    } else {
-	      warn(false, ("invalid redirect option: " + (JSON.stringify(redirect))))
+	      warn(false, ("invalid redirect option: " + (JSON.stringify(redirect))));
 	      return _createRoute(null, location)
 	    }
 	  }
@@ -12654,15 +12698,15 @@
 	    location,
 	    matchAs
 	  ) {
-	    var aliasedPath = fillParams(matchAs, location.params, ("aliased route with path \"" + matchAs + "\""))
+	    var aliasedPath = fillParams(matchAs, location.params, ("aliased route with path \"" + matchAs + "\""));
 	    var aliasedMatch = match({
 	      _normalized: true,
 	      path: aliasedPath
-	    })
+	    });
 	    if (aliasedMatch) {
-	      var matched = aliasedMatch.matched
-	      var aliasedRecord = matched[matched.length - 1]
-	      location.params = aliasedMatch.params
+	      var matched = aliasedMatch.matched;
+	      var aliasedRecord = matched[matched.length - 1];
+	      location.params = aliasedMatch.params;
 	      return _createRoute(aliasedRecord, location)
 	    }
 	    return _createRoute(null, location)
@@ -12682,7 +12726,10 @@
 	    return createRoute(record, location, redirectedFrom)
 	  }
 	
-	  return match
+	  return {
+	    match: match,
+	    addRoutes: addRoutes
+	  }
 	}
 	
 	function matchRoute (
@@ -12693,7 +12740,7 @@
 	  var ref = getRouteRegex(path);
 	  var regexp = ref.regexp;
 	  var keys = ref.keys;
-	  var m = pathname.match(regexp)
+	  var m = pathname.match(regexp);
 	
 	  if (!m) {
 	    return false
@@ -12702,9 +12749,9 @@
 	  }
 	
 	  for (var i = 1, len = m.length; i < len; ++i) {
-	    var key = keys[i - 1]
-	    var val = typeof m[i] === 'string' ? decodeURIComponent(m[i]) : m[i]
-	    if (key) { params[key.name] = val }
+	    var key = keys[i - 1];
+	    var val = typeof m[i] === 'string' ? decodeURIComponent(m[i]) : m[i];
+	    if (key) { params[key.name] = val; }
 	  }
 	
 	  return true
@@ -12716,330 +12763,82 @@
 	
 	/*  */
 	
-	var inBrowser = typeof window !== 'undefined'
 	
-	var supportsHistory = inBrowser && (function () {
-	  var ua = window.navigator.userAgent
+	var positionStore = Object.create(null);
 	
-	  if (
-	    (ua.indexOf('Android 2.') !== -1 || ua.indexOf('Android 4.0') !== -1) &&
-	    ua.indexOf('Mobile Safari') !== -1 &&
-	    ua.indexOf('Chrome') === -1 &&
-	    ua.indexOf('Windows Phone') === -1
-	  ) {
-	    return false
+	function setupScroll () {
+	  window.addEventListener('popstate', function (e) {
+	    saveScrollPosition();
+	    if (e.state && e.state.key) {
+	      setStateKey(e.state.key);
+	    }
+	  });
+	}
+	
+	function handleScroll (
+	  router,
+	  to,
+	  from,
+	  isPop
+	) {
+	  if (!router.app) {
+	    return
 	  }
 	
-	  return window.history && 'pushState' in window.history
-	})()
+	  var behavior = router.options.scrollBehavior;
+	  if (!behavior) {
+	    return
+	  }
 	
-	/*  */
+	  if (false) {
+	    assert(typeof behavior === 'function', "scrollBehavior must be a function");
+	  }
 	
-	function runQueue (queue, fn, cb) {
-	  var step = function (index) {
-	    if (index >= queue.length) {
-	      cb()
-	    } else {
-	      if (queue[index]) {
-	        fn(queue[index], function () {
-	          step(index + 1)
-	        })
-	      } else {
-	        step(index + 1)
+	  // wait until re-render finishes before scrolling
+	  router.app.$nextTick(function () {
+	    var position = getScrollPosition();
+	    var shouldScroll = behavior(to, from, isPop ? position : null);
+	    if (!shouldScroll) {
+	      return
+	    }
+	    var isObject = typeof shouldScroll === 'object';
+	    if (isObject && typeof shouldScroll.selector === 'string') {
+	      var el = document.querySelector(shouldScroll.selector);
+	      if (el) {
+	        position = getElementPosition(el);
+	      } else if (isValidPosition(shouldScroll)) {
+	        position = normalizePosition(shouldScroll);
 	      }
+	    } else if (isObject && isValidPosition(shouldScroll)) {
+	      position = normalizePosition(shouldScroll);
 	    }
-	  }
-	  step(0)
-	}
 	
-	/*  */
-	
-	
-	var History = function History (router, base) {
-	  this.router = router
-	  this.base = normalizeBase(base)
-	  // start with a route object that stands for "nowhere"
-	  this.current = START
-	  this.pending = null
-	};
-	
-	History.prototype.listen = function listen (cb) {
-	  this.cb = cb
-	};
-	
-	History.prototype.transitionTo = function transitionTo (location, onComplete, onAbort) {
-	    var this$1 = this;
-	
-	  var route = this.router.match(location, this.current)
-	  this.confirmTransition(route, function () {
-	    this$1.updateRoute(route)
-	    onComplete && onComplete(route)
-	    this$1.ensureURL()
-	  }, onAbort)
-	};
-	
-	History.prototype.confirmTransition = function confirmTransition (route, onComplete, onAbort) {
-	    var this$1 = this;
-	
-	  var current = this.current
-	  var abort = function () { onAbort && onAbort() }
-	  if (isSameRoute(route, current)) {
-	    this.ensureURL()
-	    return abort()
-	  }
-	
-	  var ref = resolveQueue(this.current.matched, route.matched);
-	    var deactivated = ref.deactivated;
-	    var activated = ref.activated;
-	
-	  var queue = [].concat(
-	    // in-component leave guards
-	    extractLeaveGuards(deactivated),
-	    // global before hooks
-	    this.router.beforeHooks,
-	    // enter guards
-	    activated.map(function (m) { return m.beforeEnter; }),
-	    // async components
-	    resolveAsyncComponents(activated)
-	  )
-	
-	  this.pending = route
-	  var iterator = function (hook, next) {
-	    if (this$1.pending !== route) {
-	      return abort()
+	    if (position) {
+	      window.scrollTo(position.x, position.y);
 	    }
-	    hook(route, current, function (to) {
-	      if (to === false) {
-	        // next(false) -> abort navigation, ensure current URL
-	        this$1.ensureURL(true)
-	        abort()
-	      } else if (typeof to === 'string' || typeof to === 'object') {
-	        // next('/') or next({ path: '/' }) -> redirect
-	        (typeof to === 'object' && to.replace) ? this$1.replace(to) : this$1.push(to)
-	        abort()
-	      } else {
-	        // confirm transition and pass on the value
-	        next(to)
-	      }
-	    })
-	  }
-	
-	  runQueue(queue, iterator, function () {
-	    var postEnterCbs = []
-	    var enterGuards = extractEnterGuards(activated, postEnterCbs, function () {
-	      return this$1.current === route
-	    })
-	    // wait until async components are resolved before
-	    // extracting in-component enter guards
-	    runQueue(enterGuards, iterator, function () {
-	      if (this$1.pending !== route) {
-	        return abort()
-	      }
-	      this$1.pending = null
-	      onComplete(route)
-	      if (this$1.router.app) {
-	        this$1.router.app.$nextTick(function () {
-	          postEnterCbs.forEach(function (cb) { return cb(); })
-	        })
-	      }
-	    })
-	  })
-	};
-	
-	History.prototype.updateRoute = function updateRoute (route) {
-	  var prev = this.current
-	  this.current = route
-	  this.cb && this.cb(route)
-	  this.router.afterHooks.forEach(function (hook) {
-	    hook && hook(route, prev)
-	  })
-	};
-	
-	function normalizeBase (base) {
-	  if (!base) {
-	    if (inBrowser) {
-	      // respect <base> tag
-	      var baseEl = document.querySelector('base')
-	      base = baseEl ? baseEl.getAttribute('href') : '/'
-	    } else {
-	      base = '/'
-	    }
-	  }
-	  // make sure there's the starting slash
-	  if (base.charAt(0) !== '/') {
-	    base = '/' + base
-	  }
-	  // remove trailing slash
-	  return base.replace(/\/$/, '')
+	  });
 	}
 	
-	function resolveQueue (
-	  current,
-	  next
-	) {
-	  var i
-	  var max = Math.max(current.length, next.length)
-	  for (i = 0; i < max; i++) {
-	    if (current[i] !== next[i]) {
-	      break
-	    }
-	  }
-	  return {
-	    activated: next.slice(i),
-	    deactivated: current.slice(i)
+	function saveScrollPosition () {
+	  var key = getStateKey();
+	  if (key) {
+	    positionStore[key] = {
+	      x: window.pageXOffset,
+	      y: window.pageYOffset
+	    };
 	  }
 	}
 	
-	function extractGuard (
-	  def,
-	  key
-	) {
-	  if (typeof def !== 'function') {
-	    // extend now so that global mixins are applied.
-	    def = _Vue.extend(def)
+	function getScrollPosition () {
+	  var key = getStateKey();
+	  if (key) {
+	    return positionStore[key]
 	  }
-	  return def.options[key]
-	}
-	
-	function extractLeaveGuards (matched) {
-	  return flatten(flatMapComponents(matched, function (def, instance) {
-	    var guard = extractGuard(def, 'beforeRouteLeave')
-	    if (guard) {
-	      return Array.isArray(guard)
-	        ? guard.map(function (guard) { return wrapLeaveGuard(guard, instance); })
-	        : wrapLeaveGuard(guard, instance)
-	    }
-	  }).reverse())
-	}
-	
-	function wrapLeaveGuard (
-	  guard,
-	  instance
-	) {
-	  return function routeLeaveGuard () {
-	    return guard.apply(instance, arguments)
-	  }
-	}
-	
-	function extractEnterGuards (
-	  matched,
-	  cbs,
-	  isValid
-	) {
-	  return flatten(flatMapComponents(matched, function (def, _, match, key) {
-	    var guard = extractGuard(def, 'beforeRouteEnter')
-	    if (guard) {
-	      return Array.isArray(guard)
-	        ? guard.map(function (guard) { return wrapEnterGuard(guard, cbs, match, key, isValid); })
-	        : wrapEnterGuard(guard, cbs, match, key, isValid)
-	    }
-	  }))
-	}
-	
-	function wrapEnterGuard (
-	  guard,
-	  cbs,
-	  match,
-	  key,
-	  isValid
-	) {
-	  return function routeEnterGuard (to, from, next) {
-	    return guard(to, from, function (cb) {
-	      next(cb)
-	      if (typeof cb === 'function') {
-	        cbs.push(function () {
-	          // #750
-	          // if a router-view is wrapped with an out-in transition,
-	          // the instance may not have been registered at this time.
-	          // we will need to poll for registration until current route
-	          // is no longer valid.
-	          poll(cb, match.instances, key, isValid)
-	        })
-	      }
-	    })
-	  }
-	}
-	
-	function poll (
-	  cb, // somehow flow cannot infer this is a function
-	  instances,
-	  key,
-	  isValid
-	) {
-	  if (instances[key]) {
-	    cb(instances[key])
-	  } else if (isValid()) {
-	    setTimeout(function () {
-	      poll(cb, instances, key, isValid)
-	    }, 16)
-	  }
-	}
-	
-	function resolveAsyncComponents (matched) {
-	  return flatMapComponents(matched, function (def, _, match, key) {
-	    // if it's a function and doesn't have Vue options attached,
-	    // assume it's an async component resolve function.
-	    // we are not using Vue's default async resolving mechanism because
-	    // we want to halt the navigation until the incoming component has been
-	    // resolved.
-	    if (typeof def === 'function' && !def.options) {
-	      return function (to, from, next) {
-	        var resolve = function (resolvedDef) {
-	          match.components[key] = resolvedDef
-	          next()
-	        }
-	
-	        var reject = function (reason) {
-	          warn(false, ("Failed to resolve async component " + key + ": " + reason))
-	          next(false)
-	        }
-	
-	        var res = def(resolve, reject)
-	        if (res && typeof res.then === 'function') {
-	          res.then(resolve, reject)
-	        }
-	      }
-	    }
-	  })
-	}
-	
-	function flatMapComponents (
-	  matched,
-	  fn
-	) {
-	  return flatten(matched.map(function (m) {
-	    return Object.keys(m.components).map(function (key) { return fn(
-	      m.components[key],
-	      m.instances[key],
-	      m, key
-	    ); })
-	  }))
-	}
-	
-	function flatten (arr) {
-	  return Array.prototype.concat.apply([], arr)
-	}
-	
-	/*  */
-	
-	var positionStore = Object.create(null)
-	
-	function saveScrollPosition (key) {
-	  if (!key) { return }
-	  positionStore[key] = {
-	    x: window.pageXOffset,
-	    y: window.pageYOffset
-	  }
-	}
-	
-	function getScrollPosition (key) {
-	  if (!key) { return }
-	  return positionStore[key]
 	}
 	
 	function getElementPosition (el) {
-	  var docRect = document.documentElement.getBoundingClientRect()
-	  var elRect = el.getBoundingClientRect()
+	  var docRect = document.documentElement.getBoundingClientRect();
+	  var elRect = el.getBoundingClientRect();
 	  return {
 	    x: elRect.left - docRect.left,
 	    y: elRect.top - docRect.top
@@ -13063,278 +12862,618 @@
 	
 	/*  */
 	
+	var supportsPushState = inBrowser && (function () {
+	  var ua = window.navigator.userAgent;
+	
+	  if (
+	    (ua.indexOf('Android 2.') !== -1 || ua.indexOf('Android 4.0') !== -1) &&
+	    ua.indexOf('Mobile Safari') !== -1 &&
+	    ua.indexOf('Chrome') === -1 &&
+	    ua.indexOf('Windows Phone') === -1
+	  ) {
+	    return false
+	  }
+	
+	  return window.history && 'pushState' in window.history
+	})();
 	
 	// use User Timing api (if present) for more accurate key precision
 	var Time = inBrowser && window.performance && window.performance.now
 	  ? window.performance
-	  : Date
+	  : Date;
 	
-	var genKey = function () { return String(Time.now()); }
-	var _key = genKey()
+	var _key = genKey();
 	
-	var HTML5History = (function (History) {
+	function genKey () {
+	  return Time.now().toFixed(3)
+	}
+	
+	function getStateKey () {
+	  return _key
+	}
+	
+	function setStateKey (key) {
+	  _key = key;
+	}
+	
+	function pushState (url, replace) {
+	  saveScrollPosition();
+	  // try...catch the pushState call to get around Safari
+	  // DOM Exception 18 where it limits to 100 pushState calls
+	  var history = window.history;
+	  try {
+	    if (replace) {
+	      history.replaceState({ key: _key }, '', url);
+	    } else {
+	      _key = genKey();
+	      history.pushState({ key: _key }, '', url);
+	    }
+	  } catch (e) {
+	    window.location[replace ? 'replace' : 'assign'](url);
+	  }
+	}
+	
+	function replaceState (url) {
+	  pushState(url, true);
+	}
+	
+	/*  */
+	
+	function runQueue (queue, fn, cb) {
+	  var step = function (index) {
+	    if (index >= queue.length) {
+	      cb();
+	    } else {
+	      if (queue[index]) {
+	        fn(queue[index], function () {
+	          step(index + 1);
+	        });
+	      } else {
+	        step(index + 1);
+	      }
+	    }
+	  };
+	  step(0);
+	}
+	
+	/*  */
+	
+	
+	var History = function History (router, base) {
+	  this.router = router;
+	  this.base = normalizeBase(base);
+	  // start with a route object that stands for "nowhere"
+	  this.current = START;
+	  this.pending = null;
+	  this.ready = false;
+	  this.readyCbs = [];
+	};
+	
+	History.prototype.listen = function listen (cb) {
+	  this.cb = cb;
+	};
+	
+	History.prototype.onReady = function onReady (cb) {
+	  if (this.ready) {
+	    cb();
+	  } else {
+	    this.readyCbs.push(cb);
+	  }
+	};
+	
+	History.prototype.transitionTo = function transitionTo (location, onComplete, onAbort) {
+	    var this$1 = this;
+	
+	  var route = this.router.match(location, this.current);
+	  this.confirmTransition(route, function () {
+	    this$1.updateRoute(route);
+	    onComplete && onComplete(route);
+	    this$1.ensureURL();
+	
+	    // fire ready cbs once
+	    if (!this$1.ready) {
+	      this$1.ready = true;
+	      this$1.readyCbs.forEach(function (cb) {
+	        cb(route);
+	      });
+	    }
+	  }, onAbort);
+	};
+	
+	History.prototype.confirmTransition = function confirmTransition (route, onComplete, onAbort) {
+	    var this$1 = this;
+	
+	  var current = this.current;
+	  var abort = function () { onAbort && onAbort(); };
+	  if (
+	    isSameRoute(route, current) &&
+	    // in the case the route map has been dynamically appended to
+	    route.matched.length === current.matched.length
+	  ) {
+	    this.ensureURL();
+	    return abort()
+	  }
+	
+	  var ref = resolveQueue(this.current.matched, route.matched);
+	    var updated = ref.updated;
+	    var deactivated = ref.deactivated;
+	    var activated = ref.activated;
+	
+	  var queue = [].concat(
+	    // in-component leave guards
+	    extractLeaveGuards(deactivated),
+	    // global before hooks
+	    this.router.beforeHooks,
+	    // in-component update hooks
+	    extractUpdateHooks(updated),
+	    // in-config enter guards
+	    activated.map(function (m) { return m.beforeEnter; }),
+	    // async components
+	    resolveAsyncComponents(activated)
+	  );
+	
+	  this.pending = route;
+	  var iterator = function (hook, next) {
+	    if (this$1.pending !== route) {
+	      return abort()
+	    }
+	    hook(route, current, function (to) {
+	      if (to === false) {
+	        // next(false) -> abort navigation, ensure current URL
+	        this$1.ensureURL(true);
+	        abort();
+	      } else if (typeof to === 'string' || typeof to === 'object') {
+	        // next('/') or next({ path: '/' }) -> redirect
+	        (typeof to === 'object' && to.replace) ? this$1.replace(to) : this$1.push(to);
+	        abort();
+	      } else {
+	        // confirm transition and pass on the value
+	        next(to);
+	      }
+	    });
+	  };
+	
+	  runQueue(queue, iterator, function () {
+	    var postEnterCbs = [];
+	    var isValid = function () { return this$1.current === route; };
+	    var enterGuards = extractEnterGuards(activated, postEnterCbs, isValid);
+	    // wait until async components are resolved before
+	    // extracting in-component enter guards
+	    runQueue(enterGuards, iterator, function () {
+	      if (this$1.pending !== route) {
+	        return abort()
+	      }
+	      this$1.pending = null;
+	      onComplete(route);
+	      if (this$1.router.app) {
+	        this$1.router.app.$nextTick(function () {
+	          postEnterCbs.forEach(function (cb) { return cb(); });
+	        });
+	      }
+	    });
+	  });
+	};
+	
+	History.prototype.updateRoute = function updateRoute (route) {
+	  var prev = this.current;
+	  this.current = route;
+	  this.cb && this.cb(route);
+	  this.router.afterHooks.forEach(function (hook) {
+	    hook && hook(route, prev);
+	  });
+	};
+	
+	function normalizeBase (base) {
+	  if (!base) {
+	    if (inBrowser) {
+	      // respect <base> tag
+	      var baseEl = document.querySelector('base');
+	      base = baseEl ? baseEl.getAttribute('href') : '/';
+	    } else {
+	      base = '/';
+	    }
+	  }
+	  // make sure there's the starting slash
+	  if (base.charAt(0) !== '/') {
+	    base = '/' + base;
+	  }
+	  // remove trailing slash
+	  return base.replace(/\/$/, '')
+	}
+	
+	function resolveQueue (
+	  current,
+	  next
+	) {
+	  var i;
+	  var max = Math.max(current.length, next.length);
+	  for (i = 0; i < max; i++) {
+	    if (current[i] !== next[i]) {
+	      break
+	    }
+	  }
+	  return {
+	    updated: next.slice(0, i),
+	    activated: next.slice(i),
+	    deactivated: current.slice(i)
+	  }
+	}
+	
+	function extractGuards (
+	  records,
+	  name,
+	  bind,
+	  reverse
+	) {
+	  var guards = flatMapComponents(records, function (def, instance, match, key) {
+	    var guard = extractGuard(def, name);
+	    if (guard) {
+	      return Array.isArray(guard)
+	        ? guard.map(function (guard) { return bind(guard, instance, match, key); })
+	        : bind(guard, instance, match, key)
+	    }
+	  });
+	  return flatten(reverse ? guards.reverse() : guards)
+	}
+	
+	function extractGuard (
+	  def,
+	  key
+	) {
+	  if (typeof def !== 'function') {
+	    // extend now so that global mixins are applied.
+	    def = _Vue.extend(def);
+	  }
+	  return def.options[key]
+	}
+	
+	function extractLeaveGuards (deactivated) {
+	  return extractGuards(deactivated, 'beforeRouteLeave', bindGuard, true)
+	}
+	
+	function extractUpdateHooks (updated) {
+	  return extractGuards(updated, 'beforeRouteUpdate', bindGuard)
+	}
+	
+	function bindGuard (guard, instance) {
+	  return function boundRouteGuard () {
+	    return guard.apply(instance, arguments)
+	  }
+	}
+	
+	function extractEnterGuards (
+	  activated,
+	  cbs,
+	  isValid
+	) {
+	  return extractGuards(activated, 'beforeRouteEnter', function (guard, _, match, key) {
+	    return bindEnterGuard(guard, match, key, cbs, isValid)
+	  })
+	}
+	
+	function bindEnterGuard (
+	  guard,
+	  match,
+	  key,
+	  cbs,
+	  isValid
+	) {
+	  return function routeEnterGuard (to, from, next) {
+	    return guard(to, from, function (cb) {
+	      next(cb);
+	      if (typeof cb === 'function') {
+	        cbs.push(function () {
+	          // #750
+	          // if a router-view is wrapped with an out-in transition,
+	          // the instance may not have been registered at this time.
+	          // we will need to poll for registration until current route
+	          // is no longer valid.
+	          poll(cb, match.instances, key, isValid);
+	        });
+	      }
+	    })
+	  }
+	}
+	
+	function poll (
+	  cb, // somehow flow cannot infer this is a function
+	  instances,
+	  key,
+	  isValid
+	) {
+	  if (instances[key]) {
+	    cb(instances[key]);
+	  } else if (isValid()) {
+	    setTimeout(function () {
+	      poll(cb, instances, key, isValid);
+	    }, 16);
+	  }
+	}
+	
+	function resolveAsyncComponents (matched) {
+	  return flatMapComponents(matched, function (def, _, match, key) {
+	    // if it's a function and doesn't have Vue options attached,
+	    // assume it's an async component resolve function.
+	    // we are not using Vue's default async resolving mechanism because
+	    // we want to halt the navigation until the incoming component has been
+	    // resolved.
+	    if (typeof def === 'function' && !def.options) {
+	      return function (to, from, next) {
+	        var resolve = once(function (resolvedDef) {
+	          match.components[key] = resolvedDef;
+	          next();
+	        });
+	
+	        var reject = once(function (reason) {
+	          warn(false, ("Failed to resolve async component " + key + ": " + reason));
+	          next(false);
+	        });
+	
+	        var res = def(resolve, reject);
+	        if (res && typeof res.then === 'function') {
+	          res.then(resolve, reject);
+	        }
+	      }
+	    }
+	  })
+	}
+	
+	function flatMapComponents (
+	  matched,
+	  fn
+	) {
+	  return flatten(matched.map(function (m) {
+	    return Object.keys(m.components).map(function (key) { return fn(
+	      m.components[key],
+	      m.instances[key],
+	      m, key
+	    ); })
+	  }))
+	}
+	
+	function flatten (arr) {
+	  return Array.prototype.concat.apply([], arr)
+	}
+	
+	// in Webpack 2, require.ensure now also returns a Promise
+	// so the resolve/reject functions may get called an extra time
+	// if the user uses an arrow function shorthand that happens to
+	// return that Promise.
+	function once (fn) {
+	  var called = false;
+	  return function () {
+	    if (called) { return }
+	    called = true;
+	    return fn.apply(this, arguments)
+	  }
+	}
+	
+	/*  */
+	
+	
+	var HTML5History = (function (History$$1) {
 	  function HTML5History (router, base) {
 	    var this$1 = this;
 	
-	    History.call(this, router, base)
+	    History$$1.call(this, router, base);
 	
-	    var expectScroll = router.options.scrollBehavior
-	    window.addEventListener('popstate', function (e) {
-	      _key = e.state && e.state.key
-	      var current = this$1.current
-	      this$1.transitionTo(getLocation(this$1.base), function (next) {
-	        if (expectScroll) {
-	          this$1.handleScroll(next, current, true)
-	        }
-	      })
-	    })
+	    var expectScroll = router.options.scrollBehavior;
 	
 	    if (expectScroll) {
-	      window.addEventListener('scroll', function () {
-	        saveScrollPosition(_key)
-	      })
+	      setupScroll();
 	    }
+	
+	    window.addEventListener('popstate', function (e) {
+	      this$1.transitionTo(getLocation(this$1.base), function (route) {
+	        if (expectScroll) {
+	          handleScroll(router, route, this$1.current, true);
+	        }
+	      });
+	    });
 	  }
 	
-	  if ( History ) HTML5History.__proto__ = History;
-	  HTML5History.prototype = Object.create( History && History.prototype );
+	  if ( History$$1 ) HTML5History.__proto__ = History$$1;
+	  HTML5History.prototype = Object.create( History$$1 && History$$1.prototype );
 	  HTML5History.prototype.constructor = HTML5History;
 	
 	  HTML5History.prototype.go = function go (n) {
-	    window.history.go(n)
+	    window.history.go(n);
 	  };
 	
-	  HTML5History.prototype.push = function push (location) {
+	  HTML5History.prototype.push = function push (location, onComplete, onAbort) {
 	    var this$1 = this;
 	
-	    var current = this.current
 	    this.transitionTo(location, function (route) {
-	      pushState(cleanPath(this$1.base + route.fullPath))
-	      this$1.handleScroll(route, current, false)
-	    })
+	      pushState(cleanPath(this$1.base + route.fullPath));
+	      handleScroll(this$1.router, route, this$1.current, false);
+	      onComplete && onComplete(route);
+	    }, onAbort);
 	  };
 	
-	  HTML5History.prototype.replace = function replace (location) {
+	  HTML5History.prototype.replace = function replace (location, onComplete, onAbort) {
 	    var this$1 = this;
 	
-	    var current = this.current
 	    this.transitionTo(location, function (route) {
-	      replaceState(cleanPath(this$1.base + route.fullPath))
-	      this$1.handleScroll(route, current, false)
-	    })
+	      replaceState(cleanPath(this$1.base + route.fullPath));
+	      handleScroll(this$1.router, route, this$1.current, false);
+	      onComplete && onComplete(route);
+	    }, onAbort);
 	  };
 	
 	  HTML5History.prototype.ensureURL = function ensureURL (push) {
 	    if (getLocation(this.base) !== this.current.fullPath) {
-	      var current = cleanPath(this.base + this.current.fullPath)
-	      push ? pushState(current) : replaceState(current)
+	      var current = cleanPath(this.base + this.current.fullPath);
+	      push ? pushState(current) : replaceState(current);
 	    }
 	  };
 	
-	  HTML5History.prototype.handleScroll = function handleScroll (to, from, isPop) {
-	    var router = this.router
-	    if (!router.app) {
-	      return
-	    }
-	
-	    var behavior = router.options.scrollBehavior
-	    if (!behavior) {
-	      return
-	    }
-	    if (false) {
-	      assert(typeof behavior === 'function', "scrollBehavior must be a function")
-	    }
-	
-	    // wait until re-render finishes before scrolling
-	    router.app.$nextTick(function () {
-	      var position = getScrollPosition(_key)
-	      var shouldScroll = behavior(to, from, isPop ? position : null)
-	      if (!shouldScroll) {
-	        return
-	      }
-	      var isObject = typeof shouldScroll === 'object'
-	      if (isObject && typeof shouldScroll.selector === 'string') {
-	        var el = document.querySelector(shouldScroll.selector)
-	        if (el) {
-	          position = getElementPosition(el)
-	        } else if (isValidPosition(shouldScroll)) {
-	          position = normalizePosition(shouldScroll)
-	        }
-	      } else if (isObject && isValidPosition(shouldScroll)) {
-	        position = normalizePosition(shouldScroll)
-	      }
-	
-	      if (position) {
-	        window.scrollTo(position.x, position.y)
-	      }
-	    })
+	  HTML5History.prototype.getCurrentLocation = function getCurrentLocation () {
+	    return getLocation(this.base)
 	  };
 	
 	  return HTML5History;
 	}(History));
 	
 	function getLocation (base) {
-	  var path = window.location.pathname
+	  var path = window.location.pathname;
 	  if (base && path.indexOf(base) === 0) {
-	    path = path.slice(base.length)
+	    path = path.slice(base.length);
 	  }
 	  return (path || '/') + window.location.search + window.location.hash
-	}
-	
-	function pushState (url, replace) {
-	  // try...catch the pushState call to get around Safari
-	  // DOM Exception 18 where it limits to 100 pushState calls
-	  var history = window.history
-	  try {
-	    if (replace) {
-	      history.replaceState({ key: _key }, '', url)
-	    } else {
-	      _key = genKey()
-	      history.pushState({ key: _key }, '', url)
-	    }
-	    saveScrollPosition(_key)
-	  } catch (e) {
-	    window.location[replace ? 'replace' : 'assign'](url)
-	  }
-	}
-	
-	function replaceState (url) {
-	  pushState(url, true)
 	}
 	
 	/*  */
 	
 	
-	var HashHistory = (function (History) {
+	var HashHistory = (function (History$$1) {
 	  function HashHistory (router, base, fallback) {
-	    History.call(this, router, base)
+	    History$$1.call(this, router, base);
 	    // check history fallback deeplinking
-	    if (fallback && this.checkFallback()) {
+	    if (fallback && checkFallback(this.base)) {
 	      return
 	    }
-	    ensureSlash()
+	    ensureSlash();
 	  }
 	
-	  if ( History ) HashHistory.__proto__ = History;
-	  HashHistory.prototype = Object.create( History && History.prototype );
+	  if ( History$$1 ) HashHistory.__proto__ = History$$1;
+	  HashHistory.prototype = Object.create( History$$1 && History$$1.prototype );
 	  HashHistory.prototype.constructor = HashHistory;
 	
-	  HashHistory.prototype.checkFallback = function checkFallback () {
-	    var location = getLocation(this.base)
-	    if (!/^\/#/.test(location)) {
-	      window.location.replace(
-	        cleanPath(this.base + '/#' + location)
-	      )
-	      return true
-	    }
+	  // this is delayed until the app mounts
+	  // to avoid the hashchange listener being fired too early
+	  HashHistory.prototype.setupListeners = function setupListeners () {
+	    var this$1 = this;
+	
+	    window.addEventListener('hashchange', function () {
+	      if (!ensureSlash()) {
+	        return
+	      }
+	      this$1.transitionTo(getHash(), function (route) {
+	        replaceHash(route.fullPath);
+	      });
+	    });
 	  };
 	
-	  HashHistory.prototype.onHashChange = function onHashChange () {
-	    if (!ensureSlash()) {
-	      return
-	    }
-	    this.transitionTo(getHash(), function (route) {
-	      replaceHash(route.fullPath)
-	    })
-	  };
-	
-	  HashHistory.prototype.push = function push (location) {
+	  HashHistory.prototype.push = function push (location, onComplete, onAbort) {
 	    this.transitionTo(location, function (route) {
-	      pushHash(route.fullPath)
-	    })
+	      pushHash(route.fullPath);
+	      onComplete && onComplete(route);
+	    }, onAbort);
 	  };
 	
-	  HashHistory.prototype.replace = function replace (location) {
+	  HashHistory.prototype.replace = function replace (location, onComplete, onAbort) {
 	    this.transitionTo(location, function (route) {
-	      replaceHash(route.fullPath)
-	    })
+	      replaceHash(route.fullPath);
+	      onComplete && onComplete(route);
+	    }, onAbort);
 	  };
 	
 	  HashHistory.prototype.go = function go (n) {
-	    window.history.go(n)
+	    window.history.go(n);
 	  };
 	
 	  HashHistory.prototype.ensureURL = function ensureURL (push) {
-	    var current = this.current.fullPath
+	    var current = this.current.fullPath;
 	    if (getHash() !== current) {
-	      push ? pushHash(current) : replaceHash(current)
+	      push ? pushHash(current) : replaceHash(current);
 	    }
+	  };
+	
+	  HashHistory.prototype.getCurrentLocation = function getCurrentLocation () {
+	    return getHash()
 	  };
 	
 	  return HashHistory;
 	}(History));
 	
+	function checkFallback (base) {
+	  var location = getLocation(base);
+	  if (!/^\/#/.test(location)) {
+	    window.location.replace(
+	      cleanPath(base + '/#' + location)
+	    );
+	    return true
+	  }
+	}
+	
 	function ensureSlash () {
-	  var path = getHash()
+	  var path = getHash();
 	  if (path.charAt(0) === '/') {
 	    return true
 	  }
-	  replaceHash('/' + path)
+	  replaceHash('/' + path);
 	  return false
 	}
 	
 	function getHash () {
 	  // We can't use window.location.hash here because it's not
 	  // consistent across browsers - Firefox will pre-decode it!
-	  var href = window.location.href
-	  var index = href.indexOf('#')
+	  var href = window.location.href;
+	  var index = href.indexOf('#');
 	  return index === -1 ? '' : href.slice(index + 1)
 	}
 	
 	function pushHash (path) {
-	  window.location.hash = path
+	  window.location.hash = path;
 	}
 	
 	function replaceHash (path) {
-	  var i = window.location.href.indexOf('#')
+	  var i = window.location.href.indexOf('#');
 	  window.location.replace(
 	    window.location.href.slice(0, i >= 0 ? i : 0) + '#' + path
-	  )
+	  );
 	}
 	
 	/*  */
 	
 	
-	var AbstractHistory = (function (History) {
+	var AbstractHistory = (function (History$$1) {
 	  function AbstractHistory (router, base) {
-	    History.call(this, router, base)
-	    this.stack = []
-	    this.index = -1
+	    History$$1.call(this, router, base);
+	    this.stack = [];
+	    this.index = -1;
 	  }
 	
-	  if ( History ) AbstractHistory.__proto__ = History;
-	  AbstractHistory.prototype = Object.create( History && History.prototype );
+	  if ( History$$1 ) AbstractHistory.__proto__ = History$$1;
+	  AbstractHistory.prototype = Object.create( History$$1 && History$$1.prototype );
 	  AbstractHistory.prototype.constructor = AbstractHistory;
 	
-	  AbstractHistory.prototype.push = function push (location) {
+	  AbstractHistory.prototype.push = function push (location, onComplete, onAbort) {
 	    var this$1 = this;
 	
 	    this.transitionTo(location, function (route) {
-	      this$1.stack = this$1.stack.slice(0, this$1.index + 1).concat(route)
-	      this$1.index++
-	    })
+	      this$1.stack = this$1.stack.slice(0, this$1.index + 1).concat(route);
+	      this$1.index++;
+	      onComplete && onComplete(route);
+	    }, onAbort);
 	  };
 	
-	  AbstractHistory.prototype.replace = function replace (location) {
+	  AbstractHistory.prototype.replace = function replace (location, onComplete, onAbort) {
 	    var this$1 = this;
 	
 	    this.transitionTo(location, function (route) {
-	      this$1.stack = this$1.stack.slice(0, this$1.index).concat(route)
-	    })
+	      this$1.stack = this$1.stack.slice(0, this$1.index).concat(route);
+	      onComplete && onComplete(route);
+	    }, onAbort);
 	  };
 	
 	  AbstractHistory.prototype.go = function go (n) {
 	    var this$1 = this;
 	
-	    var targetIndex = this.index + n
+	    var targetIndex = this.index + n;
 	    if (targetIndex < 0 || targetIndex >= this.stack.length) {
 	      return
 	    }
-	    var route = this.stack[targetIndex]
+	    var route = this.stack[targetIndex];
 	    this.confirmTransition(route, function () {
-	      this$1.index = targetIndex
-	      this$1.updateRoute(route)
-	    })
+	      this$1.index = targetIndex;
+	      this$1.updateRoute(route);
+	    });
+	  };
+	
+	  AbstractHistory.prototype.getCurrentLocation = function getCurrentLocation () {
+	    var current = this.stack[this.stack.length - 1];
+	    return current ? current.fullPath : '/'
 	  };
 	
 	  AbstractHistory.prototype.ensureURL = function ensureURL () {
@@ -13349,38 +13488,49 @@
 	var VueRouter = function VueRouter (options) {
 	  if ( options === void 0 ) options = {};
 	
-	  this.app = null
-	  this.options = options
-	  this.beforeHooks = []
-	  this.afterHooks = []
-	  this.match = createMatcher(options.routes || [])
+	  this.app = null;
+	  this.apps = [];
+	  this.options = options;
+	  this.beforeHooks = [];
+	  this.afterHooks = [];
+	  this.matcher = createMatcher(options.routes || []);
 	
-	  var mode = options.mode || 'hash'
-	  this.fallback = mode === 'history' && !supportsHistory
+	  var mode = options.mode || 'hash';
+	  this.fallback = mode === 'history' && !supportsPushState;
 	  if (this.fallback) {
-	    mode = 'hash'
+	    mode = 'hash';
 	  }
 	  if (!inBrowser) {
-	    mode = 'abstract'
+	    mode = 'abstract';
 	  }
-	  this.mode = mode
+	  this.mode = mode;
 	
 	  switch (mode) {
 	    case 'history':
-	      this.history = new HTML5History(this, options.base)
+	      this.history = new HTML5History(this, options.base);
 	      break
 	    case 'hash':
-	      this.history = new HashHistory(this, options.base, this.fallback)
+	      this.history = new HashHistory(this, options.base, this.fallback);
 	      break
 	    case 'abstract':
-	      this.history = new AbstractHistory(this, options.base)
+	      this.history = new AbstractHistory(this, options.base);
 	      break
 	    default:
-	      ("production") !== 'production' && assert(false, ("invalid mode: " + mode))
+	      if (false) {
+	        assert(false, ("invalid mode: " + mode));
+	      }
 	  }
 	};
 	
 	var prototypeAccessors = { currentRoute: {} };
+	
+	VueRouter.prototype.match = function match (
+	  raw,
+	  current,
+	  redirectedFrom
+	) {
+	  return this.matcher.match(raw, current, redirectedFrom)
+	};
 	
 	prototypeAccessors.currentRoute.get = function () {
 	  return this.history && this.history.current
@@ -13393,60 +13543,75 @@
 	    install.installed,
 	    "not installed. Make sure to call `Vue.use(VueRouter)` " +
 	    "before creating root instance."
-	  )
+	  );
 	
-	  this.app = app
+	  this.apps.push(app);
 	
-	  var history = this.history
+	  // main app already initialized.
+	  if (this.app) {
+	    return
+	  }
+	
+	  this.app = app;
+	
+	  var history = this.history;
 	
 	  if (history instanceof HTML5History) {
-	    history.transitionTo(getLocation(history.base))
+	    history.transitionTo(history.getCurrentLocation());
 	  } else if (history instanceof HashHistory) {
 	    var setupHashListener = function () {
-	      window.addEventListener('hashchange', function () {
-	        history.onHashChange()
-	      })
-	    }
-	    history.transitionTo(getHash(), setupHashListener, setupHashListener)
+	      history.setupListeners();
+	    };
+	    history.transitionTo(
+	      history.getCurrentLocation(),
+	      setupHashListener,
+	      setupHashListener
+	    );
 	  }
 	
 	  history.listen(function (route) {
-	    this$1.app._route = route
-	  })
+	    this$1.apps.forEach(function (app) {
+	      app._route = route;
+	    });
+	  });
 	};
 	
 	VueRouter.prototype.beforeEach = function beforeEach (fn) {
-	  this.beforeHooks.push(fn)
+	  this.beforeHooks.push(fn);
 	};
 	
 	VueRouter.prototype.afterEach = function afterEach (fn) {
-	  this.afterHooks.push(fn)
+	  this.afterHooks.push(fn);
 	};
 	
-	VueRouter.prototype.push = function push (location) {
-	  this.history.push(location)
+	VueRouter.prototype.onReady = function onReady (cb) {
+	  this.history.onReady(cb);
 	};
 	
-	VueRouter.prototype.replace = function replace (location) {
-	  this.history.replace(location)
+	VueRouter.prototype.push = function push (location, onComplete, onAbort) {
+	  this.history.push(location, onComplete, onAbort);
+	};
+	
+	VueRouter.prototype.replace = function replace (location, onComplete, onAbort) {
+	  this.history.replace(location, onComplete, onAbort);
 	};
 	
 	VueRouter.prototype.go = function go (n) {
-	  this.history.go(n)
+	  this.history.go(n);
 	};
 	
 	VueRouter.prototype.back = function back () {
-	  this.go(-1)
+	  this.go(-1);
 	};
 	
 	VueRouter.prototype.forward = function forward () {
-	  this.go(1)
+	  this.go(1);
 	};
 	
 	VueRouter.prototype.getMatchedComponents = function getMatchedComponents (to) {
 	  var route = to
-	    ? this.resolve(to).resolved
-	    : this.currentRoute
+	    ? this.resolve(to).route
+	    : this.currentRoute;
 	  if (!route) {
 	    return []
 	  }
@@ -13462,33 +13627,44 @@
 	  current,
 	  append
 	) {
-	  var normalizedTo = normalizeLocation(to, current || this.history.current, append)
-	  var resolved = this.match(normalizedTo, current)
-	  var fullPath = resolved.redirectedFrom || resolved.fullPath
-	  var base = this.history.base
-	  var href = createHref(base, fullPath, this.mode)
+	  var location = normalizeLocation(to, current || this.history.current, append);
+	  var route = this.match(location, current);
+	  var fullPath = route.redirectedFrom || route.fullPath;
+	  var base = this.history.base;
+	  var href = createHref(base, fullPath, this.mode);
 	  return {
-	    normalizedTo: normalizedTo,
-	    resolved: resolved,
-	    href: href
+	    location: location,
+	    route: route,
+	    href: href,
+	    // for backwards compat
+	    normalizedTo: location,
+	    resolved: route
+	  }
+	};
+	
+	VueRouter.prototype.addRoutes = function addRoutes (routes) {
+	  this.matcher.addRoutes(routes);
+	  if (this.history.current !== START) {
+	    this.history.transitionTo(this.history.getCurrentLocation());
 	  }
 	};
 	
 	Object.defineProperties( VueRouter.prototype, prototypeAccessors );
 	
 	function createHref (base, fullPath, mode) {
-	  var path = mode === 'hash' ? '#' + fullPath : fullPath
+	  var path = mode === 'hash' ? '#' + fullPath : fullPath;
 	  return base ? cleanPath(base + '/' + path) : path
 	}
 	
-	VueRouter.install = install
-	VueRouter.version = '2.1.3'
+	VueRouter.install = install;
+	VueRouter.version = '2.2.1';
 	
 	if (inBrowser && window.Vue) {
-	  window.Vue.use(VueRouter)
+	  window.Vue.use(VueRouter);
 	}
 	
 	module.exports = VueRouter;
+	
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ },
@@ -14321,23 +14497,23 @@
 	
 	var _marker2 = _interopRequireDefault(_marker);
 	
-	var _cluster = __webpack_require__(136);
+	var _cluster = __webpack_require__(138);
 	
 	var _cluster2 = _interopRequireDefault(_cluster);
 	
-	var _polyline = __webpack_require__(138);
+	var _polyline = __webpack_require__(140);
 	
 	var _polyline2 = _interopRequireDefault(_polyline);
 	
-	var _polygon = __webpack_require__(146);
+	var _polygon = __webpack_require__(148);
 	
 	var _polygon2 = _interopRequireDefault(_polygon);
 	
-	var _circle = __webpack_require__(147);
+	var _circle = __webpack_require__(149);
 	
 	var _circle2 = _interopRequireDefault(_circle);
 	
-	var _rectangle = __webpack_require__(148);
+	var _rectangle = __webpack_require__(150);
 	
 	var _rectangle2 = _interopRequireDefault(_rectangle);
 	
@@ -14345,7 +14521,7 @@
 	
 	var _lodash2 = _interopRequireDefault(_lodash);
 	
-	var _infoWindow = __webpack_require__(149);
+	var _infoWindow = __webpack_require__(151);
 	
 	var _infoWindow2 = _interopRequireDefault(_infoWindow);
 	
@@ -14353,15 +14529,15 @@
 	
 	var _map2 = _interopRequireDefault(_map);
 	
-	var _streetViewPanorama = __webpack_require__(152);
+	var _streetViewPanorama = __webpack_require__(154);
 	
 	var _streetViewPanorama2 = _interopRequireDefault(_streetViewPanorama);
 	
-	var _placeInput = __webpack_require__(157);
+	var _placeInput = __webpack_require__(159);
 	
 	var _placeInput2 = _interopRequireDefault(_placeInput);
 	
-	var _autocomplete = __webpack_require__(161);
+	var _autocomplete = __webpack_require__(163);
 	
 	var _autocomplete2 = _interopRequireDefault(_autocomplete);
 	
@@ -14369,7 +14545,7 @@
 	
 	var _mapElementMixin2 = _interopRequireDefault(_mapElementMixin);
 	
-	var _mountableMixin = __webpack_require__(133);
+	var _mountableMixin = __webpack_require__(135);
 	
 	var _mountableMixin2 = _interopRequireDefault(_mountableMixin);
 	
@@ -15275,7 +15451,7 @@
 	
 	var _mapElementMixin2 = _interopRequireDefault(_mapElementMixin);
 	
-	var _cluster = __webpack_require__(136);
+	var _cluster = __webpack_require__(138);
 	
 	var _cluster2 = _interopRequireDefault(_cluster);
 	
@@ -32856,31 +33032,23 @@
 /* 127 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function(console) {var __vue_exports__, __vue_options__
-	var __vue_styles__ = {}
-	
+	/* WEBPACK VAR INJECTION */(function(console) {
 	/* styles */
 	__webpack_require__(128)
 	
-	/* script */
-	__vue_exports__ = __webpack_require__(132)
-	
-	/* template */
-	var __vue_template__ = __webpack_require__(135)
-	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
-	if (
-	  typeof __vue_exports__.default === "object" ||
-	  typeof __vue_exports__.default === "function"
-	) {
-	if (Object.keys(__vue_exports__).some(function (key) { return key !== "default" && key !== "__esModule" })) {console.error("named exports are not supported in *.vue files.")}
-	__vue_options__ = __vue_exports__ = __vue_exports__.default
-	}
-	if (typeof __vue_options__ === "function") {
-	  __vue_options__ = __vue_options__.options
-	}
-	__vue_options__.__file = "/root/sift/frontend/node_modules/vue2-google-maps/dist/components/map.vue"
-	__vue_options__.render = __vue_template__.render
-	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
+	var Component = __webpack_require__(133)(
+	  /* script */
+	  __webpack_require__(134),
+	  /* template */
+	  __webpack_require__(137),
+	  /* scopeId */
+	  null,
+	  /* cssModules */
+	  null
+	)
+	Component.options.__file = "/Users/jackrans/Documents/gps-sift/frontend/node_modules/vue2-google-maps/dist/components/map.vue"
+	if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
+	if (Component.options.functional) {console.error("[vue-loader] map.vue: functional components are not supported with templates, they should use render functions.")}
 	
 	/* hot reload */
 	if (false) {(function () {
@@ -32889,14 +33057,13 @@
 	  if (!hotAPI.compatible) return
 	  module.hot.accept()
 	  if (!module.hot.data) {
-	    hotAPI.createRecord("data-v-74cbb3be", __vue_options__)
+	    hotAPI.createRecord("data-v-9438afc6", Component.options)
 	  } else {
-	    hotAPI.reload("data-v-74cbb3be", __vue_options__)
+	    hotAPI.reload("data-v-9438afc6", Component.options)
 	  }
 	})()}
-	if (__vue_options__.functional) {console.error("[vue-loader] map.vue: functional components are not supported and should be defined in plain js files using render functions.")}
 	
-	module.exports = __vue_exports__
+	module.exports = Component.exports
 	
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
@@ -32909,21 +33076,21 @@
 	// load the styles
 	var content = __webpack_require__(129);
 	if(typeof content === 'string') content = [[module.id, content, '']];
-	// add the styles to the DOM
-	var update = __webpack_require__(131)(content, {});
 	if(content.locals) module.exports = content.locals;
+	// add the styles to the DOM
+	var update = __webpack_require__(131)("5d1403d0", content, false);
 	// Hot Module Replacement
 	if(false) {
-		// When the styles change, update the <style> tags
-		if(!content.locals) {
-			module.hot.accept("!!./../../../css-loader/index.js?sourceMap!./../../../vue-loader/lib/style-rewriter.js?id=data-v-74cbb3be!./../../../vue-loader/lib/selector.js?type=styles&index=0!./map.vue", function() {
-				var newContent = require("!!./../../../css-loader/index.js?sourceMap!./../../../vue-loader/lib/style-rewriter.js?id=data-v-74cbb3be!./../../../vue-loader/lib/selector.js?type=styles&index=0!./map.vue");
-				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-				update(newContent);
-			});
-		}
-		// When the module is disposed, remove the <style> tags
-		module.hot.dispose(function() { update(); });
+	 // When the styles change, update the <style> tags
+	 if(!content.locals) {
+	   module.hot.accept("!!./../../../css-loader/index.js?sourceMap!./../../../vue-loader/lib/style-rewriter.js?id=data-v-9438afc6!./../../../vue-loader/lib/selector.js?type=styles&index=0!./map.vue", function() {
+	     var newContent = require("!!./../../../css-loader/index.js?sourceMap!./../../../vue-loader/lib/style-rewriter.js?id=data-v-9438afc6!./../../../vue-loader/lib/selector.js?type=styles&index=0!./map.vue");
+	     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+	     update(newContent);
+	   });
+	 }
+	 // When the module is disposed, remove the <style> tags
+	 module.hot.dispose(function() { update(); });
 	}
 
 /***/ },
@@ -33001,225 +33168,325 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	/*
-		MIT License http://www.opensource.org/licenses/mit-license.php
-		Author Tobias Koppers @sokra
+	  MIT License http://www.opensource.org/licenses/mit-license.php
+	  Author Tobias Koppers @sokra
+	  Modified by Evan You @yyx990803
 	*/
-	var stylesInDom = {},
-		memoize = function(fn) {
-			var memo;
-			return function () {
-				if (typeof memo === "undefined") memo = fn.apply(this, arguments);
-				return memo;
-			};
-		},
-		isOldIE = memoize(function() {
-			return /msie [6-9]\b/.test(window.navigator.userAgent.toLowerCase());
-		}),
-		getHeadElement = memoize(function () {
-			return document.head || document.getElementsByTagName("head")[0];
-		}),
-		singletonElement = null,
-		singletonCounter = 0,
-		styleElementsInsertedAtTop = [];
 	
-	module.exports = function(list, options) {
-		if(false) {
-			if(typeof document !== "object") throw new Error("The style-loader cannot be used in a non-browser environment");
-		}
+	var hasDocument = typeof document !== 'undefined'
 	
-		options = options || {};
-		// Force single-tag solution on IE6-9, which has a hard limit on the # of <style>
-		// tags it will allow on a page
-		if (typeof options.singleton === "undefined") options.singleton = isOldIE();
-	
-		// By default, add <style> tags to the bottom of <head>.
-		if (typeof options.insertAt === "undefined") options.insertAt = "bottom";
-	
-		var styles = listToStyles(list);
-		addStylesToDom(styles, options);
-	
-		return function update(newList) {
-			var mayRemove = [];
-			for(var i = 0; i < styles.length; i++) {
-				var item = styles[i];
-				var domStyle = stylesInDom[item.id];
-				domStyle.refs--;
-				mayRemove.push(domStyle);
-			}
-			if(newList) {
-				var newStyles = listToStyles(newList);
-				addStylesToDom(newStyles, options);
-			}
-			for(var i = 0; i < mayRemove.length; i++) {
-				var domStyle = mayRemove[i];
-				if(domStyle.refs === 0) {
-					for(var j = 0; j < domStyle.parts.length; j++)
-						domStyle.parts[j]();
-					delete stylesInDom[domStyle.id];
-				}
-			}
-		};
+	if (false) {
+	  if (!hasDocument) {
+	    throw new Error(
+	    'vue-style-loader cannot be used in a non-browser environment. ' +
+	    "Use { target: 'node' } in your Webpack config to indicate a server-rendering environment."
+	  ) }
 	}
 	
-	function addStylesToDom(styles, options) {
-		for(var i = 0; i < styles.length; i++) {
-			var item = styles[i];
-			var domStyle = stylesInDom[item.id];
-			if(domStyle) {
-				domStyle.refs++;
-				for(var j = 0; j < domStyle.parts.length; j++) {
-					domStyle.parts[j](item.parts[j]);
-				}
-				for(; j < item.parts.length; j++) {
-					domStyle.parts.push(addStyle(item.parts[j], options));
-				}
-			} else {
-				var parts = [];
-				for(var j = 0; j < item.parts.length; j++) {
-					parts.push(addStyle(item.parts[j], options));
-				}
-				stylesInDom[item.id] = {id: item.id, refs: 1, parts: parts};
-			}
-		}
+	var listToStyles = __webpack_require__(132)
+	
+	/*
+	type StyleObject = {
+	  id: number;
+	  parts: Array<StyleObjectPart>
 	}
 	
-	function listToStyles(list) {
-		var styles = [];
-		var newStyles = {};
-		for(var i = 0; i < list.length; i++) {
-			var item = list[i];
-			var id = item[0];
-			var css = item[1];
-			var media = item[2];
-			var sourceMap = item[3];
-			var part = {css: css, media: media, sourceMap: sourceMap};
-			if(!newStyles[id])
-				styles.push(newStyles[id] = {id: id, parts: [part]});
-			else
-				newStyles[id].parts.push(part);
-		}
-		return styles;
+	type StyleObjectPart = {
+	  css: string;
+	  media: string;
+	  sourceMap: ?string
+	}
+	*/
+	
+	var stylesInDom = {/*
+	  [id: number]: {
+	    id: number,
+	    refs: number,
+	    parts: Array<(obj?: StyleObjectPart) => void>
+	  }
+	*/}
+	
+	var head = hasDocument && (document.head || document.getElementsByTagName('head')[0])
+	var singletonElement = null
+	var singletonCounter = 0
+	var isProduction = false
+	var noop = function () {}
+	
+	// Force single-tag solution on IE6-9, which has a hard limit on the # of <style>
+	// tags it will allow on a page
+	var isOldIE = typeof navigator !== 'undefined' && /msie [6-9]\b/.test(navigator.userAgent.toLowerCase())
+	
+	module.exports = function (parentId, list, _isProduction) {
+	  isProduction = _isProduction
+	
+	  var styles = listToStyles(parentId, list)
+	  addStylesToDom(styles)
+	
+	  return function update (newList) {
+	    var mayRemove = []
+	    for (var i = 0; i < styles.length; i++) {
+	      var item = styles[i]
+	      var domStyle = stylesInDom[item.id]
+	      domStyle.refs--
+	      mayRemove.push(domStyle)
+	    }
+	    if (newList) {
+	      styles = listToStyles(parentId, newList)
+	      addStylesToDom(styles)
+	    } else {
+	      styles = []
+	    }
+	    for (var i = 0; i < mayRemove.length; i++) {
+	      var domStyle = mayRemove[i]
+	      if (domStyle.refs === 0) {
+	        for (var j = 0; j < domStyle.parts.length; j++) {
+	          domStyle.parts[j]()
+	        }
+	        delete stylesInDom[domStyle.id]
+	      }
+	    }
+	  }
 	}
 	
-	function insertStyleElement(options, styleElement) {
-		var head = getHeadElement();
-		var lastStyleElementInsertedAtTop = styleElementsInsertedAtTop[styleElementsInsertedAtTop.length - 1];
-		if (options.insertAt === "top") {
-			if(!lastStyleElementInsertedAtTop) {
-				head.insertBefore(styleElement, head.firstChild);
-			} else if(lastStyleElementInsertedAtTop.nextSibling) {
-				head.insertBefore(styleElement, lastStyleElementInsertedAtTop.nextSibling);
-			} else {
-				head.appendChild(styleElement);
-			}
-			styleElementsInsertedAtTop.push(styleElement);
-		} else if (options.insertAt === "bottom") {
-			head.appendChild(styleElement);
-		} else {
-			throw new Error("Invalid value for parameter 'insertAt'. Must be 'top' or 'bottom'.");
-		}
+	function addStylesToDom (styles /* Array<StyleObject> */) {
+	  for (var i = 0; i < styles.length; i++) {
+	    var item = styles[i]
+	    var domStyle = stylesInDom[item.id]
+	    if (domStyle) {
+	      domStyle.refs++
+	      for (var j = 0; j < domStyle.parts.length; j++) {
+	        domStyle.parts[j](item.parts[j])
+	      }
+	      for (; j < item.parts.length; j++) {
+	        domStyle.parts.push(addStyle(item.parts[j]))
+	      }
+	      if (domStyle.parts.length > item.parts.length) {
+	        domStyle.parts.length = item.parts.length
+	      }
+	    } else {
+	      var parts = []
+	      for (var j = 0; j < item.parts.length; j++) {
+	        parts.push(addStyle(item.parts[j]))
+	      }
+	      stylesInDom[item.id] = { id: item.id, refs: 1, parts: parts }
+	    }
+	  }
 	}
 	
-	function removeStyleElement(styleElement) {
-		styleElement.parentNode.removeChild(styleElement);
-		var idx = styleElementsInsertedAtTop.indexOf(styleElement);
-		if(idx >= 0) {
-			styleElementsInsertedAtTop.splice(idx, 1);
-		}
+	function listToStyles (parentId, list) {
+	  var styles = []
+	  var newStyles = {}
+	  for (var i = 0; i < list.length; i++) {
+	    var item = list[i]
+	    var id = item[0]
+	    var css = item[1]
+	    var media = item[2]
+	    var sourceMap = item[3]
+	    var part = { css: css, media: media, sourceMap: sourceMap }
+	    if (!newStyles[id]) {
+	      part.id = parentId + ':0'
+	      styles.push(newStyles[id] = { id: id, parts: [part] })
+	    } else {
+	      part.id = parentId + ':' + newStyles[id].parts.length
+	      newStyles[id].parts.push(part)
+	    }
+	  }
+	  return styles
 	}
 	
-	function createStyleElement(options) {
-		var styleElement = document.createElement("style");
-		styleElement.type = "text/css";
-		insertStyleElement(options, styleElement);
-		return styleElement;
+	function createStyleElement () {
+	  var styleElement = document.createElement('style')
+	  styleElement.type = 'text/css'
+	  head.appendChild(styleElement)
+	  return styleElement
 	}
 	
-	function addStyle(obj, options) {
-		var styleElement, update, remove;
+	function addStyle (obj /* StyleObjectPart */) {
+	  var update, remove
+	  var styleElement = document.querySelector('style[data-vue-ssr-id~="' + obj.id + '"]')
+	  var hasSSR = styleElement != null
 	
-		if (options.singleton) {
-			var styleIndex = singletonCounter++;
-			styleElement = singletonElement || (singletonElement = createStyleElement(options));
-			update = applyToSingletonTag.bind(null, styleElement, styleIndex, false);
-			remove = applyToSingletonTag.bind(null, styleElement, styleIndex, true);
-		} else {
-			styleElement = createStyleElement(options);
-			update = applyToTag.bind(null, styleElement);
-			remove = function() {
-				removeStyleElement(styleElement);
-			};
-		}
+	  // if in production mode and style is already provided by SSR,
+	  // simply do nothing.
+	  if (hasSSR && isProduction) {
+	    return noop
+	  }
 	
-		update(obj);
+	  if (isOldIE) {
+	    // use singleton mode for IE9.
+	    var styleIndex = singletonCounter++
+	    styleElement = singletonElement || (singletonElement = createStyleElement())
+	    update = applyToSingletonTag.bind(null, styleElement, styleIndex, false)
+	    remove = applyToSingletonTag.bind(null, styleElement, styleIndex, true)
+	  } else {
+	    // use multi-style-tag mode in all other cases
+	    styleElement = styleElement || createStyleElement()
+	    update = applyToTag.bind(null, styleElement)
+	    remove = function () {
+	      styleElement.parentNode.removeChild(styleElement)
+	    }
+	  }
 	
-		return function updateStyle(newObj) {
-			if(newObj) {
-				if(newObj.css === obj.css && newObj.media === obj.media && newObj.sourceMap === obj.sourceMap)
-					return;
-				update(obj = newObj);
-			} else {
-				remove();
-			}
-		};
+	  if (!hasSSR) {
+	    update(obj)
+	  }
+	
+	  return function updateStyle (newObj /* StyleObjectPart */) {
+	    if (newObj) {
+	      if (newObj.css === obj.css &&
+	          newObj.media === obj.media &&
+	          newObj.sourceMap === obj.sourceMap) {
+	        return
+	      }
+	      update(obj = newObj)
+	    } else {
+	      remove()
+	    }
+	  }
 	}
 	
 	var replaceText = (function () {
-		var textStore = [];
+	  var textStore = []
 	
-		return function (index, replacement) {
-			textStore[index] = replacement;
-			return textStore.filter(Boolean).join('\n');
-		};
-	})();
+	  return function (index, replacement) {
+	    textStore[index] = replacement
+	    return textStore.filter(Boolean).join('\n')
+	  }
+	})()
 	
-	function applyToSingletonTag(styleElement, index, remove, obj) {
-		var css = remove ? "" : obj.css;
+	function applyToSingletonTag (styleElement, index, remove, obj) {
+	  var css = remove ? '' : obj.css
 	
-		if (styleElement.styleSheet) {
-			styleElement.styleSheet.cssText = replaceText(index, css);
-		} else {
-			var cssNode = document.createTextNode(css);
-			var childNodes = styleElement.childNodes;
-			if (childNodes[index]) styleElement.removeChild(childNodes[index]);
-			if (childNodes.length) {
-				styleElement.insertBefore(cssNode, childNodes[index]);
-			} else {
-				styleElement.appendChild(cssNode);
-			}
-		}
+	  if (styleElement.styleSheet) {
+	    styleElement.styleSheet.cssText = replaceText(index, css)
+	  } else {
+	    var cssNode = document.createTextNode(css)
+	    var childNodes = styleElement.childNodes
+	    if (childNodes[index]) styleElement.removeChild(childNodes[index])
+	    if (childNodes.length) {
+	      styleElement.insertBefore(cssNode, childNodes[index])
+	    } else {
+	      styleElement.appendChild(cssNode)
+	    }
+	  }
 	}
 	
-	function applyToTag(styleElement, obj) {
-		var css = obj.css;
-		var media = obj.media;
-		var sourceMap = obj.sourceMap;
+	function applyToTag (styleElement, obj) {
+	  var css = obj.css
+	  var media = obj.media
+	  var sourceMap = obj.sourceMap
 	
-		if (media) {
-			styleElement.setAttribute("media", media);
-		}
+	  if (media) {
+	    styleElement.setAttribute('media', media)
+	  }
 	
-		if (sourceMap) {
-			// https://developer.chrome.com/devtools/docs/javascript-debugging
-			// this makes source maps inside style tags work properly in Chrome
-			css += '\n/*# sourceURL=' + sourceMap.sources[0] + ' */';
-			// http://stackoverflow.com/a/26603875
-			css += "\n/*# sourceMappingURL=data:application/json;base64," + btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap)))) + " */";
-		}
+	  if (sourceMap) {
+	    // https://developer.chrome.com/devtools/docs/javascript-debugging
+	    // this makes source maps inside style tags work properly in Chrome
+	    css += '\n/*# sourceURL=' + sourceMap.sources[0] + ' */'
+	    // http://stackoverflow.com/a/26603875
+	    css += '\n/*# sourceMappingURL=data:application/json;base64,' + btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap)))) + ' */'
+	  }
 	
-		if (styleElement.styleSheet) {
-			styleElement.styleSheet.cssText = css;
-		} else {
-			while(styleElement.firstChild) {
-				styleElement.removeChild(styleElement.firstChild);
-			}
-			styleElement.appendChild(document.createTextNode(css));
-		}
+	  if (styleElement.styleSheet) {
+	    styleElement.styleSheet.cssText = css
+	  } else {
+	    while (styleElement.firstChild) {
+	      styleElement.removeChild(styleElement.firstChild)
+	    }
+	    styleElement.appendChild(document.createTextNode(css))
+	  }
 	}
 
 
 /***/ },
 /* 132 */
+/***/ function(module, exports) {
+
+	/**
+	 * Translates the list format produced by css-loader into something
+	 * easier to manipulate.
+	 */
+	module.exports = function listToStyles (parentId, list) {
+	  var styles = []
+	  var newStyles = {}
+	  for (var i = 0; i < list.length; i++) {
+	    var item = list[i]
+	    var id = item[0]
+	    var css = item[1]
+	    var media = item[2]
+	    var sourceMap = item[3]
+	    var part = {
+	      id: parentId + ':' + i,
+	      css: css,
+	      media: media,
+	      sourceMap: sourceMap
+	    }
+	    if (!newStyles[id]) {
+	      styles.push(newStyles[id] = { id: id, parts: [part] })
+	    } else {
+	      newStyles[id].parts.push(part)
+	    }
+	  }
+	  return styles
+	}
+
+
+/***/ },
+/* 133 */
+/***/ function(module, exports) {
+
+	module.exports = function normalizeComponent (
+	  rawScriptExports,
+	  compiledTemplate,
+	  scopeId,
+	  cssModules
+	) {
+	  var esModule
+	  var scriptExports = rawScriptExports = rawScriptExports || {}
+	
+	  // ES6 modules interop
+	  var type = typeof rawScriptExports.default
+	  if (type === 'object' || type === 'function') {
+	    esModule = rawScriptExports
+	    scriptExports = rawScriptExports.default
+	  }
+	
+	  // Vue.extend constructor export interop
+	  var options = typeof scriptExports === 'function'
+	    ? scriptExports.options
+	    : scriptExports
+	
+	  // render functions
+	  if (compiledTemplate) {
+	    options.render = compiledTemplate.render
+	    options.staticRenderFns = compiledTemplate.staticRenderFns
+	  }
+	
+	  // scopedId
+	  if (scopeId) {
+	    options._scopeId = scopeId
+	  }
+	
+	  // inject cssModules
+	  if (cssModules) {
+	    var computed = options.computed || (options.computed = {})
+	    Object.keys(cssModules).forEach(function (key) {
+	      var module = cssModules[key]
+	      computed[key] = function () { return module }
+	    })
+	  }
+	
+	  return {
+	    esModule: esModule,
+	    exports: scriptExports,
+	    options: options
+	  }
+	}
+
+
+/***/ },
+/* 134 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -33252,11 +33519,11 @@
 	
 	var _getPropsValuesMixin2 = _interopRequireDefault(_getPropsValuesMixin);
 	
-	var _mountableMixin = __webpack_require__(133);
+	var _mountableMixin = __webpack_require__(135);
 	
 	var _mountableMixin2 = _interopRequireDefault(_mountableMixin);
 	
-	var _latlngChangedHandler = __webpack_require__(134);
+	var _latlngChangedHandler = __webpack_require__(136);
 	
 	var _latlngChangedHandler2 = _interopRequireDefault(_latlngChangedHandler);
 	
@@ -33387,10 +33654,11 @@
 	      // manually trigger center and zoom
 	      _this2.$mapObject.addListener('center_changed', function () {
 	        _this2.$emit('center_changed', _this2.$mapObject.getCenter());
-	        _this2.$emit('bounds_changed', _this2.$mapObject.getBounds());
 	      });
 	      _this2.$mapObject.addListener('zoom_changed', function () {
 	        _this2.$emit('zoom_changed', _this2.$mapObject.getZoom());
+	      });
+	      _this2.$mapObject.addListener('bounds_changed', function () {
 	        _this2.$emit('bounds_changed', _this2.$mapObject.getBounds());
 	      });
 	
@@ -33409,7 +33677,7 @@
 	};
 
 /***/ },
-/* 133 */
+/* 135 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -33478,7 +33746,7 @@
 	};
 
 /***/ },
-/* 134 */
+/* 136 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -33506,7 +33774,7 @@
 	}
 
 /***/ },
-/* 135 */
+/* 137 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -33523,12 +33791,12 @@
 	if (false) {
 	  module.hot.accept()
 	  if (module.hot.data) {
-	     require("vue-hot-reload-api").rerender("data-v-74cbb3be", module.exports)
+	     require("vue-hot-reload-api").rerender("data-v-9438afc6", module.exports)
 	  }
 	}
 
 /***/ },
-/* 136 */
+/* 138 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(console) {'use strict';
@@ -33553,7 +33821,7 @@
 	
 	var _getPropsValuesMixin2 = _interopRequireDefault(_getPropsValuesMixin);
 	
-	var _markerClustererPlus = __webpack_require__(137);
+	var _markerClustererPlus = __webpack_require__(139);
 	
 	var _markerClustererPlus2 = _interopRequireDefault(_markerClustererPlus);
 	
@@ -33620,7 +33888,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ },
-/* 137 */
+/* 139 */
 /***/ function(module, exports) {
 
 	/**
@@ -35260,7 +35528,7 @@
 
 
 /***/ },
-/* 138 */
+/* 140 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -35269,7 +35537,7 @@
 	  value: true
 	});
 	
-	var _slicedToArray2 = __webpack_require__(139);
+	var _slicedToArray2 = __webpack_require__(141);
 	
 	var _slicedToArray3 = _interopRequireDefault(_slicedToArray2);
 	
@@ -35383,18 +35651,18 @@
 	};
 
 /***/ },
-/* 139 */
+/* 141 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 	
 	exports.__esModule = true;
 	
-	var _isIterable2 = __webpack_require__(140);
+	var _isIterable2 = __webpack_require__(142);
 	
 	var _isIterable3 = _interopRequireDefault(_isIterable2);
 	
-	var _getIterator2 = __webpack_require__(143);
+	var _getIterator2 = __webpack_require__(145);
 	
 	var _getIterator3 = _interopRequireDefault(_getIterator2);
 	
@@ -35439,21 +35707,21 @@
 	}();
 
 /***/ },
-/* 140 */
+/* 142 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = { "default": __webpack_require__(141), __esModule: true };
+	module.exports = { "default": __webpack_require__(143), __esModule: true };
 
 /***/ },
-/* 141 */
+/* 143 */
 /***/ function(module, exports, __webpack_require__) {
 
 	__webpack_require__(65);
 	__webpack_require__(43);
-	module.exports = __webpack_require__(142);
+	module.exports = __webpack_require__(144);
 
 /***/ },
-/* 142 */
+/* 144 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var classof   = __webpack_require__(106)
@@ -35467,21 +35735,21 @@
 	};
 
 /***/ },
-/* 143 */
+/* 145 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = { "default": __webpack_require__(144), __esModule: true };
+	module.exports = { "default": __webpack_require__(146), __esModule: true };
 
 /***/ },
-/* 144 */
+/* 146 */
 /***/ function(module, exports, __webpack_require__) {
 
 	__webpack_require__(65);
 	__webpack_require__(43);
-	module.exports = __webpack_require__(145);
+	module.exports = __webpack_require__(147);
 
 /***/ },
-/* 145 */
+/* 147 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var anObject = __webpack_require__(26)
@@ -35493,7 +35761,7 @@
 	};
 
 /***/ },
-/* 146 */
+/* 148 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -35502,11 +35770,7 @@
 	  value: true
 	});
 	
-	var _getIterator2 = __webpack_require__(143);
-	
-	var _getIterator3 = _interopRequireDefault(_getIterator2);
-	
-	var _slicedToArray2 = __webpack_require__(139);
+	var _slicedToArray2 = __webpack_require__(141);
 	
 	var _slicedToArray3 = _interopRequireDefault(_slicedToArray2);
 	
@@ -35604,33 +35868,12 @@
 	          var eventListeners = [];
 	
 	          var mvcArray = _this.$polygonObject.getPaths();
-	          var _iteratorNormalCompletion = true;
-	          var _didIteratorError = false;
-	          var _iteratorError = undefined;
-	
-	          try {
-	            for (var _iterator = (0, _getIterator3.default)(mvcArray), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-	              var mvcPath = _step.value;
-	
-	              eventListeners.push([mvcPath, mvcPath.addListener('insert_at', updatePaths)]);
-	              eventListeners.push([mvcPath, mvcPath.addListener('remove_at', updatePaths)]);
-	              eventListeners.push([mvcPath, mvcPath.addListener('set_at', updatePaths)]);
-	            }
-	          } catch (err) {
-	            _didIteratorError = true;
-	            _iteratorError = err;
-	          } finally {
-	            try {
-	              if (!_iteratorNormalCompletion && _iterator.return) {
-	                _iterator.return();
-	              }
-	            } finally {
-	              if (_didIteratorError) {
-	                throw _iteratorError;
-	              }
-	            }
+	          for (var i = 0; i < mvcArray.getLength(); i++) {
+	            var mvcPath = mvcArray.getAt(i);
+	            eventListeners.push([mvcPath, mvcPath.addListener('insert_at', updatePaths)]);
+	            eventListeners.push([mvcPath, mvcPath.addListener('remove_at', updatePaths)]);
+	            eventListeners.push([mvcPath, mvcPath.addListener('set_at', updatePaths)]);
 	          }
-	
 	          eventListeners.push([mvcArray, mvcArray.addListener('insert_at', updatePaths)]);
 	          eventListeners.push([mvcArray, mvcArray.addListener('remove_at', updatePaths)]);
 	          eventListeners.push([mvcArray, mvcArray.addListener('set_at', updatePaths)]);
@@ -35647,7 +35890,8 @@
 	        })();
 	      }
 	    }, {
-	      deep: this.deepWatch
+	      deep: this.deepWatch,
+	      immediate: true
 	    });
 	
 	    this.$watch('path', function (path) {
@@ -35680,7 +35924,8 @@
 	        })();
 	      }
 	    }, {
-	      deep: this.deepWatch
+	      deep: this.deepWatch,
+	      immediate: true
 	    });
 	
 	    // Display the map
@@ -35689,7 +35934,7 @@
 	};
 
 /***/ },
-/* 147 */
+/* 149 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -35792,7 +36037,7 @@
 	};
 
 /***/ },
-/* 148 */
+/* 150 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -35874,31 +36119,22 @@
 	};
 
 /***/ },
-/* 149 */
+/* 151 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function(console) {var __vue_exports__, __vue_options__
-	var __vue_styles__ = {}
-	
-	/* script */
-	__vue_exports__ = __webpack_require__(150)
-	
-	/* template */
-	var __vue_template__ = __webpack_require__(151)
-	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
-	if (
-	  typeof __vue_exports__.default === "object" ||
-	  typeof __vue_exports__.default === "function"
-	) {
-	if (Object.keys(__vue_exports__).some(function (key) { return key !== "default" && key !== "__esModule" })) {console.error("named exports are not supported in *.vue files.")}
-	__vue_options__ = __vue_exports__ = __vue_exports__.default
-	}
-	if (typeof __vue_options__ === "function") {
-	  __vue_options__ = __vue_options__.options
-	}
-	__vue_options__.__file = "/root/sift/frontend/node_modules/vue2-google-maps/dist/components/infoWindow.vue"
-	__vue_options__.render = __vue_template__.render
-	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
+	/* WEBPACK VAR INJECTION */(function(console) {var Component = __webpack_require__(133)(
+	  /* script */
+	  __webpack_require__(152),
+	  /* template */
+	  __webpack_require__(153),
+	  /* scopeId */
+	  null,
+	  /* cssModules */
+	  null
+	)
+	Component.options.__file = "/Users/jackrans/Documents/gps-sift/frontend/node_modules/vue2-google-maps/dist/components/infoWindow.vue"
+	if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
+	if (Component.options.functional) {console.error("[vue-loader] infoWindow.vue: functional components are not supported with templates, they should use render functions.")}
 	
 	/* hot reload */
 	if (false) {(function () {
@@ -35907,19 +36143,18 @@
 	  if (!hotAPI.compatible) return
 	  module.hot.accept()
 	  if (!module.hot.data) {
-	    hotAPI.createRecord("data-v-611a9668", __vue_options__)
+	    hotAPI.createRecord("data-v-bc6030e6", Component.options)
 	  } else {
-	    hotAPI.reload("data-v-611a9668", __vue_options__)
+	    hotAPI.reload("data-v-bc6030e6", Component.options)
 	  }
 	})()}
-	if (__vue_options__.functional) {console.error("[vue-loader] infoWindow.vue: functional components are not supported and should be defined in plain js files using render functions.")}
 	
-	module.exports = __vue_exports__
+	module.exports = Component.exports
 	
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ },
-/* 150 */
+/* 152 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -36047,7 +36282,7 @@
 	};
 
 /***/ },
-/* 151 */
+/* 153 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -36063,39 +36298,31 @@
 	if (false) {
 	  module.hot.accept()
 	  if (module.hot.data) {
-	     require("vue-hot-reload-api").rerender("data-v-611a9668", module.exports)
+	     require("vue-hot-reload-api").rerender("data-v-bc6030e6", module.exports)
 	  }
 	}
 
 /***/ },
-/* 152 */
+/* 154 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function(console) {var __vue_exports__, __vue_options__
-	var __vue_styles__ = {}
-	
+	/* WEBPACK VAR INJECTION */(function(console) {
 	/* styles */
-	__webpack_require__(153)
+	__webpack_require__(155)
 	
-	/* script */
-	__vue_exports__ = __webpack_require__(155)
-	
-	/* template */
-	var __vue_template__ = __webpack_require__(156)
-	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
-	if (
-	  typeof __vue_exports__.default === "object" ||
-	  typeof __vue_exports__.default === "function"
-	) {
-	if (Object.keys(__vue_exports__).some(function (key) { return key !== "default" && key !== "__esModule" })) {console.error("named exports are not supported in *.vue files.")}
-	__vue_options__ = __vue_exports__ = __vue_exports__.default
-	}
-	if (typeof __vue_options__ === "function") {
-	  __vue_options__ = __vue_options__.options
-	}
-	__vue_options__.__file = "/root/sift/frontend/node_modules/vue2-google-maps/dist/components/streetViewPanorama.vue"
-	__vue_options__.render = __vue_template__.render
-	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
+	var Component = __webpack_require__(133)(
+	  /* script */
+	  __webpack_require__(157),
+	  /* template */
+	  __webpack_require__(158),
+	  /* scopeId */
+	  null,
+	  /* cssModules */
+	  null
+	)
+	Component.options.__file = "/Users/jackrans/Documents/gps-sift/frontend/node_modules/vue2-google-maps/dist/components/streetViewPanorama.vue"
+	if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
+	if (Component.options.functional) {console.error("[vue-loader] streetViewPanorama.vue: functional components are not supported with templates, they should use render functions.")}
 	
 	/* hot reload */
 	if (false) {(function () {
@@ -36104,45 +36331,44 @@
 	  if (!hotAPI.compatible) return
 	  module.hot.accept()
 	  if (!module.hot.data) {
-	    hotAPI.createRecord("data-v-4b24e62a", __vue_options__)
+	    hotAPI.createRecord("data-v-25106eac", Component.options)
 	  } else {
-	    hotAPI.reload("data-v-4b24e62a", __vue_options__)
+	    hotAPI.reload("data-v-25106eac", Component.options)
 	  }
 	})()}
-	if (__vue_options__.functional) {console.error("[vue-loader] streetViewPanorama.vue: functional components are not supported and should be defined in plain js files using render functions.")}
 	
-	module.exports = __vue_exports__
+	module.exports = Component.exports
 	
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ },
-/* 153 */
+/* 155 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(154);
+	var content = __webpack_require__(156);
 	if(typeof content === 'string') content = [[module.id, content, '']];
-	// add the styles to the DOM
-	var update = __webpack_require__(131)(content, {});
 	if(content.locals) module.exports = content.locals;
+	// add the styles to the DOM
+	var update = __webpack_require__(131)("ce68d7f4", content, false);
 	// Hot Module Replacement
 	if(false) {
-		// When the styles change, update the <style> tags
-		if(!content.locals) {
-			module.hot.accept("!!./../../../css-loader/index.js?sourceMap!./../../../vue-loader/lib/style-rewriter.js?id=data-v-4b24e62a!./../../../vue-loader/lib/selector.js?type=styles&index=0!./streetViewPanorama.vue", function() {
-				var newContent = require("!!./../../../css-loader/index.js?sourceMap!./../../../vue-loader/lib/style-rewriter.js?id=data-v-4b24e62a!./../../../vue-loader/lib/selector.js?type=styles&index=0!./streetViewPanorama.vue");
-				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-				update(newContent);
-			});
-		}
-		// When the module is disposed, remove the <style> tags
-		module.hot.dispose(function() { update(); });
+	 // When the styles change, update the <style> tags
+	 if(!content.locals) {
+	   module.hot.accept("!!./../../../css-loader/index.js?sourceMap!./../../../vue-loader/lib/style-rewriter.js?id=data-v-25106eac!./../../../vue-loader/lib/selector.js?type=styles&index=0!./streetViewPanorama.vue", function() {
+	     var newContent = require("!!./../../../css-loader/index.js?sourceMap!./../../../vue-loader/lib/style-rewriter.js?id=data-v-25106eac!./../../../vue-loader/lib/selector.js?type=styles&index=0!./streetViewPanorama.vue");
+	     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+	     update(newContent);
+	   });
+	 }
+	 // When the module is disposed, remove the <style> tags
+	 module.hot.dispose(function() { update(); });
 	}
 
 /***/ },
-/* 154 */
+/* 156 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(130)();
@@ -36156,7 +36382,7 @@
 
 
 /***/ },
-/* 155 */
+/* 157 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(console) {'use strict';
@@ -36189,11 +36415,11 @@
 	
 	var _getPropsValuesMixin2 = _interopRequireDefault(_getPropsValuesMixin);
 	
-	var _mountableMixin = __webpack_require__(133);
+	var _mountableMixin = __webpack_require__(135);
 	
 	var _mountableMixin2 = _interopRequireDefault(_mountableMixin);
 	
-	var _latlngChangedHandler = __webpack_require__(134);
+	var _latlngChangedHandler = __webpack_require__(136);
 	
 	var _latlngChangedHandler2 = _interopRequireDefault(_latlngChangedHandler);
 	
@@ -36311,7 +36537,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ },
-/* 156 */
+/* 158 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -36326,36 +36552,27 @@
 	if (false) {
 	  module.hot.accept()
 	  if (module.hot.data) {
-	     require("vue-hot-reload-api").rerender("data-v-4b24e62a", module.exports)
+	     require("vue-hot-reload-api").rerender("data-v-25106eac", module.exports)
 	  }
 	}
 
 /***/ },
-/* 157 */
+/* 159 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function(console) {var __vue_exports__, __vue_options__
-	var __vue_styles__ = {}
-	
-	/* script */
-	__vue_exports__ = __webpack_require__(158)
-	
-	/* template */
-	var __vue_template__ = __webpack_require__(160)
-	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
-	if (
-	  typeof __vue_exports__.default === "object" ||
-	  typeof __vue_exports__.default === "function"
-	) {
-	if (Object.keys(__vue_exports__).some(function (key) { return key !== "default" && key !== "__esModule" })) {console.error("named exports are not supported in *.vue files.")}
-	__vue_options__ = __vue_exports__ = __vue_exports__.default
-	}
-	if (typeof __vue_options__ === "function") {
-	  __vue_options__ = __vue_options__.options
-	}
-	__vue_options__.__file = "/root/sift/frontend/node_modules/vue2-google-maps/dist/components/placeInput.vue"
-	__vue_options__.render = __vue_template__.render
-	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
+	/* WEBPACK VAR INJECTION */(function(console) {var Component = __webpack_require__(133)(
+	  /* script */
+	  __webpack_require__(160),
+	  /* template */
+	  __webpack_require__(162),
+	  /* scopeId */
+	  null,
+	  /* cssModules */
+	  null
+	)
+	Component.options.__file = "/Users/jackrans/Documents/gps-sift/frontend/node_modules/vue2-google-maps/dist/components/placeInput.vue"
+	if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
+	if (Component.options.functional) {console.error("[vue-loader] placeInput.vue: functional components are not supported with templates, they should use render functions.")}
 	
 	/* hot reload */
 	if (false) {(function () {
@@ -36364,19 +36581,18 @@
 	  if (!hotAPI.compatible) return
 	  module.hot.accept()
 	  if (!module.hot.data) {
-	    hotAPI.createRecord("data-v-56a07311", __vue_options__)
+	    hotAPI.createRecord("data-v-28fda5d2", Component.options)
 	  } else {
-	    hotAPI.reload("data-v-56a07311", __vue_options__)
+	    hotAPI.reload("data-v-28fda5d2", Component.options)
 	  }
 	})()}
-	if (__vue_options__.functional) {console.error("[vue-loader] placeInput.vue: functional components are not supported and should be defined in plain js files using render functions.")}
 	
-	module.exports = __vue_exports__
+	module.exports = Component.exports
 	
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ },
-/* 158 */
+/* 160 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(console) {'use strict';
@@ -36397,7 +36613,7 @@
 	
 	var _propsBinder2 = _interopRequireDefault(_propsBinder);
 	
-	var _simulateArrowDown = __webpack_require__(159);
+	var _simulateArrowDown = __webpack_require__(161);
 	
 	var _simulateArrowDown2 = _interopRequireDefault(_simulateArrowDown);
 	
@@ -36492,7 +36708,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ },
-/* 159 */
+/* 161 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -36531,7 +36747,7 @@
 	};
 
 /***/ },
-/* 160 */
+/* 162 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -36552,36 +36768,27 @@
 	if (false) {
 	  module.hot.accept()
 	  if (module.hot.data) {
-	     require("vue-hot-reload-api").rerender("data-v-56a07311", module.exports)
+	     require("vue-hot-reload-api").rerender("data-v-28fda5d2", module.exports)
 	  }
 	}
 
 /***/ },
-/* 161 */
+/* 163 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function(console) {var __vue_exports__, __vue_options__
-	var __vue_styles__ = {}
-	
-	/* script */
-	__vue_exports__ = __webpack_require__(162)
-	
-	/* template */
-	var __vue_template__ = __webpack_require__(163)
-	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
-	if (
-	  typeof __vue_exports__.default === "object" ||
-	  typeof __vue_exports__.default === "function"
-	) {
-	if (Object.keys(__vue_exports__).some(function (key) { return key !== "default" && key !== "__esModule" })) {console.error("named exports are not supported in *.vue files.")}
-	__vue_options__ = __vue_exports__ = __vue_exports__.default
-	}
-	if (typeof __vue_options__ === "function") {
-	  __vue_options__ = __vue_options__.options
-	}
-	__vue_options__.__file = "/root/sift/frontend/node_modules/vue2-google-maps/dist/components/autocomplete.vue"
-	__vue_options__.render = __vue_template__.render
-	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
+	/* WEBPACK VAR INJECTION */(function(console) {var Component = __webpack_require__(133)(
+	  /* script */
+	  __webpack_require__(164),
+	  /* template */
+	  __webpack_require__(165),
+	  /* scopeId */
+	  null,
+	  /* cssModules */
+	  null
+	)
+	Component.options.__file = "/Users/jackrans/Documents/gps-sift/frontend/node_modules/vue2-google-maps/dist/components/autocomplete.vue"
+	if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
+	if (Component.options.functional) {console.error("[vue-loader] autocomplete.vue: functional components are not supported with templates, they should use render functions.")}
 	
 	/* hot reload */
 	if (false) {(function () {
@@ -36590,19 +36797,18 @@
 	  if (!hotAPI.compatible) return
 	  module.hot.accept()
 	  if (!module.hot.data) {
-	    hotAPI.createRecord("data-v-41533014", __vue_options__)
+	    hotAPI.createRecord("data-v-e19c2312", Component.options)
 	  } else {
-	    hotAPI.reload("data-v-41533014", __vue_options__)
+	    hotAPI.reload("data-v-e19c2312", Component.options)
 	  }
 	})()}
-	if (__vue_options__.functional) {console.error("[vue-loader] autocomplete.vue: functional components are not supported and should be defined in plain js files using render functions.")}
 	
-	module.exports = __vue_exports__
+	module.exports = Component.exports
 	
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ },
-/* 162 */
+/* 164 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -36623,7 +36829,7 @@
 	
 	var _propsBinder2 = _interopRequireDefault(_propsBinder);
 	
-	var _simulateArrowDown = __webpack_require__(159);
+	var _simulateArrowDown = __webpack_require__(161);
 	
 	var _simulateArrowDown2 = _interopRequireDefault(_simulateArrowDown);
 	
@@ -36712,7 +36918,7 @@
 	};
 
 /***/ },
-/* 163 */
+/* 165 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -36731,39 +36937,31 @@
 	if (false) {
 	  module.hot.accept()
 	  if (module.hot.data) {
-	     require("vue-hot-reload-api").rerender("data-v-41533014", module.exports)
+	     require("vue-hot-reload-api").rerender("data-v-e19c2312", module.exports)
 	  }
 	}
 
 /***/ },
-/* 164 */
+/* 166 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function(console) {var __vue_exports__, __vue_options__
-	var __vue_styles__ = {}
-	
+	/* WEBPACK VAR INJECTION */(function(console) {
 	/* styles */
-	__webpack_require__(165)
+	__webpack_require__(167)
 	
-	/* script */
-	__vue_exports__ = __webpack_require__(167)
-	
-	/* template */
-	var __vue_template__ = __webpack_require__(168)
-	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
-	if (
-	  typeof __vue_exports__.default === "object" ||
-	  typeof __vue_exports__.default === "function"
-	) {
-	if (Object.keys(__vue_exports__).some(function (key) { return key !== "default" && key !== "__esModule" })) {console.error("named exports are not supported in *.vue files.")}
-	__vue_options__ = __vue_exports__ = __vue_exports__.default
-	}
-	if (typeof __vue_options__ === "function") {
-	  __vue_options__ = __vue_options__.options
-	}
-	__vue_options__.__file = "/root/sift/frontend/src/scripts/map.vue"
-	__vue_options__.render = __vue_template__.render
-	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
+	var Component = __webpack_require__(133)(
+	  /* script */
+	  __webpack_require__(169),
+	  /* template */
+	  __webpack_require__(170),
+	  /* scopeId */
+	  null,
+	  /* cssModules */
+	  null
+	)
+	Component.options.__file = "/Users/jackrans/Documents/gps-sift/frontend/src/scripts/map.vue"
+	if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
+	if (Component.options.functional) {console.error("[vue-loader] map.vue: functional components are not supported with templates, they should use render functions.")}
 	
 	/* hot reload */
 	if (false) {(function () {
@@ -36772,45 +36970,44 @@
 	  if (!hotAPI.compatible) return
 	  module.hot.accept()
 	  if (!module.hot.data) {
-	    hotAPI.createRecord("data-v-79f6edc8", __vue_options__)
+	    hotAPI.createRecord("data-v-d667758a", Component.options)
 	  } else {
-	    hotAPI.reload("data-v-79f6edc8", __vue_options__)
+	    hotAPI.reload("data-v-d667758a", Component.options)
 	  }
 	})()}
-	if (__vue_options__.functional) {console.error("[vue-loader] map.vue: functional components are not supported and should be defined in plain js files using render functions.")}
 	
-	module.exports = __vue_exports__
+	module.exports = Component.exports
 	
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ },
-/* 165 */
+/* 167 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(166);
+	var content = __webpack_require__(168);
 	if(typeof content === 'string') content = [[module.id, content, '']];
-	// add the styles to the DOM
-	var update = __webpack_require__(131)(content, {});
 	if(content.locals) module.exports = content.locals;
+	// add the styles to the DOM
+	var update = __webpack_require__(131)("7a3faf58", content, false);
 	// Hot Module Replacement
 	if(false) {
-		// When the styles change, update the <style> tags
-		if(!content.locals) {
-			module.hot.accept("!!./../../node_modules/css-loader/index.js?sourceMap!./../../node_modules/vue-loader/lib/style-rewriter.js?id=data-v-79f6edc8!./../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./map.vue", function() {
-				var newContent = require("!!./../../node_modules/css-loader/index.js?sourceMap!./../../node_modules/vue-loader/lib/style-rewriter.js?id=data-v-79f6edc8!./../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./map.vue");
-				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-				update(newContent);
-			});
-		}
-		// When the module is disposed, remove the <style> tags
-		module.hot.dispose(function() { update(); });
+	 // When the styles change, update the <style> tags
+	 if(!content.locals) {
+	   module.hot.accept("!!./../../node_modules/css-loader/index.js?sourceMap!./../../node_modules/vue-loader/lib/style-rewriter.js?id=data-v-d667758a!./../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./map.vue", function() {
+	     var newContent = require("!!./../../node_modules/css-loader/index.js?sourceMap!./../../node_modules/vue-loader/lib/style-rewriter.js?id=data-v-d667758a!./../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./map.vue");
+	     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+	     update(newContent);
+	   });
+	 }
+	 // When the module is disposed, remove the <style> tags
+	 module.hot.dispose(function() { update(); });
 	}
 
 /***/ },
-/* 166 */
+/* 168 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(130)();
@@ -36824,7 +37021,7 @@
 
 
 /***/ },
-/* 167 */
+/* 169 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(console) {"use strict";
@@ -36903,7 +37100,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ },
-/* 168 */
+/* 170 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -36943,39 +37140,31 @@
 	if (false) {
 	  module.hot.accept()
 	  if (module.hot.data) {
-	     require("vue-hot-reload-api").rerender("data-v-79f6edc8", module.exports)
+	     require("vue-hot-reload-api").rerender("data-v-d667758a", module.exports)
 	  }
 	}
 
 /***/ },
-/* 169 */
+/* 171 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function(console) {var __vue_exports__, __vue_options__
-	var __vue_styles__ = {}
-	
+	/* WEBPACK VAR INJECTION */(function(console) {
 	/* styles */
-	__webpack_require__(170)
+	__webpack_require__(172)
 	
-	/* script */
-	__vue_exports__ = __webpack_require__(172)
-	
-	/* template */
-	var __vue_template__ = __webpack_require__(174)
-	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
-	if (
-	  typeof __vue_exports__.default === "object" ||
-	  typeof __vue_exports__.default === "function"
-	) {
-	if (Object.keys(__vue_exports__).some(function (key) { return key !== "default" && key !== "__esModule" })) {console.error("named exports are not supported in *.vue files.")}
-	__vue_options__ = __vue_exports__ = __vue_exports__.default
-	}
-	if (typeof __vue_options__ === "function") {
-	  __vue_options__ = __vue_options__.options
-	}
-	__vue_options__.__file = "/root/sift/frontend/src/scripts/register.vue"
-	__vue_options__.render = __vue_template__.render
-	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
+	var Component = __webpack_require__(133)(
+	  /* script */
+	  __webpack_require__(174),
+	  /* template */
+	  __webpack_require__(176),
+	  /* scopeId */
+	  null,
+	  /* cssModules */
+	  null
+	)
+	Component.options.__file = "/Users/jackrans/Documents/gps-sift/frontend/src/scripts/register.vue"
+	if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
+	if (Component.options.functional) {console.error("[vue-loader] register.vue: functional components are not supported with templates, they should use render functions.")}
 	
 	/* hot reload */
 	if (false) {(function () {
@@ -36984,45 +37173,44 @@
 	  if (!hotAPI.compatible) return
 	  module.hot.accept()
 	  if (!module.hot.data) {
-	    hotAPI.createRecord("data-v-203fd193", __vue_options__)
+	    hotAPI.createRecord("data-v-56d3d0d4", Component.options)
 	  } else {
-	    hotAPI.reload("data-v-203fd193", __vue_options__)
+	    hotAPI.reload("data-v-56d3d0d4", Component.options)
 	  }
 	})()}
-	if (__vue_options__.functional) {console.error("[vue-loader] register.vue: functional components are not supported and should be defined in plain js files using render functions.")}
 	
-	module.exports = __vue_exports__
+	module.exports = Component.exports
 	
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ },
-/* 170 */
+/* 172 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(171);
+	var content = __webpack_require__(173);
 	if(typeof content === 'string') content = [[module.id, content, '']];
-	// add the styles to the DOM
-	var update = __webpack_require__(131)(content, {});
 	if(content.locals) module.exports = content.locals;
+	// add the styles to the DOM
+	var update = __webpack_require__(131)("406d49e2", content, false);
 	// Hot Module Replacement
 	if(false) {
-		// When the styles change, update the <style> tags
-		if(!content.locals) {
-			module.hot.accept("!!./../../node_modules/css-loader/index.js?sourceMap!./../../node_modules/vue-loader/lib/style-rewriter.js?id=data-v-203fd193!./../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./register.vue", function() {
-				var newContent = require("!!./../../node_modules/css-loader/index.js?sourceMap!./../../node_modules/vue-loader/lib/style-rewriter.js?id=data-v-203fd193!./../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./register.vue");
-				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-				update(newContent);
-			});
-		}
-		// When the module is disposed, remove the <style> tags
-		module.hot.dispose(function() { update(); });
+	 // When the styles change, update the <style> tags
+	 if(!content.locals) {
+	   module.hot.accept("!!./../../node_modules/css-loader/index.js?sourceMap!./../../node_modules/vue-loader/lib/style-rewriter.js?id=data-v-56d3d0d4!./../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./register.vue", function() {
+	     var newContent = require("!!./../../node_modules/css-loader/index.js?sourceMap!./../../node_modules/vue-loader/lib/style-rewriter.js?id=data-v-56d3d0d4!./../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./register.vue");
+	     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+	     update(newContent);
+	   });
+	 }
+	 // When the module is disposed, remove the <style> tags
+	 module.hot.dispose(function() { update(); });
 	}
 
 /***/ },
-/* 171 */
+/* 173 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(130)();
@@ -37036,7 +37224,7 @@
 
 
 /***/ },
-/* 172 */
+/* 174 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(console) {'use strict';
@@ -37045,7 +37233,7 @@
 	  value: true
 	});
 	
-	var _qrcodeGenerator = __webpack_require__(173);
+	var _qrcodeGenerator = __webpack_require__(175);
 	
 	var _qrcodeGenerator2 = _interopRequireDefault(_qrcodeGenerator);
 	
@@ -37108,7 +37296,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ },
-/* 173 */
+/* 175 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;//---------------------------------------------------------------------
@@ -39173,7 +39361,7 @@
 
 
 /***/ },
-/* 174 */
+/* 176 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -39219,39 +39407,31 @@
 	if (false) {
 	  module.hot.accept()
 	  if (module.hot.data) {
-	     require("vue-hot-reload-api").rerender("data-v-203fd193", module.exports)
+	     require("vue-hot-reload-api").rerender("data-v-56d3d0d4", module.exports)
 	  }
 	}
 
 /***/ },
-/* 175 */
+/* 177 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function(console) {var __vue_exports__, __vue_options__
-	var __vue_styles__ = {}
-	
+	/* WEBPACK VAR INJECTION */(function(console) {
 	/* styles */
-	__webpack_require__(176)
+	__webpack_require__(178)
 	
-	/* script */
-	__vue_exports__ = __webpack_require__(178)
-	
-	/* template */
-	var __vue_template__ = __webpack_require__(289)
-	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
-	if (
-	  typeof __vue_exports__.default === "object" ||
-	  typeof __vue_exports__.default === "function"
-	) {
-	if (Object.keys(__vue_exports__).some(function (key) { return key !== "default" && key !== "__esModule" })) {console.error("named exports are not supported in *.vue files.")}
-	__vue_options__ = __vue_exports__ = __vue_exports__.default
-	}
-	if (typeof __vue_options__ === "function") {
-	  __vue_options__ = __vue_options__.options
-	}
-	__vue_options__.__file = "/root/sift/frontend/src/scripts/devices.vue"
-	__vue_options__.render = __vue_template__.render
-	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
+	var Component = __webpack_require__(133)(
+	  /* script */
+	  __webpack_require__(180),
+	  /* template */
+	  __webpack_require__(291),
+	  /* scopeId */
+	  null,
+	  /* cssModules */
+	  null
+	)
+	Component.options.__file = "/Users/jackrans/Documents/gps-sift/frontend/src/scripts/devices.vue"
+	if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
+	if (Component.options.functional) {console.error("[vue-loader] devices.vue: functional components are not supported with templates, they should use render functions.")}
 	
 	/* hot reload */
 	if (false) {(function () {
@@ -39260,45 +39440,44 @@
 	  if (!hotAPI.compatible) return
 	  module.hot.accept()
 	  if (!module.hot.data) {
-	    hotAPI.createRecord("data-v-2536141d", __vue_options__)
+	    hotAPI.createRecord("data-v-1674a8bc", Component.options)
 	  } else {
-	    hotAPI.reload("data-v-2536141d", __vue_options__)
+	    hotAPI.reload("data-v-1674a8bc", Component.options)
 	  }
 	})()}
-	if (__vue_options__.functional) {console.error("[vue-loader] devices.vue: functional components are not supported and should be defined in plain js files using render functions.")}
 	
-	module.exports = __vue_exports__
+	module.exports = Component.exports
 	
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ },
-/* 176 */
+/* 178 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(177);
+	var content = __webpack_require__(179);
 	if(typeof content === 'string') content = [[module.id, content, '']];
-	// add the styles to the DOM
-	var update = __webpack_require__(131)(content, {});
 	if(content.locals) module.exports = content.locals;
+	// add the styles to the DOM
+	var update = __webpack_require__(131)("2d114452", content, false);
 	// Hot Module Replacement
 	if(false) {
-		// When the styles change, update the <style> tags
-		if(!content.locals) {
-			module.hot.accept("!!./../../node_modules/css-loader/index.js?sourceMap!./../../node_modules/vue-loader/lib/style-rewriter.js?id=data-v-2536141d!./../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./devices.vue", function() {
-				var newContent = require("!!./../../node_modules/css-loader/index.js?sourceMap!./../../node_modules/vue-loader/lib/style-rewriter.js?id=data-v-2536141d!./../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./devices.vue");
-				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-				update(newContent);
-			});
-		}
-		// When the module is disposed, remove the <style> tags
-		module.hot.dispose(function() { update(); });
+	 // When the styles change, update the <style> tags
+	 if(!content.locals) {
+	   module.hot.accept("!!./../../node_modules/css-loader/index.js?sourceMap!./../../node_modules/vue-loader/lib/style-rewriter.js?id=data-v-1674a8bc!./../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./devices.vue", function() {
+	     var newContent = require("!!./../../node_modules/css-loader/index.js?sourceMap!./../../node_modules/vue-loader/lib/style-rewriter.js?id=data-v-1674a8bc!./../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./devices.vue");
+	     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+	     update(newContent);
+	   });
+	 }
+	 // When the module is disposed, remove the <style> tags
+	 module.hot.dispose(function() { update(); });
 	}
 
 /***/ },
-/* 177 */
+/* 179 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(130)();
@@ -39306,13 +39485,13 @@
 	
 	
 	// module
-	exports.push([module.id, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"devices.vue","sourceRoot":"webpack://"}]);
+	exports.push([module.id, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"devices.vue","sourceRoot":"webpack://"}]);
 	
 	// exports
 
 
 /***/ },
-/* 178 */
+/* 180 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(console) {'use strict';
@@ -39325,7 +39504,7 @@
 	
 	var _keys2 = _interopRequireDefault(_keys);
 	
-	var _moment = __webpack_require__(179);
+	var _moment = __webpack_require__(181);
 	
 	var _moment2 = _interopRequireDefault(_moment);
 	
@@ -39365,6 +39544,8 @@
 	//
 	//
 	//
+	//
+	//
 	
 	var format = function format(values) {
 	  var result = {};
@@ -39377,7 +39558,11 @@
 	};
 	
 	exports.default = {
-	  data: function data() {},
+	  data: function data() {
+	    return {
+	      devices: []
+	    };
+	  },
 	
 	  beforeDestroy: function beforeDestroy() {
 	    console.log("DESTROYED: ", this);
@@ -39391,6 +39576,8 @@
 	  mounted: function mounted() {
 	    var _this = this;
 	
+	    console.log('ready');
+	    this.updateTimes();
 	    this.timeUpdates = setInterval(function () {
 	      _this.updateTimes();
 	    }, 60 * 1000);
@@ -39398,32 +39585,31 @@
 	
 	  methods: {
 	    updateTimes: function updateTimes() {
-	      this.devices = this.$store.state.devices.map(function (dev) {
-	        return {
-	          key: dev.key,
-	          value: format(JSON.parse(dev.value))
-	        };
-	      });
+	      console.log('update times');
+	      if (this.$store.state.devices) {
+	        this.devices = this.$store.state.devices.map(function (dev) {
+	          return {
+	            key: dev.key,
+	            value: format(JSON.parse(dev.value))
+	          };
+	        });
+	      }
 	    },
 	    route: function route(path) {
 	      this.$router.push(path);
 	    }
 	  },
 	  computed: {
-	    devices: function devices() {
-	      return this.$store.state.devices.map(function (dev) {
-	        return {
-	          key: dev.key,
-	          value: format(JSON.parse(dev.value))
-	        };
-	      });
+	    dummy: function dummy() {
+	      this.updateTimes();
+	      return this.$store.state.devices && [];
 	    }
 	  }
 	};
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ },
-/* 179 */
+/* 181 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(console, module) {//! moment.js
@@ -41240,7 +41426,7 @@
 	            module && module.exports) {
 	        try {
 	            oldLocale = globalLocale._abbr;
-	            __webpack_require__(180)("./" + name);
+	            __webpack_require__(182)("./" + name);
 	            // because defineLocale currently also sets the global locale, we
 	            // want to undo that for lazy loaded locales
 	            getSetGlobalLocale(oldLocale);
@@ -43731,226 +43917,226 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1), __webpack_require__(121)(module)))
 
 /***/ },
-/* 180 */
+/* 182 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var map = {
-		"./af": 181,
-		"./af.js": 181,
-		"./ar": 182,
-		"./ar-dz": 183,
-		"./ar-dz.js": 183,
-		"./ar-ly": 184,
-		"./ar-ly.js": 184,
-		"./ar-ma": 185,
-		"./ar-ma.js": 185,
-		"./ar-sa": 186,
-		"./ar-sa.js": 186,
-		"./ar-tn": 187,
-		"./ar-tn.js": 187,
-		"./ar.js": 182,
-		"./az": 188,
-		"./az.js": 188,
-		"./be": 189,
-		"./be.js": 189,
-		"./bg": 190,
-		"./bg.js": 190,
-		"./bn": 191,
-		"./bn.js": 191,
-		"./bo": 192,
-		"./bo.js": 192,
-		"./br": 193,
-		"./br.js": 193,
-		"./bs": 194,
-		"./bs.js": 194,
-		"./ca": 195,
-		"./ca.js": 195,
-		"./cs": 196,
-		"./cs.js": 196,
-		"./cv": 197,
-		"./cv.js": 197,
-		"./cy": 198,
-		"./cy.js": 198,
-		"./da": 199,
-		"./da.js": 199,
-		"./de": 200,
-		"./de-at": 201,
-		"./de-at.js": 201,
-		"./de.js": 200,
-		"./dv": 202,
-		"./dv.js": 202,
-		"./el": 203,
-		"./el.js": 203,
-		"./en-au": 204,
-		"./en-au.js": 204,
-		"./en-ca": 205,
-		"./en-ca.js": 205,
-		"./en-gb": 206,
-		"./en-gb.js": 206,
-		"./en-ie": 207,
-		"./en-ie.js": 207,
-		"./en-nz": 208,
-		"./en-nz.js": 208,
-		"./eo": 209,
-		"./eo.js": 209,
-		"./es": 210,
-		"./es-do": 211,
-		"./es-do.js": 211,
-		"./es.js": 210,
-		"./et": 212,
-		"./et.js": 212,
-		"./eu": 213,
-		"./eu.js": 213,
-		"./fa": 214,
-		"./fa.js": 214,
-		"./fi": 215,
-		"./fi.js": 215,
-		"./fo": 216,
-		"./fo.js": 216,
-		"./fr": 217,
-		"./fr-ca": 218,
-		"./fr-ca.js": 218,
-		"./fr-ch": 219,
-		"./fr-ch.js": 219,
-		"./fr.js": 217,
-		"./fy": 220,
-		"./fy.js": 220,
-		"./gd": 221,
-		"./gd.js": 221,
-		"./gl": 222,
-		"./gl.js": 222,
-		"./he": 223,
-		"./he.js": 223,
-		"./hi": 224,
-		"./hi.js": 224,
-		"./hr": 225,
-		"./hr.js": 225,
-		"./hu": 226,
-		"./hu.js": 226,
-		"./hy-am": 227,
-		"./hy-am.js": 227,
-		"./id": 228,
-		"./id.js": 228,
-		"./is": 229,
-		"./is.js": 229,
-		"./it": 230,
-		"./it.js": 230,
-		"./ja": 231,
-		"./ja.js": 231,
-		"./jv": 232,
-		"./jv.js": 232,
-		"./ka": 233,
-		"./ka.js": 233,
-		"./kk": 234,
-		"./kk.js": 234,
-		"./km": 235,
-		"./km.js": 235,
-		"./ko": 236,
-		"./ko.js": 236,
-		"./ky": 237,
-		"./ky.js": 237,
-		"./lb": 238,
-		"./lb.js": 238,
-		"./lo": 239,
-		"./lo.js": 239,
-		"./lt": 240,
-		"./lt.js": 240,
-		"./lv": 241,
-		"./lv.js": 241,
-		"./me": 242,
-		"./me.js": 242,
-		"./mi": 243,
-		"./mi.js": 243,
-		"./mk": 244,
-		"./mk.js": 244,
-		"./ml": 245,
-		"./ml.js": 245,
-		"./mr": 246,
-		"./mr.js": 246,
-		"./ms": 247,
-		"./ms-my": 248,
-		"./ms-my.js": 248,
-		"./ms.js": 247,
-		"./my": 249,
-		"./my.js": 249,
-		"./nb": 250,
-		"./nb.js": 250,
-		"./ne": 251,
-		"./ne.js": 251,
-		"./nl": 252,
-		"./nl-be": 253,
-		"./nl-be.js": 253,
-		"./nl.js": 252,
-		"./nn": 254,
-		"./nn.js": 254,
-		"./pa-in": 255,
-		"./pa-in.js": 255,
-		"./pl": 256,
-		"./pl.js": 256,
-		"./pt": 257,
-		"./pt-br": 258,
-		"./pt-br.js": 258,
-		"./pt.js": 257,
-		"./ro": 259,
-		"./ro.js": 259,
-		"./ru": 260,
-		"./ru.js": 260,
-		"./se": 261,
-		"./se.js": 261,
-		"./si": 262,
-		"./si.js": 262,
-		"./sk": 263,
-		"./sk.js": 263,
-		"./sl": 264,
-		"./sl.js": 264,
-		"./sq": 265,
-		"./sq.js": 265,
-		"./sr": 266,
-		"./sr-cyrl": 267,
-		"./sr-cyrl.js": 267,
-		"./sr.js": 266,
-		"./ss": 268,
-		"./ss.js": 268,
-		"./sv": 269,
-		"./sv.js": 269,
-		"./sw": 270,
-		"./sw.js": 270,
-		"./ta": 271,
-		"./ta.js": 271,
-		"./te": 272,
-		"./te.js": 272,
-		"./tet": 273,
-		"./tet.js": 273,
-		"./th": 274,
-		"./th.js": 274,
-		"./tl-ph": 275,
-		"./tl-ph.js": 275,
-		"./tlh": 276,
-		"./tlh.js": 276,
-		"./tr": 277,
-		"./tr.js": 277,
-		"./tzl": 278,
-		"./tzl.js": 278,
-		"./tzm": 279,
-		"./tzm-latn": 280,
-		"./tzm-latn.js": 280,
-		"./tzm.js": 279,
-		"./uk": 281,
-		"./uk.js": 281,
-		"./uz": 282,
-		"./uz.js": 282,
-		"./vi": 283,
-		"./vi.js": 283,
-		"./x-pseudo": 284,
-		"./x-pseudo.js": 284,
-		"./yo": 285,
-		"./yo.js": 285,
-		"./zh-cn": 286,
-		"./zh-cn.js": 286,
-		"./zh-hk": 287,
-		"./zh-hk.js": 287,
-		"./zh-tw": 288,
-		"./zh-tw.js": 288
+		"./af": 183,
+		"./af.js": 183,
+		"./ar": 184,
+		"./ar-dz": 185,
+		"./ar-dz.js": 185,
+		"./ar-ly": 186,
+		"./ar-ly.js": 186,
+		"./ar-ma": 187,
+		"./ar-ma.js": 187,
+		"./ar-sa": 188,
+		"./ar-sa.js": 188,
+		"./ar-tn": 189,
+		"./ar-tn.js": 189,
+		"./ar.js": 184,
+		"./az": 190,
+		"./az.js": 190,
+		"./be": 191,
+		"./be.js": 191,
+		"./bg": 192,
+		"./bg.js": 192,
+		"./bn": 193,
+		"./bn.js": 193,
+		"./bo": 194,
+		"./bo.js": 194,
+		"./br": 195,
+		"./br.js": 195,
+		"./bs": 196,
+		"./bs.js": 196,
+		"./ca": 197,
+		"./ca.js": 197,
+		"./cs": 198,
+		"./cs.js": 198,
+		"./cv": 199,
+		"./cv.js": 199,
+		"./cy": 200,
+		"./cy.js": 200,
+		"./da": 201,
+		"./da.js": 201,
+		"./de": 202,
+		"./de-at": 203,
+		"./de-at.js": 203,
+		"./de.js": 202,
+		"./dv": 204,
+		"./dv.js": 204,
+		"./el": 205,
+		"./el.js": 205,
+		"./en-au": 206,
+		"./en-au.js": 206,
+		"./en-ca": 207,
+		"./en-ca.js": 207,
+		"./en-gb": 208,
+		"./en-gb.js": 208,
+		"./en-ie": 209,
+		"./en-ie.js": 209,
+		"./en-nz": 210,
+		"./en-nz.js": 210,
+		"./eo": 211,
+		"./eo.js": 211,
+		"./es": 212,
+		"./es-do": 213,
+		"./es-do.js": 213,
+		"./es.js": 212,
+		"./et": 214,
+		"./et.js": 214,
+		"./eu": 215,
+		"./eu.js": 215,
+		"./fa": 216,
+		"./fa.js": 216,
+		"./fi": 217,
+		"./fi.js": 217,
+		"./fo": 218,
+		"./fo.js": 218,
+		"./fr": 219,
+		"./fr-ca": 220,
+		"./fr-ca.js": 220,
+		"./fr-ch": 221,
+		"./fr-ch.js": 221,
+		"./fr.js": 219,
+		"./fy": 222,
+		"./fy.js": 222,
+		"./gd": 223,
+		"./gd.js": 223,
+		"./gl": 224,
+		"./gl.js": 224,
+		"./he": 225,
+		"./he.js": 225,
+		"./hi": 226,
+		"./hi.js": 226,
+		"./hr": 227,
+		"./hr.js": 227,
+		"./hu": 228,
+		"./hu.js": 228,
+		"./hy-am": 229,
+		"./hy-am.js": 229,
+		"./id": 230,
+		"./id.js": 230,
+		"./is": 231,
+		"./is.js": 231,
+		"./it": 232,
+		"./it.js": 232,
+		"./ja": 233,
+		"./ja.js": 233,
+		"./jv": 234,
+		"./jv.js": 234,
+		"./ka": 235,
+		"./ka.js": 235,
+		"./kk": 236,
+		"./kk.js": 236,
+		"./km": 237,
+		"./km.js": 237,
+		"./ko": 238,
+		"./ko.js": 238,
+		"./ky": 239,
+		"./ky.js": 239,
+		"./lb": 240,
+		"./lb.js": 240,
+		"./lo": 241,
+		"./lo.js": 241,
+		"./lt": 242,
+		"./lt.js": 242,
+		"./lv": 243,
+		"./lv.js": 243,
+		"./me": 244,
+		"./me.js": 244,
+		"./mi": 245,
+		"./mi.js": 245,
+		"./mk": 246,
+		"./mk.js": 246,
+		"./ml": 247,
+		"./ml.js": 247,
+		"./mr": 248,
+		"./mr.js": 248,
+		"./ms": 249,
+		"./ms-my": 250,
+		"./ms-my.js": 250,
+		"./ms.js": 249,
+		"./my": 251,
+		"./my.js": 251,
+		"./nb": 252,
+		"./nb.js": 252,
+		"./ne": 253,
+		"./ne.js": 253,
+		"./nl": 254,
+		"./nl-be": 255,
+		"./nl-be.js": 255,
+		"./nl.js": 254,
+		"./nn": 256,
+		"./nn.js": 256,
+		"./pa-in": 257,
+		"./pa-in.js": 257,
+		"./pl": 258,
+		"./pl.js": 258,
+		"./pt": 259,
+		"./pt-br": 260,
+		"./pt-br.js": 260,
+		"./pt.js": 259,
+		"./ro": 261,
+		"./ro.js": 261,
+		"./ru": 262,
+		"./ru.js": 262,
+		"./se": 263,
+		"./se.js": 263,
+		"./si": 264,
+		"./si.js": 264,
+		"./sk": 265,
+		"./sk.js": 265,
+		"./sl": 266,
+		"./sl.js": 266,
+		"./sq": 267,
+		"./sq.js": 267,
+		"./sr": 268,
+		"./sr-cyrl": 269,
+		"./sr-cyrl.js": 269,
+		"./sr.js": 268,
+		"./ss": 270,
+		"./ss.js": 270,
+		"./sv": 271,
+		"./sv.js": 271,
+		"./sw": 272,
+		"./sw.js": 272,
+		"./ta": 273,
+		"./ta.js": 273,
+		"./te": 274,
+		"./te.js": 274,
+		"./tet": 275,
+		"./tet.js": 275,
+		"./th": 276,
+		"./th.js": 276,
+		"./tl-ph": 277,
+		"./tl-ph.js": 277,
+		"./tlh": 278,
+		"./tlh.js": 278,
+		"./tr": 279,
+		"./tr.js": 279,
+		"./tzl": 280,
+		"./tzl.js": 280,
+		"./tzm": 281,
+		"./tzm-latn": 282,
+		"./tzm-latn.js": 282,
+		"./tzm.js": 281,
+		"./uk": 283,
+		"./uk.js": 283,
+		"./uz": 284,
+		"./uz.js": 284,
+		"./vi": 285,
+		"./vi.js": 285,
+		"./x-pseudo": 286,
+		"./x-pseudo.js": 286,
+		"./yo": 287,
+		"./yo.js": 287,
+		"./zh-cn": 288,
+		"./zh-cn.js": 288,
+		"./zh-hk": 289,
+		"./zh-hk.js": 289,
+		"./zh-tw": 290,
+		"./zh-tw.js": 290
 	};
 	function webpackContext(req) {
 		return __webpack_require__(webpackContextResolve(req));
@@ -43963,11 +44149,11 @@
 	};
 	webpackContext.resolve = webpackContextResolve;
 	module.exports = webpackContext;
-	webpackContext.id = 180;
+	webpackContext.id = 182;
 
 
 /***/ },
-/* 181 */
+/* 183 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -43975,7 +44161,7 @@
 	//! author : Werner Mollentze : https://github.com/wernerm
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -44045,7 +44231,7 @@
 
 
 /***/ },
-/* 182 */
+/* 184 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -44055,7 +44241,7 @@
 	//! author : forabi https://github.com/forabi
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -44192,7 +44378,7 @@
 
 
 /***/ },
-/* 183 */
+/* 185 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -44200,7 +44386,7 @@
 	//! author : Noureddine LOUAHEDJ : https://github.com/noureddineme
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -44256,7 +44442,7 @@
 
 
 /***/ },
-/* 184 */
+/* 186 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -44264,7 +44450,7 @@
 	//! author : Ali Hmer: https://github.com/kikoanis
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -44387,7 +44573,7 @@
 
 
 /***/ },
-/* 185 */
+/* 187 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -44396,7 +44582,7 @@
 	//! author : Abdel Said : https://github.com/abdelsaid
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -44452,7 +44638,7 @@
 
 
 /***/ },
-/* 186 */
+/* 188 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -44460,7 +44646,7 @@
 	//! author : Suhail Alkowaileet : https://github.com/xsoh
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -44562,7 +44748,7 @@
 
 
 /***/ },
-/* 187 */
+/* 189 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -44570,7 +44756,7 @@
 	//! author : Nader Toukabri : https://github.com/naderio
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -44626,7 +44812,7 @@
 
 
 /***/ },
-/* 188 */
+/* 190 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -44634,7 +44820,7 @@
 	//! author : topchiyev : https://github.com/topchiyev
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -44736,7 +44922,7 @@
 
 
 /***/ },
-/* 189 */
+/* 191 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -44746,7 +44932,7 @@
 	//! Author : Menelion Elensúle : https://github.com/Oire
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -44875,7 +45061,7 @@
 
 
 /***/ },
-/* 190 */
+/* 192 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -44883,7 +45069,7 @@
 	//! author : Krasen Borisov : https://github.com/kraz
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -44970,7 +45156,7 @@
 
 
 /***/ },
-/* 191 */
+/* 193 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -44978,7 +45164,7 @@
 	//! author : Kaushik Gandhi : https://github.com/kaushikgandhi
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -45094,7 +45280,7 @@
 
 
 /***/ },
-/* 192 */
+/* 194 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -45102,7 +45288,7 @@
 	//! author : Thupten N. Chakrishar : https://github.com/vajradog
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -45218,7 +45404,7 @@
 
 
 /***/ },
-/* 193 */
+/* 195 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -45226,7 +45412,7 @@
 	//! author : Jean-Baptiste Le Duigou : https://github.com/jbleduigou
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -45331,7 +45517,7 @@
 
 
 /***/ },
-/* 194 */
+/* 196 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -45340,7 +45526,7 @@
 	//! based on (hr) translation by Bojan Marković
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -45479,7 +45665,7 @@
 
 
 /***/ },
-/* 195 */
+/* 197 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -45487,7 +45673,7 @@
 	//! author : Juan G. Hurtado : https://github.com/juanghurtado
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -45565,7 +45751,7 @@
 
 
 /***/ },
-/* 196 */
+/* 198 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -45573,7 +45759,7 @@
 	//! author : petrbela : https://github.com/petrbela
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -45742,7 +45928,7 @@
 
 
 /***/ },
-/* 197 */
+/* 199 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -45750,7 +45936,7 @@
 	//! author : Anatoly Mironov : https://github.com/mirontoli
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -45810,7 +45996,7 @@
 
 
 /***/ },
-/* 198 */
+/* 200 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -45819,7 +46005,7 @@
 	//! author : https://github.com/ryangreaves
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -45896,7 +46082,7 @@
 
 
 /***/ },
-/* 199 */
+/* 201 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -45904,7 +46090,7 @@
 	//! author : Ulrik Nielsen : https://github.com/mrbase
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -45961,7 +46147,7 @@
 
 
 /***/ },
-/* 200 */
+/* 202 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -45971,7 +46157,7 @@
 	//! author : Mikolaj Dadela : https://github.com/mik01aj
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -46044,7 +46230,7 @@
 
 
 /***/ },
-/* 201 */
+/* 203 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -46055,7 +46241,7 @@
 	//! author : Mikolaj Dadela : https://github.com/mik01aj
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -46128,7 +46314,7 @@
 
 
 /***/ },
-/* 202 */
+/* 204 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -46136,7 +46322,7 @@
 	//! author : Jawish Hameed : https://github.com/jawish
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -46233,7 +46419,7 @@
 
 
 /***/ },
-/* 203 */
+/* 205 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -46241,7 +46427,7 @@
 	//! author : Aggelos Karalias : https://github.com/mehiel
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -46336,7 +46522,7 @@
 
 
 /***/ },
-/* 204 */
+/* 206 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -46344,7 +46530,7 @@
 	//! author : Jared Morse : https://github.com/jarcoal
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -46408,7 +46594,7 @@
 
 
 /***/ },
-/* 205 */
+/* 207 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -46416,7 +46602,7 @@
 	//! author : Jonathan Abourbih : https://github.com/jonbca
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -46476,7 +46662,7 @@
 
 
 /***/ },
-/* 206 */
+/* 208 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -46484,7 +46670,7 @@
 	//! author : Chris Gedrim : https://github.com/chrisgedrim
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -46548,7 +46734,7 @@
 
 
 /***/ },
-/* 207 */
+/* 209 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -46556,7 +46742,7 @@
 	//! author : Chris Cartlidge : https://github.com/chriscartlidge
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -46620,7 +46806,7 @@
 
 
 /***/ },
-/* 208 */
+/* 210 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -46628,7 +46814,7 @@
 	//! author : Luke McGregor : https://github.com/lukemcgregor
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -46692,7 +46878,7 @@
 
 
 /***/ },
-/* 209 */
+/* 211 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -46702,7 +46888,7 @@
 	//!          Se ne, bonvolu korekti kaj avizi min por ke mi povas lerni!
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -46770,7 +46956,7 @@
 
 
 /***/ },
-/* 210 */
+/* 212 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -46778,7 +46964,7 @@
 	//! author : Julio Napurí : https://github.com/julionc
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -46856,14 +47042,14 @@
 
 
 /***/ },
-/* 211 */
+/* 213 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
 	//! locale : Spanish (Dominican Republic) [es-do]
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -46941,7 +47127,7 @@
 
 
 /***/ },
-/* 212 */
+/* 214 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -46950,7 +47136,7 @@
 	//! improvements : Illimar Tambek : https://github.com/ragulka
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -47026,7 +47212,7 @@
 
 
 /***/ },
-/* 213 */
+/* 215 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -47034,7 +47220,7 @@
 	//! author : Eneko Illarramendi : https://github.com/eillarra
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -47097,7 +47283,7 @@
 
 
 /***/ },
-/* 214 */
+/* 216 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -47105,7 +47291,7 @@
 	//! author : Ebrahim Byagowi : https://github.com/ebraminio
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -47209,7 +47395,7 @@
 
 
 /***/ },
-/* 215 */
+/* 217 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -47217,7 +47403,7 @@
 	//! author : Tarmo Aidantausta : https://github.com/bleadof
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -47321,7 +47507,7 @@
 
 
 /***/ },
-/* 216 */
+/* 218 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -47329,7 +47515,7 @@
 	//! author : Ragnar Johannesen : https://github.com/ragnar123
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -47386,7 +47572,7 @@
 
 
 /***/ },
-/* 217 */
+/* 219 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -47394,7 +47580,7 @@
 	//! author : John Fischer : https://github.com/jfroffice
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -47455,7 +47641,7 @@
 
 
 /***/ },
-/* 218 */
+/* 220 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -47463,7 +47649,7 @@
 	//! author : Jonathan Abourbih : https://github.com/jonbca
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -47520,7 +47706,7 @@
 
 
 /***/ },
-/* 219 */
+/* 221 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -47528,7 +47714,7 @@
 	//! author : Gaspard Bucher : https://github.com/gaspard
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -47589,7 +47775,7 @@
 
 
 /***/ },
-/* 220 */
+/* 222 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -47597,7 +47783,7 @@
 	//! author : Robin van der Vliet : https://github.com/robin0van0der0v
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -47667,7 +47853,7 @@
 
 
 /***/ },
-/* 221 */
+/* 223 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -47675,7 +47861,7 @@
 	//! author : Jon Ashdown : https://github.com/jonashdown
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -47748,7 +47934,7 @@
 
 
 /***/ },
-/* 222 */
+/* 224 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -47756,7 +47942,7 @@
 	//! author : Juan G. Hurtado : https://github.com/juanghurtado
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -47830,7 +48016,7 @@
 
 
 /***/ },
-/* 223 */
+/* 225 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -47840,7 +48026,7 @@
 	//! author : Tal Ater : https://github.com/TalAter
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -47934,7 +48120,7 @@
 
 
 /***/ },
-/* 224 */
+/* 226 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -47942,7 +48128,7 @@
 	//! author : Mayank Singhal : https://github.com/mayanksinghal
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -48063,7 +48249,7 @@
 
 
 /***/ },
-/* 225 */
+/* 227 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -48071,7 +48257,7 @@
 	//! author : Bojan Marković : https://github.com/bmarkovic
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -48213,7 +48399,7 @@
 
 
 /***/ },
-/* 226 */
+/* 228 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -48221,7 +48407,7 @@
 	//! author : Adam Brunner : https://github.com/adambrunner
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -48327,7 +48513,7 @@
 
 
 /***/ },
-/* 227 */
+/* 229 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -48335,7 +48521,7 @@
 	//! author : Armendarabyan : https://github.com/armendarabyan
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -48427,7 +48613,7 @@
 
 
 /***/ },
-/* 228 */
+/* 230 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -48436,7 +48622,7 @@
 	//! reference: http://id.wikisource.org/wiki/Pedoman_Umum_Ejaan_Bahasa_Indonesia_yang_Disempurnakan
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -48515,7 +48701,7 @@
 
 
 /***/ },
-/* 229 */
+/* 231 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -48523,7 +48709,7 @@
 	//! author : Hinrik Örn Sigurðsson : https://github.com/hinrik
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -48647,7 +48833,7 @@
 
 
 /***/ },
-/* 230 */
+/* 232 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -48656,7 +48842,7 @@
 	//! author: Mattia Larentis: https://github.com/nostalgiaz
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -48722,7 +48908,7 @@
 
 
 /***/ },
-/* 231 */
+/* 233 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -48730,7 +48916,7 @@
 	//! author : LI Long : https://github.com/baryon
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -48803,7 +48989,7 @@
 
 
 /***/ },
-/* 232 */
+/* 234 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -48812,7 +48998,7 @@
 	//! reference: http://jv.wikipedia.org/wiki/Basa_Jawa
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -48891,7 +49077,7 @@
 
 
 /***/ },
-/* 233 */
+/* 235 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -48899,7 +49085,7 @@
 	//! author : Irakli Janiashvili : https://github.com/irakli-janiashvili
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -48985,7 +49171,7 @@
 
 
 /***/ },
-/* 234 */
+/* 236 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -48993,7 +49179,7 @@
 	//! authors : Nurlan Rakhimzhanov : https://github.com/nurlan
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -49077,7 +49263,7 @@
 
 
 /***/ },
-/* 235 */
+/* 237 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -49085,7 +49271,7 @@
 	//! author : Kruy Vanna : https://github.com/kruyvanna
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -49140,7 +49326,7 @@
 
 
 /***/ },
-/* 236 */
+/* 238 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -49149,7 +49335,7 @@
 	//! author : Jeeeyul Lee <jeeeyul@gmail.com>
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -49210,7 +49396,7 @@
 
 
 /***/ },
-/* 237 */
+/* 239 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -49218,7 +49404,7 @@
 	//! author : Chyngyz Arystan uulu : https://github.com/chyngyz
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -49303,7 +49489,7 @@
 
 
 /***/ },
-/* 238 */
+/* 240 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -49312,7 +49498,7 @@
 	//! author : David Raison : https://github.com/kwisatz
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -49445,7 +49631,7 @@
 
 
 /***/ },
-/* 239 */
+/* 241 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -49453,7 +49639,7 @@
 	//! author : Ryan Hart : https://github.com/ryanhart2
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -49520,7 +49706,7 @@
 
 
 /***/ },
-/* 240 */
+/* 242 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -49528,7 +49714,7 @@
 	//! author : Mindaugas Mozūras : https://github.com/mmozuras
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -49642,7 +49828,7 @@
 
 
 /***/ },
-/* 241 */
+/* 243 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -49651,7 +49837,7 @@
 	//! author : Jānis Elmeris : https://github.com/JanisE
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -49744,7 +49930,7 @@
 
 
 /***/ },
-/* 242 */
+/* 244 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -49752,7 +49938,7 @@
 	//! author : Miodrag Nikač <miodrag@restartit.me> : https://github.com/miodragnikac
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -49860,7 +50046,7 @@
 
 
 /***/ },
-/* 243 */
+/* 245 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -49868,7 +50054,7 @@
 	//! author : John Corrigan <robbiecloset@gmail.com> : https://github.com/johnideal
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -49929,7 +50115,7 @@
 
 
 /***/ },
-/* 244 */
+/* 246 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -49937,7 +50123,7 @@
 	//! author : Borislav Mickov : https://github.com/B0k0
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -50024,7 +50210,7 @@
 
 
 /***/ },
-/* 245 */
+/* 247 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -50032,7 +50218,7 @@
 	//! author : Floyd Pink : https://github.com/floydpink
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -50110,7 +50296,7 @@
 
 
 /***/ },
-/* 246 */
+/* 248 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -50119,7 +50305,7 @@
 	//! author : Vivek Athalye : https://github.com/vnathalye
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -50274,7 +50460,7 @@
 
 
 /***/ },
-/* 247 */
+/* 249 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -50282,7 +50468,7 @@
 	//! author : Weldan Jamili : https://github.com/weldan
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -50361,7 +50547,7 @@
 
 
 /***/ },
-/* 248 */
+/* 250 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -50370,7 +50556,7 @@
 	//! author : Weldan Jamili : https://github.com/weldan
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -50449,7 +50635,7 @@
 
 
 /***/ },
-/* 249 */
+/* 251 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -50459,7 +50645,7 @@
 	//! author : Tin Aung Lin : https://github.com/thanyawzinmin
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -50550,7 +50736,7 @@
 
 
 /***/ },
-/* 250 */
+/* 252 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -50559,7 +50745,7 @@
 	//!           Sigurd Gartmann : https://github.com/sigurdga
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -50618,7 +50804,7 @@
 
 
 /***/ },
-/* 251 */
+/* 253 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -50626,7 +50812,7 @@
 	//! author : suvash : https://github.com/suvash
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -50746,7 +50932,7 @@
 
 
 /***/ },
-/* 252 */
+/* 254 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -50755,7 +50941,7 @@
 	//! author : Jacob Middag : https://github.com/middagj
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -50837,7 +51023,7 @@
 
 
 /***/ },
-/* 253 */
+/* 255 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -50846,7 +51032,7 @@
 	//! author : Jacob Middag : https://github.com/middagj
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -50928,7 +51114,7 @@
 
 
 /***/ },
-/* 254 */
+/* 256 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -50936,7 +51122,7 @@
 	//! author : https://github.com/mechuwind
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -50993,7 +51179,7 @@
 
 
 /***/ },
-/* 255 */
+/* 257 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -51001,7 +51187,7 @@
 	//! author : Harpreet Singh : https://github.com/harpreetkhalsagtbit
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -51122,7 +51308,7 @@
 
 
 /***/ },
-/* 256 */
+/* 258 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -51130,7 +51316,7 @@
 	//! author : Rafal Hirsz : https://github.com/evoL
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -51232,7 +51418,7 @@
 
 
 /***/ },
-/* 257 */
+/* 259 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -51240,7 +51426,7 @@
 	//! author : Jefferson : https://github.com/jalex79
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -51302,7 +51488,7 @@
 
 
 /***/ },
-/* 258 */
+/* 260 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -51310,7 +51496,7 @@
 	//! author : Caio Ribeiro Pereira : https://github.com/caio-ribeiro-pereira
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -51368,7 +51554,7 @@
 
 
 /***/ },
-/* 259 */
+/* 261 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -51377,7 +51563,7 @@
 	//! author : Valentin Agachi : https://github.com/avaly
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -51448,7 +51634,7 @@
 
 
 /***/ },
-/* 260 */
+/* 262 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -51458,7 +51644,7 @@
 	//! author : Коренберг Марк : https://github.com/socketpair
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -51636,7 +51822,7 @@
 
 
 /***/ },
-/* 261 */
+/* 263 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -51644,7 +51830,7 @@
 	//! authors : Bård Rolstad Henriksen : https://github.com/karamell
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -51702,7 +51888,7 @@
 
 
 /***/ },
-/* 262 */
+/* 264 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -51710,7 +51896,7 @@
 	//! author : Sampath Sitinamaluwa : https://github.com/sampathsris
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -51778,7 +51964,7 @@
 
 
 /***/ },
-/* 263 */
+/* 265 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -51787,7 +51973,7 @@
 	//! based on work of petrbela : https://github.com/petrbela
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -51933,7 +52119,7 @@
 
 
 /***/ },
-/* 264 */
+/* 266 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -51941,7 +52127,7 @@
 	//! author : Robert Sedovšek : https://github.com/sedovsek
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -52100,7 +52286,7 @@
 
 
 /***/ },
-/* 265 */
+/* 267 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -52110,7 +52296,7 @@
 	//! author : Oerd Cukalla : https://github.com/oerd
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -52175,7 +52361,7 @@
 
 
 /***/ },
-/* 266 */
+/* 268 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -52183,7 +52369,7 @@
 	//! author : Milan Janačković<milanjanackovic@gmail.com> : https://github.com/milan-j
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -52290,7 +52476,7 @@
 
 
 /***/ },
-/* 267 */
+/* 269 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -52298,7 +52484,7 @@
 	//! author : Milan Janačković<milanjanackovic@gmail.com> : https://github.com/milan-j
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -52405,7 +52591,7 @@
 
 
 /***/ },
-/* 268 */
+/* 270 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -52413,7 +52599,7 @@
 	//! author : Nicolai Davies<mail@nicolai.io> : https://github.com/nicolaidavies
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -52499,7 +52685,7 @@
 
 
 /***/ },
-/* 269 */
+/* 271 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -52507,7 +52693,7 @@
 	//! author : Jens Alm : https://github.com/ulmus
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -52573,7 +52759,7 @@
 
 
 /***/ },
-/* 270 */
+/* 272 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -52581,7 +52767,7 @@
 	//! author : Fahad Kassim : https://github.com/fadsel
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -52637,7 +52823,7 @@
 
 
 /***/ },
-/* 271 */
+/* 273 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -52645,7 +52831,7 @@
 	//! author : Arjunkumar Krishnamoorthy : https://github.com/tk120404
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -52772,7 +52958,7 @@
 
 
 /***/ },
-/* 272 */
+/* 274 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -52780,7 +52966,7 @@
 	//! author : Krishna Chaitanya Thota : https://github.com/kcthota
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -52866,7 +53052,7 @@
 
 
 /***/ },
-/* 273 */
+/* 275 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -52875,7 +53061,7 @@
 	//! author : Onorio De J. Afonso : https://github.com/marobo
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -52939,7 +53125,7 @@
 
 
 /***/ },
-/* 274 */
+/* 276 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -52947,7 +53133,7 @@
 	//! author : Kridsada Thanabulpong : https://github.com/sirn
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -53011,7 +53197,7 @@
 
 
 /***/ },
-/* 275 */
+/* 277 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -53019,7 +53205,7 @@
 	//! author : Dan Hagman : https://github.com/hagmandan
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -53078,7 +53264,7 @@
 
 
 /***/ },
-/* 276 */
+/* 278 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -53086,7 +53272,7 @@
 	//! author : Dominika Kruk : https://github.com/amaranthrose
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -53203,7 +53389,7 @@
 
 
 /***/ },
-/* 277 */
+/* 279 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -53212,7 +53398,7 @@
 	//!           Burak Yiğit Kaya: https://github.com/BYK
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -53298,7 +53484,7 @@
 
 
 /***/ },
-/* 278 */
+/* 280 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -53307,7 +53493,7 @@
 	//! author : Iustì Canun
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -53394,7 +53580,7 @@
 
 
 /***/ },
-/* 279 */
+/* 281 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -53402,7 +53588,7 @@
 	//! author : Abdel Said : https://github.com/abdelsaid
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -53457,7 +53643,7 @@
 
 
 /***/ },
-/* 280 */
+/* 282 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -53465,7 +53651,7 @@
 	//! author : Abdel Said : https://github.com/abdelsaid
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -53520,7 +53706,7 @@
 
 
 /***/ },
-/* 281 */
+/* 283 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -53529,7 +53715,7 @@
 	//! Author : Menelion Elensúle : https://github.com/Oire
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -53671,7 +53857,7 @@
 
 
 /***/ },
-/* 282 */
+/* 284 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -53679,7 +53865,7 @@
 	//! author : Sardor Muminov : https://github.com/muminoff
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -53734,7 +53920,7 @@
 
 
 /***/ },
-/* 283 */
+/* 285 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -53742,7 +53928,7 @@
 	//! author : Bang Nguyen : https://github.com/bangnk
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -53818,7 +54004,7 @@
 
 
 /***/ },
-/* 284 */
+/* 286 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -53826,7 +54012,7 @@
 	//! author : Andrew Hood : https://github.com/andrewhood125
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -53891,7 +54077,7 @@
 
 
 /***/ },
-/* 285 */
+/* 287 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -53899,7 +54085,7 @@
 	//! author : Atolagbe Abisoye : https://github.com/andela-batolagbe
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -53956,7 +54142,7 @@
 
 
 /***/ },
-/* 286 */
+/* 288 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -53965,7 +54151,7 @@
 	//! author : Zeno Zeng : https://github.com/zenozeng
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -54088,7 +54274,7 @@
 
 
 /***/ },
-/* 287 */
+/* 289 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -54098,7 +54284,7 @@
 	//! author : Konstantin : https://github.com/skfd
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -54198,7 +54384,7 @@
 
 
 /***/ },
-/* 288 */
+/* 290 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -54207,7 +54393,7 @@
 	//! author : Chris Lam : https://github.com/hehachris
 	
 	;(function (global, factory) {
-	    true ? factory(__webpack_require__(179)) :
+	    true ? factory(__webpack_require__(181)) :
 	   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
 	   factory(global.moment)
 	}(this, (function (moment) { 'use strict';
@@ -54307,7 +54493,7 @@
 
 
 /***/ },
-/* 289 */
+/* 291 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -54315,7 +54501,7 @@
 	    staticClass: "page devices"
 	  }, [_c('h1', [_vm._v("Device List")]), _vm._v(" "), _c('table', {
 	    staticClass: "table table-responsive table-bordered table-striped table-hover"
-	  }, [_vm._m(0), _vm._v(" "), _c('tbody', _vm._l((_vm.devices), function(dev) {
+	  }, [_vm._m(0), _vm._v(" "), _c('tbody', [_vm._l((_vm.devices), function(dev) {
 	    return _c('tr', {
 	      on: {
 	        "click": function($event) {
@@ -54327,7 +54513,9 @@
 	        "to": '/device/' + dev.key
 	      }
 	    }, [_vm._v(_vm._s(dev.key))])], 1), _vm._v(" "), _c('td', [_vm._v(_vm._s(dev.value.lat))]), _vm._v(" "), _c('td', [_vm._v(_vm._s(dev.value.lng))]), _vm._v(" "), _c('td', [_vm._v(_vm._s(dev.value.time))])])
-	  }))])])
+	  }), _vm._v(" "), _vm._l((_vm.dummy), function(dev) {
+	    return _c('tr')
+	  })], 2)])])
 	},staticRenderFns: [function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
 	  return _c('thead', [_c('tr', [_c('th', [_vm._v("Device ID")]), _vm._v(" "), _c('th', [_vm._v("Latitude")]), _vm._v(" "), _c('th', [_vm._v("Longitude")]), _vm._v(" "), _c('th', [_vm._v("Last Update")])])])
 	}]}
@@ -54335,39 +54523,31 @@
 	if (false) {
 	  module.hot.accept()
 	  if (module.hot.data) {
-	     require("vue-hot-reload-api").rerender("data-v-2536141d", module.exports)
+	     require("vue-hot-reload-api").rerender("data-v-1674a8bc", module.exports)
 	  }
 	}
 
 /***/ },
-/* 290 */
+/* 292 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function(console) {var __vue_exports__, __vue_options__
-	var __vue_styles__ = {}
-	
+	/* WEBPACK VAR INJECTION */(function(console) {
 	/* styles */
-	__webpack_require__(291)
+	__webpack_require__(293)
 	
-	/* script */
-	__vue_exports__ = __webpack_require__(293)
-	
-	/* template */
-	var __vue_template__ = __webpack_require__(294)
-	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
-	if (
-	  typeof __vue_exports__.default === "object" ||
-	  typeof __vue_exports__.default === "function"
-	) {
-	if (Object.keys(__vue_exports__).some(function (key) { return key !== "default" && key !== "__esModule" })) {console.error("named exports are not supported in *.vue files.")}
-	__vue_options__ = __vue_exports__ = __vue_exports__.default
-	}
-	if (typeof __vue_options__ === "function") {
-	  __vue_options__ = __vue_options__.options
-	}
-	__vue_options__.__file = "/root/sift/frontend/src/scripts/device_detail.vue"
-	__vue_options__.render = __vue_template__.render
-	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
+	var Component = __webpack_require__(133)(
+	  /* script */
+	  __webpack_require__(295),
+	  /* template */
+	  __webpack_require__(296),
+	  /* scopeId */
+	  null,
+	  /* cssModules */
+	  null
+	)
+	Component.options.__file = "/Users/jackrans/Documents/gps-sift/frontend/src/scripts/device_detail.vue"
+	if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
+	if (Component.options.functional) {console.error("[vue-loader] device_detail.vue: functional components are not supported with templates, they should use render functions.")}
 	
 	/* hot reload */
 	if (false) {(function () {
@@ -54376,45 +54556,44 @@
 	  if (!hotAPI.compatible) return
 	  module.hot.accept()
 	  if (!module.hot.data) {
-	    hotAPI.createRecord("data-v-6a3bad1a", __vue_options__)
+	    hotAPI.createRecord("data-v-2b8be30e", Component.options)
 	  } else {
-	    hotAPI.reload("data-v-6a3bad1a", __vue_options__)
+	    hotAPI.reload("data-v-2b8be30e", Component.options)
 	  }
 	})()}
-	if (__vue_options__.functional) {console.error("[vue-loader] device_detail.vue: functional components are not supported and should be defined in plain js files using render functions.")}
 	
-	module.exports = __vue_exports__
+	module.exports = Component.exports
 	
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ },
-/* 291 */
+/* 293 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(292);
+	var content = __webpack_require__(294);
 	if(typeof content === 'string') content = [[module.id, content, '']];
-	// add the styles to the DOM
-	var update = __webpack_require__(131)(content, {});
 	if(content.locals) module.exports = content.locals;
+	// add the styles to the DOM
+	var update = __webpack_require__(131)("2706b1d7", content, false);
 	// Hot Module Replacement
 	if(false) {
-		// When the styles change, update the <style> tags
-		if(!content.locals) {
-			module.hot.accept("!!./../../node_modules/css-loader/index.js?sourceMap!./../../node_modules/vue-loader/lib/style-rewriter.js?id=data-v-6a3bad1a!./../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./device_detail.vue", function() {
-				var newContent = require("!!./../../node_modules/css-loader/index.js?sourceMap!./../../node_modules/vue-loader/lib/style-rewriter.js?id=data-v-6a3bad1a!./../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./device_detail.vue");
-				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-				update(newContent);
-			});
-		}
-		// When the module is disposed, remove the <style> tags
-		module.hot.dispose(function() { update(); });
+	 // When the styles change, update the <style> tags
+	 if(!content.locals) {
+	   module.hot.accept("!!./../../node_modules/css-loader/index.js?sourceMap!./../../node_modules/vue-loader/lib/style-rewriter.js?id=data-v-2b8be30e!./../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./device_detail.vue", function() {
+	     var newContent = require("!!./../../node_modules/css-loader/index.js?sourceMap!./../../node_modules/vue-loader/lib/style-rewriter.js?id=data-v-2b8be30e!./../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./device_detail.vue");
+	     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+	     update(newContent);
+	   });
+	 }
+	 // When the module is disposed, remove the <style> tags
+	 module.hot.dispose(function() { update(); });
 	}
 
 /***/ },
-/* 292 */
+/* 294 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(130)();
@@ -54428,7 +54607,7 @@
 
 
 /***/ },
-/* 293 */
+/* 295 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(console) {"use strict";
@@ -54437,7 +54616,7 @@
 	    value: true
 	});
 	
-	var _getIterator2 = __webpack_require__(143);
+	var _getIterator2 = __webpack_require__(145);
 	
 	var _getIterator3 = _interopRequireDefault(_getIterator2);
 	
@@ -54570,7 +54749,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ },
-/* 294 */
+/* 296 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -54590,12 +54769,12 @@
 	if (false) {
 	  module.hot.accept()
 	  if (module.hot.data) {
-	     require("vue-hot-reload-api").rerender("data-v-6a3bad1a", module.exports)
+	     require("vue-hot-reload-api").rerender("data-v-2b8be30e", module.exports)
 	  }
 	}
 
 /***/ },
-/* 295 */
+/* 297 */
 /***/ function(module, exports) {
 
 	exports.sync = function (store, router, options) {
