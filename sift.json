@@ -94,7 +94,7 @@
 					"key$schema": "string"
 				},
 				"positions": {
-					"key$schema": "string",
+					"key$schema": "string/string",
 					"ttl": 86400
 				}
 			}

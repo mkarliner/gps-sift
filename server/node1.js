@@ -21,7 +21,7 @@ module.exports = function (got) {
   const hookData = inData.data.map(d => JSON.parse(d.value));
 
  //Normalize the data from PassiveEye to the internal device format
-  let devData = hookData.map((d)=>{
+  let devData = hookData.reduce((na, d)=>{
     console.log("DMAP: ", d);
     let lat_ns = d.data.substr(11,1) == 1 ? '-' : '';
     let lng_ew = d.data.substr(19,1) == 1 ? '-' : '';
@@ -29,24 +29,39 @@ module.exports = function (got) {
     let lat_mins = d.data.substr(6,6);
     let lng_deg = d.data.substr(12,2);
     let lng_mins = d.data.substr(14,6);
-    //let lat_deg = parseFloat(d.data.substr(4,2));
-    //let lat_mins = parseFloat(d.data.substr(6,5))/60000;
-    //let lng_deg = parseFloat(d.data.substr(12,2));
-    //let lng_mins = parseFloat(d.data.substr(14,5))/60000;
-    //let lat = lat_deg + lat_mins;
-    //let lng = lng_deg + lng_mins;
     console.log("EXLL ", lat_ns, lat_deg, lat_mins, lng_ew, lng_deg, lng_mins);
-    return {
+    na.push( {
       name: "devices",
       key: d.device,
       value: {
         lat: parseFloat(`${lat_ns}${lat_deg}.${lat_mins}`),
         lng: parseFloat(`${lng_ew}${lng_deg}.${lng_mins}`),
         time: d.time,
-        rssi: d.rssi
+        rssi: d.rssi,
+        duplicate: d.duplicate,
+        snr: d.snr,
+        station: d.station,
+        avgSnr: d.avgSnr
       }
-    }
-  })
+    }),
+    na.push({
+      name: "positions",
+      key: d.device + "/" + d.time,
+      value: {
+        lat: parseFloat(`${lat_ns}${lat_deg}.${lat_mins}`),
+        lng: parseFloat(`${lng_ew}${lng_deg}.${lng_mins}`),
+        time: d.time,
+        rssi: d.rssi,
+        duplicate: d.duplicate,
+        snr: d.snr,
+        station: d.station,
+        avgSnr: d.avgSnr
+      }
+    })
+    return na;
+  }, []);
+
+
 
   console.log("DDD ", devData )
 

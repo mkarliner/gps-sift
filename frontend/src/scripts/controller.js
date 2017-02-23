@@ -14,16 +14,21 @@ export default class MyController extends SiftController {
   loadView(state) {
     console.log('hello-sift: loadView', state);
     // Register for storage update events on the "x" bucket so we can update the UI
-    this.storage.subscribe(['devices'], this._suHandler);
-
+    this.storage.subscribe(['devices', 'positions'], this._suHandler);
+    let wh = this.getWebhooks();
+    let devs = this.getDevices();
+    let pos = this.getPositions();
 
 
 	return {
 		html: 'summary.html',
-		data: this.getWebhooks().then(x => ( this.getDevices().then(d=>(
-
-
-    {passiveeyeUri: x[0].value, owntracksUri: x[1].value, devices: d.devices}))))
+		data:  Promise.all([wh, devs, pos]).then(values => {
+      return {
+                passiveeyeUri: values[0][0].value,
+                owntracksUri: values[0][1].value,
+                devices: values[1].devices,
+                positions: values[2].positions}
+    })
 	}
     // switch (state.type) {
 //       case 'email-thread':
@@ -48,7 +53,10 @@ export default class MyController extends SiftController {
       // Publish events from 'who' to view
 	  console.log("OSU: ", xe)
       this.publish('devices', xe);
-    });
+    }).then(this.getPositions().then(xp=> {
+      console.log("OSUP", xp)
+      this.publish('positions', xp)
+    }));
   }
 
   getWebhooks() {
@@ -68,6 +76,17 @@ export default class MyController extends SiftController {
       };
     });
   }
+
+  getPositions() {
+   return this.storage.getAll({
+     bucket: 'positions'
+   }).then((values) => {
+     console.log('hello-sift: GETALLPOS returned:', values);
+     return {
+         positions: values
+     };
+   });
+ }
 
 }
 

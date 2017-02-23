@@ -47,7 +47,7 @@ router.replace('/');
     owntracksUri: "nouriyet",
     passiveeyeUri: "nopeyet",
     devices: [],
-    clock: new Date()
+    positions: []
   },
   mutations: {
     setOwntracksUri(state, uri){
@@ -62,6 +62,10 @@ router.replace('/');
       console.log("SPEDEV", devices);
       state.devices = devices;
     },
+    setPositions(state, positions){
+      console.log("SPEPOS", positions);
+      state.positions = positions;
+    },
     setClock(state, now){
       console.log("CLOCK", now);
       state.clock = now;
@@ -75,7 +79,7 @@ export default class MyView extends SiftView {
   constructor() {
     // You have to call the super() method to initialize the base class.
     super();
-  	this.controller.subscribe('devices', this.onDevices.bind(this));
+  	this.controller.subscribe(['devices', 'positions'], this.onDevices.bind(this));
 
   	Vue.use(VueGoogleMaps, {
 	    load: {
@@ -97,6 +101,7 @@ export default class MyView extends SiftView {
     store.commit('setOwntracksUri', value.data.owntracksUri);
     store.commit('setPassiveEyeUri', value.data.passiveeyeUri);
     store.commit('setDevices', value.data.devices);
+    store.commit('setPositions', value.data.positions);
   };
 
   willPresentView(value) {
@@ -106,6 +111,7 @@ export default class MyView extends SiftView {
   onDevices(data) {
     console.log('DEVICE DATA: ', data.devices);
     store.commit('setDevices', data.devices);
+    store.commit('setPositions', data.positions);
   }
 
 }

@@ -22,9 +22,9 @@ module.exports = function (got) {
   const hookData = inData.data.map(d => JSON.parse(d.value));
 
  //Normalize the data from Owntracks to the internal device format
-  let devData = hookData.map((d)=>{
-    console.log("DMAP: ", d);
-    return {
+
+  let devData = hookData.reduce((na, d)=>{
+    na.push( {
       name: "devices",
       key: d.tid,
       value: {
@@ -32,8 +32,19 @@ module.exports = function (got) {
         lng: d.lon,
         time: d.tst
       }
-    }
-  })
+    }),
+    na.push({
+      name: "positions",
+      key: d.tid + "/" + d.tst,
+      value: {
+        lat: d.lat,
+        lng: d.lon,
+        time: d.tst
+      }
+    })
+    return na;
+  }, []);
+
 
   console.log("DDD ", devData )
 
