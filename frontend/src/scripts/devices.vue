@@ -16,7 +16,6 @@
           <td>{{dev.value.type}}</td>
           <td><router-link :to="'/device/' + dev.key">{{ dev.key}}</router-link></td>
           <td>{{dev.value.lat}}</td>
-          <td>{{dev.value.lat}}</td>
           <td>{{dev.value.lng}}</td>
           <td>{{dev.value.time}}</td>
         </tr>
