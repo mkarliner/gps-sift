@@ -34,6 +34,7 @@ module.exports = function (got) {
       name: "devices",
       key: d.device,
       value: {
+        type: "PassiveEye",
         lat: parseFloat(`${lat_ns}${lat_deg}.${lat_mins}`),
         lng: parseFloat(`${lng_ew}${lng_deg}.${lng_mins}`),
         time: d.time,

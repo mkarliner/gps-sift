@@ -10,6 +10,9 @@
     <h1>Device Detail</h1>
     <table class="table table-responsive table-bordered table-striped table-hover">
         <tbody>
+          <tr>
+              <td>ID</td>{{ device_detail.type}}</td>
+          </tr>
             <tr>
                 <td>ID</td>{{ device_detail.id}}</td>
             </tr>
@@ -65,6 +68,22 @@
 
 <script>
 
+import moment from 'moment'
+
+const parse = {
+  time: val => moment(val * 1000).fromNow(),
+  lat: val => Number(val).toFixed(5),
+  lng: val => Number(val).toFixed(5)
+};
+const format = values => {
+  const result = {};
+  Object.keys(values).forEach(key => {
+    result[key] = (parse[key] || (i => i))(values[key])
+  });
+  return result;
+};
+
+
 export default {
     data() {},
 
@@ -87,13 +106,11 @@ export default {
                 positions() {
                   let id = this.$store.state.route.params.id;
                   let posns = this.$store.state.positions;
-                  console.log("POSTN: ", this.$store.state.positions);
                   let filtered_pos =  posns.filter(p=>{
                     let dev_id = p.key.split('/')[0];
                     return dev_id == id;
                   })
-                  console.log("FILP ", filtered_pos)
-                  return filtered_pos.map(p=>JSON.parse(p.value));
+                  return filtered_pos.map(p=>format(JSON.parse(p.value))).reverse();
                 }
         }
 }

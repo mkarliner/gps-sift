@@ -4,6 +4,7 @@
     <table class="table table-responsive table-bordered table-striped table-hover">
       <thead>
         <tr>
+          <th>Type</th>
           <th>Device ID</th>
           <th>Latitude</th>
           <th>Longitude</th>
@@ -11,14 +12,17 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="dev in devices" v-on:click="route('/device/' + dev.key)">
+        <tr v-for="dev in devices" >
+          <td>{{dev.value.type}}</td>
           <td><router-link :to="'/device/' + dev.key">{{ dev.key}}</router-link></td>
+          <td>{{dev.value.lat}}</td>
           <td>{{dev.value.lat}}</td>
           <td>{{dev.value.lng}}</td>
           <td>{{dev.value.time}}</td>
         </tr>
       </tbody>
     </table>
+    <div>{{clock}}</div>
   </div>
 </template>
 
@@ -40,41 +44,25 @@ const format = values => {
 
 export default {
   data () {},
-  beforeDestroy: function () {
-    console.log("DESTROYED: ", this)
-    this.$store.state =={};
-    clearIntervall(this.timeUpdates)
-  },
-  created: function () {
-    // `this` points to the vm instance
-    console.log('CREATED:  ' + this)
-  },
-  mounted () {
-    this.timeUpdates = setInterval(() => {
-      this.updateTimes();
-    }, 60 * 1000);
-  },
-  methods: {
-    updateTimes () {
-      this.devices = this.$store.state.devices.map(dev => ({
-        key: dev.key,
-        value: format(JSON.parse(dev.value))
-      }));
-    },
-    route (path) {
-      this.$router.push(path);
-    }
-  },
+  // beforeDestroy: function () {
+  //   console.log("DESTROYED: ", this)
+  //   this.$store.state =={};
+  //   clearIntervall(this.timeUpdates)
+  // },
+
   computed: {
     devices () {
+      let dummy = this.$store.state.clock;
+      // console.log("RUNNING: ", dummy.toString())
       return this.$store.state.devices.map((dev) => {
         return {
           key: dev.key,
           value: format(JSON.parse(dev.value))
         }
-
-
       });
+    },
+    clock(){
+      return this.$store.state.clock.toString();
     }
   }
 }

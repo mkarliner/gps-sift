@@ -8,8 +8,12 @@
   <div class="page">
     <h1>Device Map</h1>
       <div class="map">
-        <gmap-map :center="center" map-type-id="terrain" :zoom="15" style="width: 100%; height: 100%">
-          <gmap-marker v-for="m in markers" :position="m" :clickable="true" :draggable="false"></gmap-marker>
+        <gmap-map :center="center" map-type-id="terrain" :zoom="12" style="width: 100%; height: 100%">
+          <template v-for="(m,i) in markers">
+          <gmap-marker  @click="infomap(m,i)" ref="infow" :position="m" :clickable="true" :draggable="false" :label="m.label">
+          </gmap-marker>
+        </template>
+          <gmap-info-window  @closeclick="infoClose()":options="infoOptions" :position="infoPos" :opened="infoVis" :content="infoContent"></gmap-info-window>
           <gmap-circle :center="center" :radius="100" :options="{editable: true}"></gmapcircle>
         </gmap-map>
       </div>
@@ -18,8 +22,31 @@
 
 <script>
 
+
 export default {
-    data() {},
+    data() {
+      return {
+        infoVis: false,
+        infoPos: {lat: 51.556230, lng: -0.223796},
+        infoOptions: {
+            pixelOffset: {width: 0, height: -35}
+            },
+        infoContent: "Nothing"
+      }
+
+    },
+        methods: {
+          infomap(m,i) {
+            console.log("INM ", this.infoVis[i], this);
+            this.$data.infoPos = m;
+            this.$data.infoVis = true;
+            this.$data.infoContent = m.id;
+
+          },
+          infoClose(m) {
+            this.$data.infoVis =  false;
+          }
+        },
         computed: {
             center() {
 	      if(this.$store.state.devices.length > 0) {
@@ -31,13 +58,18 @@ export default {
 	      }
             },
             markers() {
-                    console.log("Before big bang", typeof this.$store.state.devices)
+                    console.log("Before big bang", this, typeof this.$store.state.devices)
                         // if(typeof this.$store.state.devices.map === "undefined") {
                         //   return [];
                         // }
-                    let devs = this.$store.state.devices.map(function(dev) {
+                    let devs = this.$store.state.devices.map((dev,index)=> {
                         let d = JSON.parse(dev.value)
-                        return {lat: parseFloat(d.lat), lng: parseFloat(d.lng)}
+                        return {
+                                lat: parseFloat(d.lat),
+                                lng: parseFloat(d.lng),
+                                label: d.type == "PassiveEye" ? "P" : "O",
+                                id: dev.key
+                              }
                     })
                     console.log("DEVS: ", this.$store.state.devices)
                     return devs
@@ -60,3 +92,10 @@ export default {
 }
 
 </script>
+
+<style>
+
+.map {
+  height: 100%;
+}
+</style>

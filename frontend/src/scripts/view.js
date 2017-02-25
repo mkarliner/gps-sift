@@ -47,27 +47,23 @@ router.replace('/');
     owntracksUri: "nouriyet",
     passiveeyeUri: "nopeyet",
     devices: [],
-    positions: []
+    positions: [],
+    clock: Date.now()
   },
   mutations: {
     setOwntracksUri(state, uri){
-      console.log("SOTURI", uri);
       state.owntracksUri = uri;
     },
     setPassiveEyeUri(state, uri){
-      console.log("SPEURI", uri);
       state.passiveeyeUri = uri;
     },
     setDevices(state, devices){
-      console.log("SPEDEV", devices);
       state.devices = devices;
     },
     setPositions(state, positions){
-      console.log("SPEPOS", positions);
       state.positions = positions;
     },
     setClock(state, now){
-      console.log("CLOCK", now);
       state.clock = now;
     }
   }
@@ -79,7 +75,8 @@ export default class MyView extends SiftView {
   constructor() {
     // You have to call the super() method to initialize the base class.
     super();
-  	this.controller.subscribe(['devices', 'positions'], this.onDevices.bind(this));
+  	this.controller.subscribe(['devices'], this.onDevices.bind(this));
+    this.controller.subscribe(['positions'], this.onPositions.bind(this));
 
   	Vue.use(VueGoogleMaps, {
 	    load: {
@@ -87,6 +84,8 @@ export default class MyView extends SiftView {
 	      libraries: 'places', //// If you need to use place input
 	    }
 	  });
+
+
     app = new Vue({
   	  router,
       store,
@@ -102,6 +101,11 @@ export default class MyView extends SiftView {
     store.commit('setPassiveEyeUri', value.data.passiveeyeUri);
     store.commit('setDevices', value.data.devices);
     store.commit('setPositions', value.data.positions);
+
+    setInterval(()=>{
+      store.commit('setClock', Date.now());
+    }, 15 * 1000);
+
   };
 
   willPresentView(value) {
@@ -109,9 +113,12 @@ export default class MyView extends SiftView {
   };
 
   onDevices(data) {
-    console.log('DEVICE DATA: ', data.devices);
-    store.commit('setDevices', data.devices);
-    store.commit('setPositions', data.positions);
+    console.log("ODEV ", data)
+    store.commit('setDevices', data);
+  }
+
+  onPositions(data) {
+    store.commit('setPositions', data);
   }
 
 }

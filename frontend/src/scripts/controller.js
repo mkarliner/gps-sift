@@ -49,15 +49,13 @@ export default class MyController extends SiftController {
   // Event: storage update
   onStorageUpdate(value) {
     console.log('hello-sift: onStorageUpdate: ', value);
-    return this.getDevices().then(xe => {
-      // Publish events from 'who' to view
-	  console.log("OSU: ", xe)
-      this.publish('devices', xe);
-    }).then(this.getPositions().then(xp=> {
-      console.log("OSUP", xp)
-      this.publish('positions', xp)
-    }));
-  }
+    let devs = this.getDevices();
+    let pos = this.getPositions();
+
+    Promise.all([devs, pos]).then(values => {
+                this.publish('devices', values[0].devices);
+                this.publish('positions',values[1].positions);
+    })}
 
   getWebhooks() {
      return this.storage.get({
@@ -70,7 +68,6 @@ export default class MyController extends SiftController {
     return this.storage.getAll({
       bucket: 'devices'
     }).then((values) => {
-      console.log('hello-sift: GETALLDEVICES returned:', values);
       return {
 		      devices: values
       };
@@ -81,7 +78,6 @@ export default class MyController extends SiftController {
    return this.storage.getAll({
      bucket: 'positions'
    }).then((values) => {
-     console.log('hello-sift: GETALLPOS returned:', values);
      return {
          positions: values
      };

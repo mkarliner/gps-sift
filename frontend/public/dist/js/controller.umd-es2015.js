@@ -138,14 +138,13 @@
 	      var _this2 = this;
 	
 	      console.log('hello-sift: onStorageUpdate: ', value);
-	      return this.getDevices().then(function (xe) {
-	        // Publish events from 'who' to view
-	        console.log("OSU: ", xe);
-	        _this2.publish('devices', xe);
-	      }).then(this.getPositions().then(function (xp) {
-	        console.log("OSUP", xp);
-	        _this2.publish('positions', xp);
-	      }));
+	      var devs = this.getDevices();
+	      var pos = this.getPositions();
+	
+	      _promise2.default.all([devs, pos]).then(function (values) {
+	        _this2.publish('devices', values[0].devices);
+	        _this2.publish('positions', values[1].positions);
+	      });
 	    }
 	  }, {
 	    key: 'getWebhooks',
@@ -161,7 +160,6 @@
 	      return this.storage.getAll({
 	        bucket: 'devices'
 	      }).then(function (values) {
-	        console.log('hello-sift: GETALLDEVICES returned:', values);
 	        return {
 	          devices: values
 	        };
@@ -173,7 +171,6 @@
 	      return this.storage.getAll({
 	        bucket: 'positions'
 	      }).then(function (values) {
-	        console.log('hello-sift: GETALLPOS returned:', values);
 	        return {
 	          positions: values
 	        };

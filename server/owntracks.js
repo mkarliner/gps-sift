@@ -28,6 +28,7 @@ module.exports = function (got) {
       name: "devices",
       key: d.tid,
       value: {
+        type: "Owntracks",
         lat: d.lat,
         lng: d.lon,
         time: d.tst
@@ -46,7 +47,7 @@ module.exports = function (got) {
   }, []);
 
 
-  console.log("DDD ", devData )
+  console.log("OTRACKS ", devData )
 
   return  devData;
 };
