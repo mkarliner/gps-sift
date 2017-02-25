@@ -46,6 +46,10 @@
             </tr>
         </tbody>
     </table>
+    <div style="width: 600px">
+      <gps-map :positions="positions"></gps-map>
+    </div>
+    <div>     </div>
     <table class="table table-responsive table-bordered table-striped table-hover">
       <thead>
         <tr>
@@ -68,6 +72,7 @@
 
 <script>
 
+import LocationMap from './map_positions.vue'
 import moment from 'moment'
 
 const parse = {
@@ -85,7 +90,15 @@ const format = values => {
 
 
 export default {
-    data() {},
+    components: {
+      'gps-map': LocationMap
+    },
+    data() {
+      return {
+        positions: [],
+        test: "this is a test"
+      }
+    },
 
         computed: {
             device_detail() {
@@ -110,6 +123,7 @@ export default {
                     let dev_id = p.key.split('/')[0];
                     return dev_id == id;
                   })
+                  this.$data.positions = filtered_pos.map(p=>format(JSON.parse(p.value))).reverse();
                   return filtered_pos.map(p=>format(JSON.parse(p.value))).reverse();
                 }
         }

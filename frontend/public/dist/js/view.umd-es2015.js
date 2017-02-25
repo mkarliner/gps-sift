@@ -108,7 +108,7 @@
 	
 	var _qrcodeGenerator2 = _interopRequireDefault(_qrcodeGenerator);
 	
-	var _vuexRouterSync = __webpack_require__(297);
+	var _vuexRouterSync = __webpack_require__(304);
 	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
@@ -54431,7 +54431,7 @@
 	__vue_exports__ = __webpack_require__(295)
 	
 	/* template */
-	var __vue_template__ = __webpack_require__(296)
+	var __vue_template__ = __webpack_require__(303)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -54523,11 +54523,89 @@
 	
 	var _keys2 = _interopRequireDefault(_keys);
 	
+	var _map_positions = __webpack_require__(296);
+	
+	var _map_positions2 = _interopRequireDefault(_map_positions);
+	
 	var _moment = __webpack_require__(181);
 	
 	var _moment2 = _interopRequireDefault(_moment);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	
 	
 	var parse = {
 	  time: function time(val) {
@@ -54539,76 +54617,7 @@
 	  lng: function lng(val) {
 	    return Number(val).toFixed(5);
 	  }
-	}; //
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	
-	
+	};
 	var format = function format(values) {
 	  var result = {};
 	  (0, _keys2.default)(values).forEach(function (key) {
@@ -54620,7 +54629,15 @@
 	};
 	
 	exports.default = {
-	  data: function data() {},
+	  components: {
+	    'gps-map': _map_positions2.default
+	  },
+	  data: function data() {
+	    return {
+	      positions: [],
+	      test: "this is a test"
+	    };
+	  },
 	
 	
 	  computed: {
@@ -54668,6 +54685,9 @@
 	        var dev_id = p.key.split('/')[0];
 	        return dev_id == id;
 	      });
+	      this.$data.positions = filtered_pos.map(function (p) {
+	        return format(JSON.parse(p.value));
+	      }).reverse();
 	      return filtered_pos.map(function (p) {
 	        return format(JSON.parse(p.value));
 	      }).reverse();
@@ -54679,12 +54699,315 @@
 /* 296 */
 /***/ function(module, exports, __webpack_require__) {
 
+	/* WEBPACK VAR INJECTION */(function(console) {var __vue_exports__, __vue_options__
+	var __vue_styles__ = {}
+	
+	/* styles */
+	__webpack_require__(297)
+	__webpack_require__(299)
+	
+	/* script */
+	__vue_exports__ = __webpack_require__(301)
+	
+	/* template */
+	var __vue_template__ = __webpack_require__(302)
+	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
+	if (
+	  typeof __vue_exports__.default === "object" ||
+	  typeof __vue_exports__.default === "function"
+	) {
+	if (Object.keys(__vue_exports__).some(function (key) { return key !== "default" && key !== "__esModule" })) {console.error("named exports are not supported in *.vue files.")}
+	__vue_options__ = __vue_exports__ = __vue_exports__.default
+	}
+	if (typeof __vue_options__ === "function") {
+	  __vue_options__ = __vue_options__.options
+	}
+	__vue_options__.__file = "/root/sift/frontend/src/scripts/map_positions.vue"
+	__vue_options__.render = __vue_template__.render
+	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
+	
+	/* hot reload */
+	if (false) {(function () {
+	  var hotAPI = require("vue-hot-reload-api")
+	  hotAPI.install(require("vue"), false)
+	  if (!hotAPI.compatible) return
+	  module.hot.accept()
+	  if (!module.hot.data) {
+	    hotAPI.createRecord("data-v-784964f2", __vue_options__)
+	  } else {
+	    hotAPI.reload("data-v-784964f2", __vue_options__)
+	  }
+	})()}
+	if (__vue_options__.functional) {console.error("[vue-loader] map_positions.vue: functional components are not supported and should be defined in plain js files using render functions.")}
+	
+	module.exports = __vue_exports__
+	
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
+
+/***/ },
+/* 297 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+	
+	// load the styles
+	var content = __webpack_require__(298);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(131)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../node_modules/css-loader/index.js?sourceMap!./../../node_modules/vue-loader/lib/style-rewriter.js?id=data-v-784964f2!./../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./map_positions.vue", function() {
+				var newContent = require("!!./../../node_modules/css-loader/index.js?sourceMap!./../../node_modules/vue-loader/lib/style-rewriter.js?id=data-v-784964f2!./../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./map_positions.vue");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 298 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(130)();
+	// imports
+	
+	
+	// module
+	exports.push([module.id, "\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"map_positions.vue","sourceRoot":"webpack://"}]);
+	
+	// exports
+
+
+/***/ },
+/* 299 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+	
+	// load the styles
+	var content = __webpack_require__(300);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(131)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../node_modules/css-loader/index.js?sourceMap!./../../node_modules/vue-loader/lib/style-rewriter.js?id=data-v-784964f2!./../../node_modules/vue-loader/lib/selector.js?type=styles&index=1!./map_positions.vue", function() {
+				var newContent = require("!!./../../node_modules/css-loader/index.js?sourceMap!./../../node_modules/vue-loader/lib/style-rewriter.js?id=data-v-784964f2!./../../node_modules/vue-loader/lib/selector.js?type=styles&index=1!./map_positions.vue");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 300 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(130)();
+	// imports
+	
+	
+	// module
+	exports.push([module.id, "\n.map {\n  height: 100%;\n  width: 100%;\n}\n", "", {"version":3,"sources":["/./src/scripts/map_positions.vue?11780541"],"names":[],"mappings":";AA+FA;EACA,aAAA;EACA,YAAA;CACA","file":"map_positions.vue","sourcesContent":["<style>\n\n\n\n</style>\n\n<template>\n  <div class=\"page\">\n    <h1>Device Locations</h1>\n      <div class=\"map\">\n        <gmap-map :center=\"center\" map-type-id=\"terrain\" :zoom=\"12\" style=\"width: 100%; height: 100%\">\n          <template v-for=\"(m,i) in markers\">\n          <gmap-marker  @click=\"infomap(m,i)\" ref=\"infow\" :position=\"m\" :clickable=\"true\" :draggable=\"false\" :label=\"m.label\">\n          </gmap-marker>\n        </template>\n          <gmap-info-window  @closeclick=\"infoClose()\":options=\"infoOptions\" :position=\"infoPos\" :opened=\"infoVis\" :content=\"infoContent\"></gmap-info-window>\n          <gmap-circle :center=\"center\" :radius=\"100\" :options=\"{editable: true}\"></gmapcircle>\n        </gmap-map>\n      </div>\n  </div>\n\n</template>\n\n<script>\n\n\nexport default {\n    data() {\n      return {\n\n      }\n\n    },\n    props: ['positions', 'test'],\n        methods: {\n\n        },\n        computed: {\n            center() {\n\t      if(this.positions.length > 0) {\n              \tlet firstDev = this.positions[0];\n              \tlet d = firstDev;\n              \treturn {lat: parseFloat(d.lat), lng: parseFloat(d.lng)}\n     \t      } else {\n\t\treturn {lat: 51.556230, lng: -0.223796}\n\t      }\n            },\n            markers() {\n                    console.log(\"Before big bang\", this,  this.positions)\n                    //     // if(typeof this.$store.state.devices.map === \"undefined\") {\n                    //     //   return [];\n                    //     // }\n                    // let devs = this.positions.map((dev,index)=> {\n                    //     let d = JSON.parse(dev.value)\n                    //     return {\n                    //             lat: parseFloat(d.lat),\n                    //             lng: parseFloat(d.lng),\n                    //             label: d.type == \"PassiveEye\" ? \"P\" : \"O\",\n                    //             id: dev.key\n                    //           }\n                    // })\n                    // console.log(\"DEVS: \", this.$store.state.devices)\n                    let retpos = this.positions.map((p)=> {\n                      return {\n                        lat: parseFloat(p.lat),\n                        lng: parseFloat(p.lng),\n                      }\n\n                    })\n\n\n                  console.log(\"RETPOS \", retpos)\n                  return retpos;\n                },\n                devices() {\n                    console.log(\"Before big bang\", typeof this.$store.state.devices)\n                        // if(typeof this.$store.state.devices.map === \"undefined\") {\n                        //   return [];\n                        // }\n                    let devs = this.$store.state.devices.map(function(dev) {\n                        return {\n                            key: dev.key,\n                            value: JSON.parse(dev.value)\n                        }\n                    })\n                    console.log(\"DEVS: \", this.$store.state.devices)\n                    return devs\n                },\n        }\n}\n\n</script>\n\n<style>\n\n.map {\n  height: 100%;\n  width: 100%;\n}\n</style>\n"],"sourceRoot":"webpack://"}]);
+	
+	// exports
+
+
+/***/ },
+/* 301 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(console) {'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _typeof2 = __webpack_require__(40);
+	
+	var _typeof3 = _interopRequireDefault(_typeof2);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	
+	
+	exports.default = {
+	    data: function data() {
+	        return {};
+	    },
+	
+	    props: ['positions', 'test'],
+	    methods: {},
+	    computed: {
+	        center: function center() {
+	            if (this.positions.length > 0) {
+	                var firstDev = this.positions[0];
+	                var d = firstDev;
+	                return { lat: parseFloat(d.lat), lng: parseFloat(d.lng) };
+	            } else {
+	                return { lat: 51.556230, lng: -0.223796 };
+	            }
+	        },
+	        markers: function markers() {
+	            console.log("Before big bang", this, this.positions);
+	            //     // if(typeof this.$store.state.devices.map === "undefined") {
+	            //     //   return [];
+	            //     // }
+	            // let devs = this.positions.map((dev,index)=> {
+	            //     let d = JSON.parse(dev.value)
+	            //     return {
+	            //             lat: parseFloat(d.lat),
+	            //             lng: parseFloat(d.lng),
+	            //             label: d.type == "PassiveEye" ? "P" : "O",
+	            //             id: dev.key
+	            //           }
+	            // })
+	            // console.log("DEVS: ", this.$store.state.devices)
+	            var retpos = this.positions.map(function (p) {
+	                return {
+	                    lat: parseFloat(p.lat),
+	                    lng: parseFloat(p.lng)
+	                };
+	            });
+	
+	            console.log("RETPOS ", retpos);
+	            return retpos;
+	        },
+	        devices: function devices() {
+	            console.log("Before big bang", (0, _typeof3.default)(this.$store.state.devices));
+	            // if(typeof this.$store.state.devices.map === "undefined") {
+	            //   return [];
+	            // }
+	            var devs = this.$store.state.devices.map(function (dev) {
+	                return {
+	                    key: dev.key,
+	                    value: JSON.parse(dev.value)
+	                };
+	            });
+	            console.log("DEVS: ", this.$store.state.devices);
+	            return devs;
+	        }
+	    }
+	};
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
+
+/***/ },
+/* 302 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+	  return _c('div', {
+	    staticClass: "page"
+	  }, [_c('h1', [_vm._v("Device Locations")]), _vm._v(" "), _c('div', {
+	    staticClass: "map"
+	  }, [_c('gmap-map', {
+	    staticStyle: {
+	      "width": "100%",
+	      "height": "100%"
+	    },
+	    attrs: {
+	      "center": _vm.center,
+	      "map-type-id": "terrain",
+	      "zoom": 12
+	    }
+	  }, [_vm._l((_vm.markers), function(m, i) {
+	    return [_c('gmap-marker', {
+	      ref: "infow",
+	      refInFor: true,
+	      attrs: {
+	        "position": m,
+	        "clickable": true,
+	        "draggable": false,
+	        "label": m.label
+	      },
+	      on: {
+	        "click": function($event) {
+	          _vm.infomap(m, i)
+	        }
+	      }
+	    })]
+	  }), _vm._v(" "), _c('gmap-info-window', {
+	    attrs: {
+	      "options": _vm.infoOptions,
+	      "position": _vm.infoPos,
+	      "opened": _vm.infoVis,
+	      "content": _vm.infoContent
+	    },
+	    on: {
+	      "closeclick": function($event) {
+	        _vm.infoClose()
+	      }
+	    }
+	  }), _vm._v(" "), _c('gmap-circle', {
+	    attrs: {
+	      "center": _vm.center,
+	      "radius": 100,
+	      "options": {
+	        editable: true
+	      }
+	    }
+	  })], 2)], 1)])
+	},staticRenderFns: []}
+	module.exports.render._withStripped = true
+	if (false) {
+	  module.hot.accept()
+	  if (module.hot.data) {
+	     require("vue-hot-reload-api").rerender("data-v-784964f2", module.exports)
+	  }
+	}
+
+/***/ },
+/* 303 */
+/***/ function(module, exports, __webpack_require__) {
+
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
 	  return _c('div', {
 	    staticClass: "page"
 	  }, [_c('h1', [_vm._v("Device Detail")]), _vm._v(" "), _c('table', {
 	    staticClass: "table table-responsive table-bordered table-striped table-hover"
-	  }, [_c('tbody', [_c('tr', [_c('td', [_vm._v("ID")]), _vm._v(_vm._s(_vm.device_detail.type))]), _vm._v(" "), _c('tr', [_c('td', [_vm._v("ID")]), _vm._v(_vm._s(_vm.device_detail.id))]), _vm._v(" "), _c('tr', [_c('td', [_vm._v("LAT")]), _vm._v(" "), _c('td', [_vm._v(_vm._s(_vm.device_detail.lat))])]), _vm._v(" "), _c('tr', [_c('td', [_vm._v("LNG")]), _vm._v(" "), _c('td', [_vm._v(_vm._s(_vm.device_detail.lng))])]), _vm._v(" "), _c('tr', [_c('td', [_vm._v("TIMESTAMP")]), _vm._v(" "), _c('td', [_vm._v(_vm._s(_vm.device_detail.time))])]), _vm._v(" "), _c('tr', [_c('td', [_vm._v("DUPLICATE")]), _vm._v(" "), _c('td', [_vm._v(_vm._s(_vm.device_detail.duplicate))])]), _vm._v(" "), _c('tr', [_c('td', [_vm._v("SNR")]), _vm._v(" "), _c('td', [_vm._v(_vm._s(_vm.device_detail.snr))])]), _vm._v(" "), _c('tr', [_c('td', [_vm._v("STATION")]), _vm._v(" "), _c('td', [_vm._v(_vm._s(_vm.device_detail.station))])]), _vm._v(" "), _c('tr', [_c('td', [_vm._v("AVG SNR")]), _vm._v(" "), _c('td', [_vm._v(_vm._s(_vm.device_detail.avgSnr))])])])]), _vm._v(" "), _c('table', {
+	  }, [_c('tbody', [_c('tr', [_c('td', [_vm._v("ID")]), _vm._v(_vm._s(_vm.device_detail.type))]), _vm._v(" "), _c('tr', [_c('td', [_vm._v("ID")]), _vm._v(_vm._s(_vm.device_detail.id))]), _vm._v(" "), _c('tr', [_c('td', [_vm._v("LAT")]), _vm._v(" "), _c('td', [_vm._v(_vm._s(_vm.device_detail.lat))])]), _vm._v(" "), _c('tr', [_c('td', [_vm._v("LNG")]), _vm._v(" "), _c('td', [_vm._v(_vm._s(_vm.device_detail.lng))])]), _vm._v(" "), _c('tr', [_c('td', [_vm._v("TIMESTAMP")]), _vm._v(" "), _c('td', [_vm._v(_vm._s(_vm.device_detail.time))])]), _vm._v(" "), _c('tr', [_c('td', [_vm._v("DUPLICATE")]), _vm._v(" "), _c('td', [_vm._v(_vm._s(_vm.device_detail.duplicate))])]), _vm._v(" "), _c('tr', [_c('td', [_vm._v("SNR")]), _vm._v(" "), _c('td', [_vm._v(_vm._s(_vm.device_detail.snr))])]), _vm._v(" "), _c('tr', [_c('td', [_vm._v("STATION")]), _vm._v(" "), _c('td', [_vm._v(_vm._s(_vm.device_detail.station))])]), _vm._v(" "), _c('tr', [_c('td', [_vm._v("AVG SNR")]), _vm._v(" "), _c('td', [_vm._v(_vm._s(_vm.device_detail.avgSnr))])])])]), _vm._v(" "), _c('div', {
+	    staticStyle: {
+	      "width": "600px"
+	    }
+	  }, [_c('gps-map', {
+	    attrs: {
+	      "positions": _vm.positions
+	    }
+	  })], 1), _vm._v(" "), _c('div'), _vm._v(" "), _c('table', {
 	    staticClass: "table table-responsive table-bordered table-striped table-hover"
 	  }, [_vm._m(0), _vm._v(" "), _c('tbody', _vm._l((_vm.positions), function(pos) {
 	    return _c('tr', [_c('td', [_vm._v(_vm._s(pos.lat))]), _vm._v(" "), _c('td', [_vm._v(_vm._s(pos.lng))]), _vm._v(" "), _c('td', [_vm._v(_vm._s(pos.time))])])
@@ -54701,7 +55024,7 @@
 	}
 
 /***/ },
-/* 297 */
+/* 304 */
 /***/ function(module, exports) {
 
 	exports.sync = function (store, router, options) {
