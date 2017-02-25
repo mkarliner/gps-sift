@@ -20,6 +20,8 @@
           <td>{{dev.value.lng}}</td>
           <td>{{dev.value.time}}</td>
         </tr>
+        <tr v-for="dev in dummy">
+        </tr>
       </tbody>
     </table>
     <div>{{clock}}</div>
@@ -43,6 +45,7 @@ const format = values => {
 };
 
 export default {
+
   data () {},
   // beforeDestroy: function () {
   //   console.log("DESTROYED: ", this)

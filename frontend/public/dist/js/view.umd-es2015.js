@@ -39402,7 +39402,7 @@
 	
 	
 	// module
-	exports.push([module.id, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"devices.vue","sourceRoot":"webpack://"}]);
+	exports.push([module.id, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"devices.vue","sourceRoot":"webpack://"}]);
 	
 	// exports
 
@@ -39438,6 +39438,8 @@
 	    return Number(val).toFixed(5);
 	  }
 	}; //
+	//
+	//
 	//
 	//
 	//
@@ -54395,13 +54397,15 @@
 	    staticClass: "page devices"
 	  }, [_c('h1', [_vm._v("Device List")]), _vm._v(" "), _c('table', {
 	    staticClass: "table table-responsive table-bordered table-striped table-hover"
-	  }, [_vm._m(0), _vm._v(" "), _c('tbody', _vm._l((_vm.devices), function(dev) {
+	  }, [_vm._m(0), _vm._v(" "), _c('tbody', [_vm._l((_vm.devices), function(dev) {
 	    return _c('tr', [_c('td', [_vm._v(_vm._s(dev.value.type))]), _vm._v(" "), _c('td', [_c('router-link', {
 	      attrs: {
 	        "to": '/device/' + dev.key
 	      }
 	    }, [_vm._v(_vm._s(dev.key))])], 1), _vm._v(" "), _c('td', [_vm._v(_vm._s(dev.value.lat))]), _vm._v(" "), _c('td', [_vm._v(_vm._s(dev.value.lat))]), _vm._v(" "), _c('td', [_vm._v(_vm._s(dev.value.lng))]), _vm._v(" "), _c('td', [_vm._v(_vm._s(dev.value.time))])])
-	  }))]), _vm._v(" "), _c('div', [_vm._v(_vm._s(_vm.clock))])])
+	  }), _vm._v(" "), _vm._l((_vm.dummy), function(dev) {
+	    return _c('tr')
+	  })], 2)]), _vm._v(" "), _c('div', [_vm._v(_vm._s(_vm.clock))])])
 	},staticRenderFns: [function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
 	  return _c('thead', [_c('tr', [_c('th', [_vm._v("Type")]), _vm._v(" "), _c('th', [_vm._v("Device ID")]), _vm._v(" "), _c('th', [_vm._v("Latitude")]), _vm._v(" "), _c('th', [_vm._v("Longitude")]), _vm._v(" "), _c('th', [_vm._v("Last Update")])])])
 	}]}
