@@ -29,7 +29,8 @@ module.exports = function (got) {
     let lat_mins = d.data.substr(6,6);
     let lng_deg = d.data.substr(12,2);
     let lng_mins = d.data.substr(14,6);
-    console.log("EXLL ", lat_ns, lat_deg, lat_mins, lng_ew, lng_deg, lng_mins);
+    let temp = parseInt(d.data.substr(2,2), 16);
+    console.log("EXLL ", lat_ns, lat_deg, lat_mins, lng_ew, lng_deg, lng_mins, temp);
     na.push( {
       name: "devices",
       key: d.device,
@@ -42,7 +43,8 @@ module.exports = function (got) {
         duplicate: d.duplicate,
         snr: d.snr,
         station: d.station,
-        avgSnr: d.avgSnr
+        avgSnr: d.avgSnr,
+        temp: temp
       }
     }),
     na.push({
@@ -56,7 +58,8 @@ module.exports = function (got) {
         duplicate: d.duplicate,
         snr: d.snr,
         station: d.station,
-        avgSnr: d.avgSnr
+        avgSnr: d.avgSnr,
+        temp: temp
       }
     })
     return na;

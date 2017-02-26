@@ -44,6 +44,10 @@
                 <td>AVG SNR</td>
                 <td>{{device_detail.avgSnr}}</td>
             </tr>
+            <tr>
+                <td>TEMP</td>
+                <td>{{device_detail.temp}}</td>
+            </tr>
         </tbody>
     </table>
     <div style="width: 600px">
@@ -56,6 +60,7 @@
           <th>Latitude</th>
           <th>Longitude</th>
           <th>Last Update</th>
+          <th>Temp</th>
         </tr>
       </thead>
       <tbody>
@@ -63,6 +68,7 @@
           <td>{{pos.lat}}</td>
           <td>{{pos.lng}}</td>
           <td>{{pos.time}}</td>
+          <td>{{pos.temp}}</td>
         </tr>
       </tbody>
     </table>
