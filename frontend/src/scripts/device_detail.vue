@@ -50,10 +50,9 @@
             </tr>
         </tbody>
     </table>
-    <div style="width: 600px">
+    <div style="width: 100%">
       <gps-map :positions="positions"></gps-map>
     </div>
-    <div>     </div>
     <table class="table table-responsive table-bordered table-striped table-hover">
       <thead>
         <tr>
