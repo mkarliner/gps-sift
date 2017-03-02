@@ -2,7 +2,7 @@
 	"name": "gps-sift",
 	"display-name": "GPS Sift",
 	"description": "",
-	"author": "",
+	"author": "Michael Karliner",
 	"version": "1.0.0",
 	"icon": "assets/blueprint.svg",
 	"interfaces": {
