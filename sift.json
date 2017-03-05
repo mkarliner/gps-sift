@@ -1,103 +1,125 @@
 {
-	"name": "gps-sift",
-	"display-name": "GPS Sift",
-	"description": "",
-	"author": "Michael Karliner",
-	"version": "1.0.0",
-	"icon": "assets/blueprint.svg",
-	"interfaces": {
-		"email": {
-			"thread": {
-				"controller": "dist/js/controller.umd-es2015.js"
-			},
-			"client": {
-				"controller": "dist/js/email-client-controller.umd-es2015.js"
-			}
-		},
-		"summary": {
-			"controller": "dist/js/controller.umd-es2015.js"
-		}
-	},
-	"dag": {
-		"inputs": {
-			"emails": {},
-			"slack-bot": {},
-			"webhooks": {
-				"passiveeye": {
-					"inbound": {
-						"uri": "pe",
-						"jsonPath": "{\"key\": \"$.body.device\", \"value\": $.body}"
-					}
-				},
-				"owntracks": {
-					"inbound": {
-						"uri": "ot",
-						"jsonPath": "{\"key\": \"$.body.tid\", \"value\": $.body}"
-					}
-				}
-			}
-		},
-
-
-
-		"nodes": [{
-			"#": "PassiveEye",
-			"input": {
-				"bucket": "passiveeye"
-			},
-			"implementation": {
-				"javascript": "server/node1.js"
-			},
-			"outputs": {
-				"positions": {},
-				"devices": {}
-			}
-		},
-		{
-					"#": "OwnTracks",
-					"input": {
-						"bucket": "owntracks"
-					},
-					"implementation": {
-						"javascript": "server/owntracks.js"
-					},
-					"outputs": {
-						"positions": {},
-						"devices": {}
-					}
-				},
-		{
-			"#": "Python Node",
-
-			"implementation": {
-				"javascript": "server/node1.js"
-			},
-			"input": {
-				"bucket": "raw_positions"
-			},
-			"outputs": {
-				"bounding": {}
-			}
-		}],
-		"stores": {
-			"raw_positions": {
-				"key$schema": "string",
-				"ttl": 86400
-			}
-		},
-		"outputs": {
-			"exports": {
-				"bounding": {
-					"key$schema": "string"
-				},
-				"devices": {
-					"key$schema": "string"
-				},
-				"positions": {
-					"key$schema": "string/string",
-					"ttl": 86400
-				}
-			}
-		}
-	}
+  "name": "gps-sift",
+  "display-name": "GPS Sift",
+  "description": "",
+  "author": "Michael Karliner",
+  "version": "1.0.0",
+  "icon": "assets/blueprint.svg",
+  "interfaces": {
+    "email": {
+      "thread": {
+        "controller": "dist/js/controller.umd-es2015.js"
+      },
+      "client": {
+        "controller": "dist/js/email-client-controller.umd-es2015.js"
+      }
+    },
+    "summary": {
+      "controller": "dist/js/controller.umd-es2015.js"
+    }
+  },
+  "dag": {
+    "inputs": {
+      "emails": {},
+      "slack-bot": {},
+      "webhooks": {
+        "passiveeye": {
+          "inbound": {
+            "uri": "pe",
+            "jsonPath": "{\"key\": \"$.body.device\", \"value\": $.body}"
+          }
+        },
+        "owntracks": {
+          "inbound": {
+            "uri": "ot",
+            "jsonPath": "{\"key\": \"$.body.tid\", \"value\": $.body}"
+          }
+        }
+      }
+    },
+    "nodes": [
+      {
+        "#": "PassiveEye",
+        "input": {
+          "bucket": "passiveeye"
+        },
+        "implementation": {
+          "javascript": "server/passiveeye.js"
+        },
+        "outputs": {
+          "device_events": {},
+          "positions": {},
+          "devices": {}
+        }
+      },
+      {
+        "#": "OwnTracks",
+        "input": {
+          "bucket": "owntracks"
+        },
+        "implementation": {
+          "javascript": "server/owntracks.js"
+        },
+        "outputs": {
+          "device_events": {},
+          "positions": {},
+          "devices": {}
+        }
+      },
+      {
+        "#": "Bin Positions",
+        "input": {
+          "bucket": "device_events",
+          "select": "$deviceId",
+          "lookup": [{
+            "bucket": "binned_positions",
+            "key": "$deviceId/*/*"
+          }]
+        },
+        "implementation": {
+          "javascript": "server/binner.js"
+        },
+        "outputs": {
+          "binned_positions": {}
+        }
+      },
+      {
+        "#": "Convex Hull",
+        "input": {
+          "bucket": "binned_positions",
+          "select": "mk/*/*"
+        },
+        "implementation": {
+          "javascript": "server/convex_hull.js"
+        },
+        "outputs": {
+          "geofence": {}
+        }
+      }
+    ],
+    "stores": {
+      "device_events": {
+        "key$schema": "string",
+        "ttl": 86400
+      },
+      "binned_positions": {
+        "key$schema": "string/string/string",
+        "ttl": 864000
+      }
+    },
+    "outputs": {
+      "exports": {
+        "devices": {
+          "key$schema": "string"
+        },
+        "positions": {
+          "key$schema": "string/string",
+          "ttl": 86400
+        },
+        "geofence": {
+          "key$schema": "string"
+        }
+      }
+    }
+  }
 }

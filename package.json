@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/mkarliner/hello-sift/issues"
   },
-  "homepage": "https://github.com/mkarliner/hello-sift#readme"
+  "homepage": "https://github.com/mkarliner/hello-sift#readme",
+  "dependencies": {
+    "graham_scan": "^1.0.4"
+  }
 }

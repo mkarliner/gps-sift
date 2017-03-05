@@ -146,6 +146,7 @@
 	    passiveeyeUri: "nopeyet",
 	    devices: [],
 	    positions: [],
+	    geofence: [],
 	    clock: Date.now()
 	  },
 	  mutations: {
@@ -160,6 +161,9 @@
 	    },
 	    setPositions: function setPositions(state, positions) {
 	      state.positions = positions;
+	    },
+	    setGeofence: function setGeofence(state, geofence) {
+	      state.geofence = geofence;
 	    },
 	    setClock: function setClock(state, now) {
 	      state.clock = now;
@@ -181,6 +185,7 @@
 	
 	    _this.controller.subscribe(['devices'], _this.onDevices.bind(_this));
 	    _this.controller.subscribe(['positions'], _this.onPositions.bind(_this));
+	    _this.controller.subscribe(['geofence'], _this.onGeofence.bind(_this));
 	
 	    _vue2.default.use(VueGoogleMaps, {
 	      load: {
@@ -210,6 +215,7 @@
 	      store.commit('setPassiveEyeUri', value.data.passiveeyeUri);
 	      store.commit('setDevices', value.data.devices);
 	      store.commit('setPositions', value.data.positions);
+	      store.commit('setGeofence', value.data.geofence);
 	
 	      setInterval(function () {
 	        store.commit('setClock', Date.now());
@@ -230,6 +236,11 @@
 	    key: 'onPositions',
 	    value: function onPositions(data) {
 	      store.commit('setPositions', data);
+	    }
+	  }, {
+	    key: 'onGeofence',
+	    value: function onGeofence(data) {
+	      store.commit('setGeofence', data);
 	    }
 	  }]);
 	  return MyView;
@@ -39402,7 +39413,7 @@
 	
 	
 	// module
-	exports.push([module.id, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"devices.vue","sourceRoot":"webpack://"}]);
+	exports.push([module.id, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"devices.vue","sourceRoot":"webpack://"}]);
 	
 	// exports
 
@@ -39428,16 +39439,20 @@
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	var parse = {
+	  age: function age(val) {
+	    return (0, _moment2.default)(val * 1000).format();
+	  },
 	  time: function time(val) {
 	    return (0, _moment2.default)(val * 1000).fromNow();
 	  },
 	  lat: function lat(val) {
-	    return Number(val).toFixed(5);
+	    return Number(val).toFixed(6);
 	  },
 	  lng: function lng(val) {
-	    return Number(val).toFixed(5);
+	    return Number(val).toFixed(6);
 	  }
 	}; //
+	//
 	//
 	//
 	//
@@ -39491,9 +39506,11 @@
 	      var dummy = this.$store.state.clock;
 	      // console.log("RUNNING: ", dummy.toString())
 	      return this.$store.state.devices.map(function (dev) {
+	        var raw = JSON.parse(dev.value);
+	        raw.age = raw.time;
 	        return {
 	          key: dev.key,
-	          value: format(JSON.parse(dev.value))
+	          value: format(raw)
 	        };
 	      });
 	    },
@@ -54401,12 +54418,12 @@
 	      attrs: {
 	        "to": '/device/' + dev.key
 	      }
-	    }, [_vm._v(_vm._s(dev.key))])], 1), _vm._v(" "), _c('td', [_vm._v(_vm._s(dev.value.lat))]), _vm._v(" "), _c('td', [_vm._v(_vm._s(dev.value.lng))]), _vm._v(" "), _c('td', [_vm._v(_vm._s(dev.value.time))])])
+	    }, [_vm._v(_vm._s(dev.key))])], 1), _vm._v(" "), _c('td', [_vm._v(_vm._s(dev.value.lat))]), _vm._v(" "), _c('td', [_vm._v(_vm._s(dev.value.lng))]), _vm._v(" "), _c('td', [_vm._v(_vm._s(dev.value.time))]), _vm._v(" "), _c('td', [_vm._v(_vm._s(dev.value.age))])])
 	  }), _vm._v(" "), _vm._l((_vm.dummy), function(dev) {
 	    return _c('tr')
-	  })], 2)]), _vm._v(" "), _c('div', [_vm._v(_vm._s(_vm.clock))])])
+	  })], 2)])])
 	},staticRenderFns: [function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return _c('thead', [_c('tr', [_c('th', [_vm._v("Type")]), _vm._v(" "), _c('th', [_vm._v("Device ID")]), _vm._v(" "), _c('th', [_vm._v("Latitude")]), _vm._v(" "), _c('th', [_vm._v("Longitude")]), _vm._v(" "), _c('th', [_vm._v("Last Update")])])])
+	  return _c('thead', [_c('tr', [_c('th', [_vm._v("Type")]), _vm._v(" "), _c('th', [_vm._v("Device ID")]), _vm._v(" "), _c('th', [_vm._v("Latitude")]), _vm._v(" "), _c('th', [_vm._v("Longitude")]), _vm._v(" "), _c('th', [_vm._v("Age")]), _vm._v(" "), _c('th', [_vm._v("Last Update")])])])
 	}]}
 	module.exports.render._withStripped = true
 	if (false) {
@@ -54499,7 +54516,7 @@
 	
 	
 	// module
-	exports.push([module.id, "\n\n\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"device_detail.vue","sourceRoot":"webpack://"}]);
+	exports.push([module.id, "\n\n", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"device_detail.vue","sourceRoot":"webpack://"}]);
 	
 	// exports
 
@@ -54508,10 +54525,10 @@
 /* 295 */
 /***/ function(module, exports, __webpack_require__) {
 
-	'use strict';
+	/* WEBPACK VAR INJECTION */(function(console) {'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	  value: true
+	    value: true
 	});
 	
 	var _getIterator2 = __webpack_require__(143);
@@ -54609,95 +54626,125 @@
 	//
 	//
 	//
-	
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
 	
 	var parse = {
-	  time: function time(val) {
-	    return (0, _moment2.default)(val * 1000).fromNow();
-	  },
-	  lat: function lat(val) {
-	    return Number(val).toFixed(5);
-	  },
-	  lng: function lng(val) {
-	    return Number(val).toFixed(5);
-	  }
+	    time: function time(val) {
+	        return (0, _moment2.default)(val * 1000).fromNow();
+	    },
+	    lat: function lat(val) {
+	        return Number(val).toFixed(6);
+	    },
+	    lng: function lng(val) {
+	        return Number(val).toFixed(6);
+	    }
 	};
 	var format = function format(values) {
-	  var result = {};
-	  (0, _keys2.default)(values).forEach(function (key) {
-	    result[key] = (parse[key] || function (i) {
-	      return i;
-	    })(values[key]);
-	  });
-	  return result;
+	    var result = {};
+	    (0, _keys2.default)(values).forEach(function (key) {
+	        result[key] = (parse[key] || function (i) {
+	            return i;
+	        })(values[key]);
+	    });
+	    return result;
 	};
 	
 	exports.default = {
-	  components: {
-	    'gps-map': _map_positions2.default
-	  },
-	  data: function data() {
-	    return {
-	      positions: [],
-	      test: "this is a test"
-	    };
-	  },
-	
-	
-	  computed: {
-	    device_detail: function device_detail() {
-	      var id = this.$store.state.route.params.id;
-	
-	      var devs = this.$store.state.devices;
-	      var details = {};
-	
-	      var _iteratorNormalCompletion = true;
-	      var _didIteratorError = false;
-	      var _iteratorError = undefined;
-	
-	      try {
-	        for (var _iterator = (0, _getIterator3.default)(devs), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-	          var i = _step.value;
-	
-	          if (i.key == id) {
-	            details = JSON.parse(i.value);
-	            details.id = i.key;
-	            break;
-	          }
-	        }
-	      } catch (err) {
-	        _didIteratorError = true;
-	        _iteratorError = err;
-	      } finally {
-	        try {
-	          if (!_iteratorNormalCompletion && _iterator.return) {
-	            _iterator.return();
-	          }
-	        } finally {
-	          if (_didIteratorError) {
-	            throw _iteratorError;
-	          }
-	        }
-	      }
-	
-	      return details;
+	    components: {
+	        'gps-map': _map_positions2.default
 	    },
-	    positions: function positions() {
-	      var id = this.$store.state.route.params.id;
-	      var posns = this.$store.state.positions;
-	      var filtered_pos = posns.filter(function (p) {
-	        var dev_id = p.key.split('/')[0];
-	        return dev_id == id;
-	      });
-	      this.$data.positions = filtered_pos.map(function (p) {
-	        return format(JSON.parse(p.value));
-	      }).reverse();
-	      return filtered_pos.map(function (p) {
-	        return format(JSON.parse(p.value));
-	      }).reverse();
+	    data: function data() {
+	        return {
+	            positions: [],
+	            geofence: [],
+	            test: "this is a test"
+	        };
+	    },
+	
+	
+	    computed: {
+	        device_detail: function device_detail() {
+	            var id = this.$store.state.route.params.id;
+	
+	            var devs = this.$store.state.devices;
+	            var details = {};
+	
+	            var _iteratorNormalCompletion = true;
+	            var _didIteratorError = false;
+	            var _iteratorError = undefined;
+	
+	            try {
+	                for (var _iterator = (0, _getIterator3.default)(devs), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	                    var i = _step.value;
+	
+	                    if (i.key == id) {
+	                        details = JSON.parse(i.value);
+	                        details.id = i.key;
+	                        break;
+	                    }
+	                }
+	            } catch (err) {
+	                _didIteratorError = true;
+	                _iteratorError = err;
+	            } finally {
+	                try {
+	                    if (!_iteratorNormalCompletion && _iterator.return) {
+	                        _iterator.return();
+	                    }
+	                } finally {
+	                    if (_didIteratorError) {
+	                        throw _iteratorError;
+	                    }
+	                }
+	            }
+	
+	            return details;
+	        },
+	        positions: function positions() {
+	            var id = this.$store.state.route.params.id;
+	            var posns = this.$store.state.positions;
+	            var filtered_pos = posns.filter(function (p) {
+	                var dev_id = p.key.split('/')[0];
+	                return dev_id == id;
+	            });
+	            this.$data.positions = filtered_pos.map(function (p) {
+	                return format(JSON.parse(p.value));
+	            }).reverse();
+	            return filtered_pos.map(function (p) {
+	                return format(JSON.parse(p.value));
+	            }).reverse();
+	        },
+	        geofence: function geofence() {
+	            var id = this.$store.state.route.params.id;
+	            var geojson = this.$store.state.geofence;
+	            var parsed = JSON.parse(geojson[0].value);
+	            var gf = parsed.map(function (g) {
+	                return {
+	                    lat: parseFloat(g.lat),
+	                    lng: parseFloat(g.lng)
+	                };
+	            });
+	            console.log("GEOFENCEVV ", gf);
+	            // let filtered_pos =  posns.filter(p=>{
+	            //   let dev_id = p.key.split('/')[0];
+	            //   return dev_id == id;
+	            // })
+	            // this.$data.positions = filtered_pos.map(p=>format(JSON.parse(p.value))).reverse();
+	            // return filtered_pos.map(p=>format(JSON.parse(p.value))).reverse();
+	            return gf;
+	        }
 	    }
-	  }
 	};
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ },
 /* 296 */
@@ -54823,7 +54870,7 @@
 	
 	
 	// module
-	exports.push([module.id, "\n.map {\n  height: 100%;\n  width: 100%;\n}\n", "", {"version":3,"sources":["/./src/scripts/map_positions.vue?11780541"],"names":[],"mappings":";AA+FA;EACA,aAAA;EACA,YAAA;CACA","file":"map_positions.vue","sourcesContent":["<style>\n\n\n\n</style>\n\n<template>\n  <div class=\"page\">\n    <h1>Device Locations</h1>\n      <div class=\"map\">\n        <gmap-map :center=\"center\" map-type-id=\"terrain\" :zoom=\"12\" style=\"width: 100%; height: 100%\">\n          <template v-for=\"(m,i) in markers\">\n          <gmap-marker  @click=\"infomap(m,i)\" ref=\"infow\" :position=\"m\" :clickable=\"true\" :draggable=\"false\" :label=\"m.label\">\n          </gmap-marker>\n        </template>\n          <gmap-info-window  @closeclick=\"infoClose()\":options=\"infoOptions\" :position=\"infoPos\" :opened=\"infoVis\" :content=\"infoContent\"></gmap-info-window>\n          <gmap-circle :center=\"center\" :radius=\"100\" :options=\"{editable: true}\"></gmapcircle>\n        </gmap-map>\n      </div>\n  </div>\n\n</template>\n\n<script>\n\n\nexport default {\n    data() {\n      return {\n\n      }\n\n    },\n    props: ['positions', 'test'],\n        methods: {\n\n        },\n        computed: {\n            center() {\n\t      if(this.positions.length > 0) {\n              \tlet firstDev = this.positions[0];\n              \tlet d = firstDev;\n              \treturn {lat: parseFloat(d.lat), lng: parseFloat(d.lng)}\n     \t      } else {\n\t\treturn {lat: 51.556230, lng: -0.223796}\n\t      }\n            },\n            markers() {\n                    console.log(\"Before big bang\", this,  this.positions)\n                    //     // if(typeof this.$store.state.devices.map === \"undefined\") {\n                    //     //   return [];\n                    //     // }\n                    // let devs = this.positions.map((dev,index)=> {\n                    //     let d = JSON.parse(dev.value)\n                    //     return {\n                    //             lat: parseFloat(d.lat),\n                    //             lng: parseFloat(d.lng),\n                    //             label: d.type == \"PassiveEye\" ? \"P\" : \"O\",\n                    //             id: dev.key\n                    //           }\n                    // })\n                    // console.log(\"DEVS: \", this.$store.state.devices)\n                    let retpos = this.positions.map((p)=> {\n                      return {\n                        lat: parseFloat(p.lat),\n                        lng: parseFloat(p.lng),\n                      }\n\n                    })\n\n\n                  console.log(\"RETPOS \", retpos)\n                  return retpos;\n                },\n                devices() {\n                    console.log(\"Before big bang\", typeof this.$store.state.devices)\n                        // if(typeof this.$store.state.devices.map === \"undefined\") {\n                        //   return [];\n                        // }\n                    let devs = this.$store.state.devices.map(function(dev) {\n                        return {\n                            key: dev.key,\n                            value: JSON.parse(dev.value)\n                        }\n                    })\n                    console.log(\"DEVS: \", this.$store.state.devices)\n                    return devs\n                },\n        }\n}\n\n</script>\n\n<style>\n\n.map {\n  height: 100%;\n  width: 100%;\n}\n</style>\n"],"sourceRoot":"webpack://"}]);
+	exports.push([module.id, "\n.map {\n  height: 100%;\n  width: 100%;\n}\n", "", {"version":3,"sources":["/./src/scripts/map_positions.vue?2a062f0f"],"names":[],"mappings":";AAgGA;EACA,aAAA;EACA,YAAA;CACA","file":"map_positions.vue","sourcesContent":["<style>\n\n\n\n</style>\n\n<template>\n  <div class=\"page\">\n    <h1>Device Locations</h1>\n      <div class=\"map\">\n        <gmap-map :center=\"center\" map-type-id=\"terrain\" :zoom=\"12\" style=\"width: 100%; height: 100%\">\n          <template v-for=\"(m,i) in markers\">\n          <gmap-marker  @click=\"infomap(m,i)\" ref=\"infow\" :position=\"m\" :clickable=\"true\" :draggable=\"false\" :label=\"m.label\">\n          </gmap-marker>\n        </template>\n          <gmap-info-window  @closeclick=\"infoClose()\":options=\"infoOptions\" :position=\"infoPos\" :opened=\"infoVis\" :content=\"infoContent\"></gmap-info-window>\n          <!-- <gmap-circle :center=\"center\" :radius=\"100\" :options=\"{editable: true}\"></gmapcircle> -->\n          <gmap-polygon :path=\"geofence\"></gmap-polygon>\n        </gmap-map>\n      </div>\n  </div>\n\n</template>\n\n<script>\n\n\nexport default {\n    data() {\n      return {\n\n      }\n\n    },\n    props: ['positions', 'test', 'geofence'],\n        methods: {\n\n        },\n        computed: {\n            center() {\n\t      if(this.positions.length > 0) {\n              \tlet firstDev = this.positions[0];\n              \tlet d = firstDev;\n              \treturn {lat: parseFloat(d.lat), lng: parseFloat(d.lng)}\n     \t      } else {\n\t\treturn {lat: 51.556230, lng: -0.223796}\n\t      }\n            },\n            markers() {\n                    console.log(\"Before big bang\", this,  this.positions)\n                    //     // if(typeof this.$store.state.devices.map === \"undefined\") {\n                    //     //   return [];\n                    //     // }\n                    // let devs = this.positions.map((dev,index)=> {\n                    //     let d = JSON.parse(dev.value)\n                    //     return {\n                    //             lat: parseFloat(d.lat),\n                    //             lng: parseFloat(d.lng),\n                    //             label: d.type == \"PassiveEye\" ? \"P\" : \"O\",\n                    //             id: dev.key\n                    //           }\n                    // })\n                    // console.log(\"DEVS: \", this.$store.state.devices)\n                    let retpos = this.positions.map((p)=> {\n                      return {\n                        lat: parseFloat(p.lat),\n                        lng: parseFloat(p.lng),\n                      }\n\n                    })\n\n\n                  console.log(\"RETPOS \", retpos)\n                  return retpos;\n                },\n                devices() {\n                    console.log(\"Before big bang\", typeof this.$store.state.devices)\n                        // if(typeof this.$store.state.devices.map === \"undefined\") {\n                        //   return [];\n                        // }\n                    let devs = this.$store.state.devices.map(function(dev) {\n                        return {\n                            key: dev.key,\n                            value: JSON.parse(dev.value)\n                        }\n                    })\n                    console.log(\"DEVS: \", this.$store.state.devices)\n                    return devs\n                },\n        }\n}\n\n</script>\n\n<style>\n\n.map {\n  height: 100%;\n  width: 100%;\n}\n</style>\n"],"sourceRoot":"webpack://"}]);
 	
 	// exports
 
@@ -54867,6 +54914,7 @@
 	//
 	//
 	//
+	//
 	
 	
 	exports.default = {
@@ -54874,7 +54922,7 @@
 	        return {};
 	    },
 	
-	    props: ['positions', 'test'],
+	    props: ['positions', 'test', 'geofence'],
 	    methods: {},
 	    computed: {
 	        center: function center() {
@@ -54976,13 +55024,9 @@
 	        _vm.infoClose()
 	      }
 	    }
-	  }), _vm._v(" "), _c('gmap-circle', {
+	  }), _vm._v(" "), _c('gmap-polygon', {
 	    attrs: {
-	      "center": _vm.center,
-	      "radius": 100,
-	      "options": {
-	        editable: true
-	      }
+	      "path": _vm.geofence
 	    }
 	  })], 2)], 1)])
 	},staticRenderFns: []}
@@ -55009,15 +55053,22 @@
 	    }
 	  }, [_c('gps-map', {
 	    attrs: {
-	      "positions": _vm.positions
+	      "positions": _vm.positions,
+	      "geofence": _vm.geofence
 	    }
 	  })], 1), _vm._v(" "), _c('table', {
 	    staticClass: "table table-responsive table-bordered table-striped table-hover"
 	  }, [_vm._m(0), _vm._v(" "), _c('tbody', _vm._l((_vm.positions), function(pos) {
 	    return _c('tr', [_c('td', [_vm._v(_vm._s(pos.lat))]), _vm._v(" "), _c('td', [_vm._v(_vm._s(pos.lng))]), _vm._v(" "), _c('td', [_vm._v(_vm._s(pos.time))]), _vm._v(" "), _c('td', [_vm._v(_vm._s(pos.temp))])])
+	  }))]), _vm._v(" "), _c('table', {
+	    staticClass: "table table-responsive table-bordered table-striped table-hover"
+	  }, [_vm._m(1), _vm._v(" "), _c('tbody', _vm._l((_vm.geofence), function(gf) {
+	    return _c('tr', [_c('td', [_vm._v(_vm._s(gf.lat))]), _vm._v(" "), _c('td', [_vm._v(_vm._s(gf.lng))])])
 	  }))])])
 	},staticRenderFns: [function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
 	  return _c('thead', [_c('tr', [_c('th', [_vm._v("Latitude")]), _vm._v(" "), _c('th', [_vm._v("Longitude")]), _vm._v(" "), _c('th', [_vm._v("Last Update")]), _vm._v(" "), _c('th', [_vm._v("Temp")])])])
+	},function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+	  return _c('thead', [_c('tr', [_c('th', [_vm._v("Latitude")]), _vm._v(" "), _c('th', [_vm._v("Longitude")])])])
 	}]}
 	module.exports.render._withStripped = true
 	if (false) {

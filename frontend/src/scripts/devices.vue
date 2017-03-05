@@ -8,6 +8,7 @@
           <th>Device ID</th>
           <th>Latitude</th>
           <th>Longitude</th>
+          <th>Age</th>
           <th>Last Update</th>
         </tr>
       </thead>
@@ -18,12 +19,12 @@
           <td>{{dev.value.lat}}</td>
           <td>{{dev.value.lng}}</td>
           <td>{{dev.value.time}}</td>
+          <td>{{dev.value.age}}</td>
         </tr>
         <tr v-for="dev in dummy">
         </tr>
       </tbody>
     </table>
-    <div>{{clock}}</div>
   </div>
 </template>
 
@@ -31,9 +32,10 @@
 import moment from 'moment'
 
 const parse = {
+  age: val => moment(val * 1000).format(),
   time: val => moment(val * 1000).fromNow(),
-  lat: val => Number(val).toFixed(5),
-  lng: val => Number(val).toFixed(5)
+  lat: val => Number(val).toFixed(6),
+  lng: val => Number(val).toFixed(6)
 };
 const format = values => {
   const result = {};
@@ -57,9 +59,11 @@ export default {
       let dummy = this.$store.state.clock;
       // console.log("RUNNING: ", dummy.toString())
       return this.$store.state.devices.map((dev) => {
+        let raw = JSON.parse(dev.value);
+        raw.age = raw.time;
         return {
           key: dev.key,
-          value: format(JSON.parse(dev.value))
+          value: format(raw)
         }
       });
     },

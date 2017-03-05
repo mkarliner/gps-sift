@@ -48,6 +48,7 @@ router.replace('/');
     passiveeyeUri: "nopeyet",
     devices: [],
     positions: [],
+    geofence: [],
     clock: Date.now()
   },
   mutations: {
@@ -63,6 +64,9 @@ router.replace('/');
     setPositions(state, positions){
       state.positions = positions;
     },
+    setGeofence(state, geofence){
+      state.geofence = geofence;
+    },
     setClock(state, now){
       state.clock = now;
     }
@@ -77,6 +81,7 @@ export default class MyView extends SiftView {
     super();
   	this.controller.subscribe(['devices'], this.onDevices.bind(this));
     this.controller.subscribe(['positions'], this.onPositions.bind(this));
+    this.controller.subscribe(['geofence'], this.onGeofence.bind(this));
 
   	Vue.use(VueGoogleMaps, {
 	    load: {
@@ -101,6 +106,7 @@ export default class MyView extends SiftView {
     store.commit('setPassiveEyeUri', value.data.passiveeyeUri);
     store.commit('setDevices', value.data.devices);
     store.commit('setPositions', value.data.positions);
+    store.commit('setGeofence', value.data.geofence);
 
     setInterval(()=>{
       store.commit('setClock', Date.now());
@@ -119,6 +125,10 @@ export default class MyView extends SiftView {
 
   onPositions(data) {
     store.commit('setPositions', data);
+  }
+
+  onGeofence(data) {
+    store.commit('setGeofence', data);
   }
 
 }

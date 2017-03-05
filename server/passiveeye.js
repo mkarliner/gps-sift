@@ -33,6 +33,7 @@ module.exports = function (got) {
     console.log("MINDEGS ", lat_mins, lat_ddeg);
     let lng_deg = parseFloat(d.data.substr(12,2));
     let lng_mins = d.data.substr(14,6);
+    //Three digits of lng mins!
     let lng_ddeg = parseFloat(lng_mins) / (60 * 1000);
     let temp = parseInt(d.data.substr(2,2), 16);
     console.log("EXLL ", lat_ns, lat_deg, lat_ddeg, lng_ew, lng_deg, lng_ddeg, temp);

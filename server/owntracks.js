@@ -15,9 +15,9 @@
 module.exports = function (got) {
   const inData = got.in;
 
-  console.log('OTRACKS: data received:', inData);
-
-  console.log("OTRX: ", inData.data[0].key, inData.data[0].value.toString())
+  // console.log('OTRACKS: data received:', inData);
+  //
+  // console.log("OTRX: ", inData.data[0].key, inData.data[0].value.toString())
 
   const hookData = inData.data.map(d => JSON.parse(d.value));
 
@@ -34,6 +34,16 @@ module.exports = function (got) {
         time: d.tst
       }
     }),
+    na.push( {
+      name: "device_events",
+      key: d.tid,
+      value: {
+        type: "Owntracks",
+        lat: d.lat,
+        lng: d.lon,
+        time: d.tst
+      }
+    })
     na.push({
       name: "positions",
       key: d.tid + "/" + d.tst,
@@ -47,7 +57,7 @@ module.exports = function (got) {
   }, []);
 
 
-  console.log("OTRACKS ", devData )
+  // console.log("OTRACKS ", devData )
 
   return  devData;
 };

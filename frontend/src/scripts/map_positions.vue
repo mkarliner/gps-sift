@@ -14,7 +14,8 @@
           </gmap-marker>
         </template>
           <gmap-info-window  @closeclick="infoClose()":options="infoOptions" :position="infoPos" :opened="infoVis" :content="infoContent"></gmap-info-window>
-          <gmap-circle :center="center" :radius="100" :options="{editable: true}"></gmapcircle>
+          <!-- <gmap-circle :center="center" :radius="100" :options="{editable: true}"></gmapcircle> -->
+          <gmap-polygon :path="geofence"></gmap-polygon>
         </gmap-map>
       </div>
   </div>
@@ -31,7 +32,7 @@ export default {
       }
 
     },
-    props: ['positions', 'test'],
+    props: ['positions', 'test', 'geofence'],
         methods: {
 
         },
