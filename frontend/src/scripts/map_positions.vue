@@ -10,7 +10,7 @@
       <div class="map">
         <gmap-map :center="center" map-type-id="terrain" :zoom="12" style="width: 100%; height: 100%">
           <template v-for="(m,i) in markers">
-          <gmap-marker  @click="infomap(m,i)" ref="infow" :position="m" :clickable="true" :draggable="false" :label="m.label">
+          <gmap-marker  @click="infomap(m,i)" ref="infow" :position="m" :clickable="false" :draggable="false" :label="m.label">
           </gmap-marker>
         </template>
           <gmap-info-window  @closeclick="infoClose()":options="infoOptions" :position="infoPos" :opened="infoVis" :content="infoContent"></gmap-info-window>
