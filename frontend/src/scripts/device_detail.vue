@@ -144,6 +144,7 @@ export default {
         geofence() {
             let id = this.$store.state.route.params.id;
             let geojson = this.$store.state.geofence;
+            console.log("GEOJSON: ", geojson)
             if(!geojson[0]) {
               return [];
             }

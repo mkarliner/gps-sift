@@ -54726,6 +54726,7 @@
 	        geofence: function geofence() {
 	            var id = this.$store.state.route.params.id;
 	            var geojson = this.$store.state.geofence;
+	            console.log("GEOJSON: ", geojson);
 	            if (!geojson[0]) {
 	                return [];
 	            }
