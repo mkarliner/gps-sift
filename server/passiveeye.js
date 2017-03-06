@@ -17,13 +17,13 @@ module.exports = function (got) {
 
 
 
-  console.log("PERX: ", inData.data[0].key, inData.data[0].value.toString())
+  console.log("PERX: ", inData, inData.data[0].key, inData.data[0].value.toString())
 
   const hookData = inData.data.map(d => JSON.parse(d.value));
 
  //Normalize the data from PassiveEye to the internal device format
   let devData = hookData.reduce((na, d)=>{
-    console.log("DMAP: ", d);
+    //console.log("DMAP: ", d);
     //Convert degress and decimal minutes (NEMA) to decimal degrees
     let lat_ns = d.data.substr(11,1) == 1 ? '-' : '';
     let lng_ew = d.data.substr(19,1) == 1 ? '-' : '';
@@ -89,7 +89,7 @@ module.exports = function (got) {
 
 
 
-  console.log("DDD ", devData )
+  //console.log("DDD ", devData )
 
   return  devData;
 };
