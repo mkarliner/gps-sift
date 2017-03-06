@@ -37574,7 +37574,7 @@
 	
 	
 	// module
-	exports.push([module.id, "\n.map {\n    height: 100%;\n}\n", "", {"version":3,"sources":["/./src/scripts/map.vue?51635b9b"],"names":[],"mappings":";AA+HA;IACA,aAAA;CACA","file":"map.vue","sourcesContent":["<style>\n\n</style>\n\n<template>\n<div class=\"page\">\n    <h1>Device Map</h1>\n    <div class=\"map\" >\n        <gmap-map :center=\"center\" ref=\"mmm\" map-type-id=\"terrain\" :zoom=\"12\" style=\"width: 100%; height: 100%\">\n            <template v-for=\"(m,i) in markers\">\n          <gmap-marker  @click=\"infomap(m,i)\" ref=\"infow\" :position=\"m\" :clickable=\"true\" :draggable=\"false\" :label=\"m.label\">\n          </gmap-marker>\n</template>\n          <gmap-info-window  @closeclick=\"infoClose()\":options=\"infoOptions\" :position=\"infoPos\" :opened=\"infoVis\" :content=\"infoContent\"></gmap-info-window>\n          <gmap-circle :center=\"center\" :radius=\"100\" :options=\"{editable: true}\"></gmap-circle>\n        </gmap-map>\n      </div>\n  </div>\n</template>\n\n<script>\nexport default {\n    data() {\n        return {\n            infoVis: false,\n            infoPos: {\n                lat: 51.556230,\n                lng: -0.223796\n            },\n            infoOptions: {\n                pixelOffset: {\n                    width: 0,\n                    height: -35\n                }\n            },\n            infoContent: \"Nothing\"\n        }\n\n    },\n    // mounted() {\n    //   console.log(\"MOUNTED \", this.$refs)\n    // },\n    //Handle gmap repaint.\n    // watch: {\n    //     '$route' (to, from) {\n    //         // Call resizePreserveCenter() on all maps\n    //         Vue.$gmapDefaultResizeBus.$emit('resize')\n    //     },\n    //     markers: function () {\n    //       console.log(\"MARKERS!!!!\")\n    //     }\n    // },\n    methods: {\n        infomap(m, i) {\n            console.log(\"INM \", this.infoVis[i], this);\n            this.$data.infoPos = m;\n            this.$data.infoVis = true;\n            this.$data.infoContent = m.id;\n\n        },\n        infoClose(m) {\n            this.$data.infoVis = false;\n        }\n    },\n    // components: {\n    //   'gmap-map': {\n    //\n    //   }\n    // },\n    computed: {\n        center() {\n            if (this.$store.state.devices.length > 0) {\n                let firstDev = this.$store.state.devices[0].value;\n                let d = JSON.parse(firstDev)\n                return {\n                    lat: parseFloat(d.lat),\n                    lng: parseFloat(d.lng)\n                }\n            } else {\n                return {\n                    lat: 51.556230,\n                    lng: -0.223796\n                }\n            }\n        },\n        markers() {\n            console.log(\"Before big bang\", this.$children)\n            // if(typeof this.$store.state.devices.map === \"undefined\") {\n            //   return [];\n            // }\n            let devs = this.$store.state.devices.map((dev, index) => {\n                let d = JSON.parse(dev.value)\n                return {\n                    lat: parseFloat(d.lat),\n                    lng: parseFloat(d.lng),\n                    label: d.type == \"PassiveEye\" ? \"P\" : \"O\",\n                    id: dev.key\n                }\n            })\n            let bounds = new google.maps.LatLngBounds();\n            devs.map(d=>{\n              bounds.extend({lat: parseFloat(d.lat), lng: parseFloat(d.lng)})\n            })\n            console.log(\"DEVS: \", this.$refs, this.$store.state.devices)\n            //Zoom map to fit markers\n            //this.$children[0].$mapObject.fitBounds();\n            return devs\n        },\n        devices() {\n            console.log(\"Before big bang\", typeof this.$store.state.devices)\n            // if(typeof this.$store.state.devices.map === \"undefined\") {\n            //   return [];\n            // }\n            let devs = this.$store.state.devices.map(function(dev) {\n                return {\n                    key: dev.key,\n                    value: JSON.parse(dev.value)\n                }\n            })\n            console.log(\"DEVS: \", this.$store.state.devices)\n            return devs\n        },\n    }\n}\n</script>\n\n<style>\n.map {\n    height: 100%;\n}\n</style>\n"],"sourceRoot":"webpack://"}]);
+	exports.push([module.id, "\n.map {\n    height: 100%;\n}\n", "", {"version":3,"sources":["/./src/scripts/map.vue?20f2c444"],"names":[],"mappings":";AAiIA;IACA,aAAA;CACA","file":"map.vue","sourcesContent":["<style>\n\n</style>\n\n<template>\n<div class=\"page\">\n    <h1>Device Map</h1>\n    <div class=\"map\" >\n        <gmap-map :center=\"center\" ref=\"mmm\" map-type-id=\"terrain\" :zoom=\"12\" style=\"width: 100%; height: 100%\">\n            <template v-for=\"(m,i) in markers\">\n          <gmap-marker  @click=\"infomap(m,i)\" ref=\"infow\" :position=\"m\" :clickable=\"true\" :draggable=\"false\" :label=\"m.label\">\n          </gmap-marker>\n</template>\n          <gmap-info-window  @closeclick=\"infoClose()\":options=\"infoOptions\" :position=\"infoPos\" :opened=\"infoVis\" :content=\"infoContent\"></gmap-info-window>\n          <gmap-circle :center=\"center\" :radius=\"100\" :options=\"{editable: true}\"></gmap-circle>\n        </gmap-map>\n      </div>\n  </div>\n</template>\n\n<script>\nexport default {\n    data() {\n        return {\n            infoVis: false,\n            infoPos: {\n                lat: 51.556230,\n                lng: -0.223796\n            },\n            infoOptions: {\n                pixelOffset: {\n                    width: 0,\n                    height: -35\n                }\n            },\n            infoContent: \"Nothing\"\n        }\n\n    },\n    // mounted() {\n    //   console.log(\"MOUNTED \", this.$refs)\n    // },\n    //Handle gmap repaint.\n    watch: {\n        '$route' (to, from) {\n            console.log(\"WATCH \", to, from)\n            // Call resizePreserveCenter() on all maps\n            //Vue.$gmapDefaultResizeBus.$emit('resize')\n        }\n    },\n    //     markers: function () {\n    //       console.log(\"MARKERS!!!!\")\n    //     }\n    // },\n    methods: {\n        infomap(m, i) {\n            console.log(\"INM \", this.infoVis[i], this);\n            this.$data.infoPos = m;\n            this.$data.infoVis = true;\n            this.$data.infoContent = m.id;\n\n        },\n        infoClose(m) {\n            this.$data.infoVis = false;\n        }\n    },\n    // components: {\n    //   'gmap-map': {\n    //\n    //   }\n    // },\n    computed: {\n        center() {\n            if (this.$store.state.devices.length > 0) {\n                let firstDev = this.$store.state.devices[0].value;\n                let d = JSON.parse(firstDev)\n                return {\n                    lat: parseFloat(d.lat),\n                    lng: parseFloat(d.lng)\n                }\n            } else {\n                return {\n                    lat: 51.5080,\n                    lng: 0.1281\n                }\n            }\n        },\n        markers() {\n            console.log(\"Before big bang\", this.$children)\n            // if(typeof this.$store.state.devices.map === \"undefined\") {\n            //   return [];\n            // }\n            let devs = this.$store.state.devices.map((dev, index) => {\n                let d = JSON.parse(dev.value)\n                return {\n                    lat: parseFloat(d.lat),\n                    lng: parseFloat(d.lng),\n                    label: d.type == \"PassiveEye\" ? \"P\" : \"O\",\n                    id: dev.key\n                }\n            })\n            // let bounds = new google.maps.LatLngBounds();\n            // devs.map(d=>{\n            //   bounds.extend({lat: parseFloat(d.lat), lng: parseFloat(d.lng)})\n            // })\n            console.log(\"DEVS: \", this.$refs, this.$store.state.devices)\n            //Zoom map to fit markers\n            //this.$children[0].$mapObject.fitBounds();\n            return devs\n        },\n        devices() {\n            console.log(\"Before big bang\", typeof this.$store.state.devices)\n            // if(typeof this.$store.state.devices.map === \"undefined\") {\n            //   return [];\n            // }\n            let devs = this.$store.state.devices.map(function(dev) {\n                return {\n                    key: dev.key,\n                    value: JSON.parse(dev.value)\n                }\n            })\n            console.log(\"DEVS: \", this.$store.state.devices)\n            return devs\n        }\n    }\n}\n</script>\n\n<style>\n.map {\n    height: 100%;\n}\n</style>\n"],"sourceRoot":"webpack://"}]);
 	
 	// exports
 
@@ -37638,11 +37638,13 @@
 	    //   console.log("MOUNTED ", this.$refs)
 	    // },
 	    //Handle gmap repaint.
-	    // watch: {
-	    //     '$route' (to, from) {
-	    //         // Call resizePreserveCenter() on all maps
-	    //         Vue.$gmapDefaultResizeBus.$emit('resize')
-	    //     },
+	    watch: {
+	        '$route': function $route(to, from) {
+	            console.log("WATCH ", to, from);
+	            // Call resizePreserveCenter() on all maps
+	            //Vue.$gmapDefaultResizeBus.$emit('resize')
+	        }
+	    },
 	    //     markers: function () {
 	    //       console.log("MARKERS!!!!")
 	    //     }
@@ -37674,8 +37676,8 @@
 	                };
 	            } else {
 	                return {
-	                    lat: 51.556230,
-	                    lng: -0.223796
+	                    lat: 51.5080,
+	                    lng: 0.1281
 	                };
 	            }
 	        },
@@ -37693,10 +37695,10 @@
 	                    id: dev.key
 	                };
 	            });
-	            var bounds = new google.maps.LatLngBounds();
-	            devs.map(function (d) {
-	                bounds.extend({ lat: parseFloat(d.lat), lng: parseFloat(d.lng) });
-	            });
+	            // let bounds = new google.maps.LatLngBounds();
+	            // devs.map(d=>{
+	            //   bounds.extend({lat: parseFloat(d.lat), lng: parseFloat(d.lng)})
+	            // })
 	            console.log("DEVS: ", this.$refs, this.$store.state.devices);
 	            //Zoom map to fit markers
 	            //this.$children[0].$mapObject.fitBounds();
@@ -55369,8 +55371,8 @@
 	    },
 	    data: function data() {
 	        return {
-	            positions: [],
-	            geofence: [],
+	            // positions: [],
+	            // geofence: [],
 	            test: "this is a test"
 	        };
 	    },
@@ -55424,6 +55426,7 @@
 	            this.$data.positions = filtered_pos.map(function (p) {
 	                return format(JSON.parse(p.value));
 	            }).reverse();
+	            console.log("PSSSS ", this.$data.positions);
 	            return filtered_pos.map(function (p) {
 	                return format(JSON.parse(p.value));
 	            }).reverse();
@@ -55570,7 +55573,7 @@
 	
 	
 	// module
-	exports.push([module.id, "\n.map {\n  height: 100%;\n  width: 100%;\n}\n", "", {"version":3,"sources":["/./src/scripts/map_positions.vue?f7b3c48c"],"names":[],"mappings":";AAgGA;EACA,aAAA;EACA,YAAA;CACA","file":"map_positions.vue","sourcesContent":["<style>\n\n\n\n</style>\n\n<template>\n  <div class=\"page\">\n    <h1>Device Locations</h1>\n      <div class=\"map\">\n        <gmap-map :center=\"center\" map-type-id=\"terrain\" :zoom=\"12\" style=\"width: 100%; height: 100%\">\n          <template v-for=\"(m,i) in markers\">\n          <gmap-marker  @click=\"infomap(m,i)\" ref=\"infow\" :position=\"m\" :clickable=\"false\" :draggable=\"false\" :label=\"m.label\">\n          </gmap-marker>\n        </template>\n          <gmap-info-window  @closeclick=\"infoClose()\":options=\"infoOptions\" :position=\"infoPos\" :opened=\"infoVis\" :content=\"infoContent\"></gmap-info-window>\n          <!-- <gmap-circle :center=\"center\" :radius=\"100\" :options=\"{editable: true}\"></gmapcircle> -->\n          <gmap-polygon :path=\"geofence\"></gmap-polygon>\n        </gmap-map>\n      </div>\n  </div>\n\n</template>\n\n<script>\n\n\nexport default {\n    data() {\n      return {\n \n      }\n\n    },\n    props: ['positions', 'test', 'geofence'],\n        methods: {\n\n        },\n        computed: {\n            center() {\n\t      if(this.positions.length > 0) {\n              \tlet firstDev = this.positions[0];\n              \tlet d = firstDev;\n              \treturn {lat: parseFloat(d.lat), lng: parseFloat(d.lng)}\n     \t      } else {\n\t\treturn {lat: 51.556230, lng: -0.223796}\n\t      }\n            },\n            markers() {\n                    console.log(\"Before big bang\", this,  this.positions)\n                    //     // if(typeof this.$store.state.devices.map === \"undefined\") {\n                    //     //   return [];\n                    //     // }\n                    // let devs = this.positions.map((dev,index)=> {\n                    //     let d = JSON.parse(dev.value)\n                    //     return {\n                    //             lat: parseFloat(d.lat),\n                    //             lng: parseFloat(d.lng),\n                    //             label: d.type == \"PassiveEye\" ? \"P\" : \"O\",\n                    //             id: dev.key\n                    //           }\n                    // })\n                    // console.log(\"DEVS: \", this.$store.state.devices)\n                    let retpos = this.positions.map((p)=> {\n                      return {\n                        lat: parseFloat(p.lat),\n                        lng: parseFloat(p.lng),\n                      }\n\n                    })\n\n\n                  console.log(\"RETPOS \", retpos)\n                  return retpos;\n                },\n                devices() {\n                    console.log(\"Before big bang\", typeof this.$store.state.devices)\n                        // if(typeof this.$store.state.devices.map === \"undefined\") {\n                        //   return [];\n                        // }\n                    let devs = this.$store.state.devices.map(function(dev) {\n                        return {\n                            key: dev.key,\n                            value: JSON.parse(dev.value)\n                        }\n                    })\n                    console.log(\"DEVS: \", this.$store.state.devices)\n                    return devs\n                },\n        }\n}\n\n</script>\n\n<style>\n\n.map {\n  height: 100%;\n  width: 100%;\n}\n</style>\n"],"sourceRoot":"webpack://"}]);
+	exports.push([module.id, "\n.map {\n  height: 100%;\n  width: 100%;\n}\n", "", {"version":3,"sources":["/./src/scripts/map_positions.vue?1f5abb1f"],"names":[],"mappings":";AA+FA;EACA,aAAA;EACA,YAAA;CACA","file":"map_positions.vue","sourcesContent":["<style>\n\n\n\n</style>\n\n<template>\n  <div class=\"page\">\n    <h1>Device Locations</h1>\n      <div class=\"map\">\n        <gmap-map :center=\"center\" map-type-id=\"terrain\" :zoom=\"12\" style=\"width: 100%; height: 100%\">\n          <template v-for=\"(m,i) in markers\">\n          <gmap-marker  :position=\"m\" :clickable=\"false\" :draggable=\"false\" :label=\"m.label\">\n          </gmap-marker>\n        </template>\n          <!-- <gmap-circle :center=\"center\" :radius=\"100\" :options=\"{editable: true}\"></gmapcircle> -->\n          <gmap-polygon :path=\"geofence\"></gmap-polygon>\n        </gmap-map>\n      </div>\n  </div>\n\n</template>\n\n<script>\n\n\nexport default {\n    // data() {\n    //   return {\n    //\n    //   }\n    //\n    // },\n    props: ['positions', 'test', 'geofence'],\n        methods: {\n\n        },\n        computed: {\n            center() {\n\t             if(this.positions.length > 0) {\n              \t  let firstDev = this.positions[0];\n              \t   let d = firstDev;\n              \t    return {lat: parseFloat(d.lat), lng: parseFloat(d.lng)}\n     \t         } else {\n\t\t               return { lat: 51.5080, lng: -0.1281}\n\t             }\n            },\n            markers() {\n                    console.log(\"Before big bang\", this,  this.positions)\n                    //     // if(typeof this.$store.state.devices.map === \"undefined\") {\n                    //     //   return [];\n                    //     // }\n                    // let devs = this.positions.map((dev,index)=> {\n                    //     let d = JSON.parse(dev.value)\n                    //     return {\n                    //             lat: parseFloat(d.lat),\n                    //             lng: parseFloat(d.lng),\n                    //             label: d.type == \"PassiveEye\" ? \"P\" : \"O\",\n                    //             id: dev.key\n                    //           }\n                    // })\n                    // console.log(\"DEVS: \", this.$store.state.devices)\n                    let retpos = this.positions.map((p)=> {\n                      return {\n                        lat: parseFloat(p.lat),\n                        lng: parseFloat(p.lng),\n                      }\n\n                    })\n\n\n                  console.log(\"RETPOS \", retpos)\n                  return retpos;\n                },\n                devices() {\n                    console.log(\"Before big bang\", typeof this.$store.state.devices)\n                        // if(typeof this.$store.state.devices.map === \"undefined\") {\n                        //   return [];\n                        // }\n                    let devs = this.$store.state.devices.map(function(dev) {\n                        return {\n                            key: dev.key,\n                            value: JSON.parse(dev.value)\n                        }\n                    })\n                    console.log(\"DEVS: \", this.$store.state.devices)\n                    return devs\n                },\n        }\n}\n\n</script>\n\n<style>\n\n.map {\n  height: 100%;\n  width: 100%;\n}\n</style>\n"],"sourceRoot":"webpack://"}]);
 	
 	// exports
 
@@ -55614,14 +55617,15 @@
 	//
 	//
 	//
-	//
 	
 	
 	exports.default = {
-	    data: function data() {
-	        return {};
-	    },
-	
+	    // data() {
+	    //   return {
+	    //
+	    //   }
+	    //
+	    // },
 	    props: ['positions', 'test', 'geofence'],
 	    methods: {},
 	    computed: {
@@ -55631,7 +55635,7 @@
 	                var d = firstDev;
 	                return { lat: parseFloat(d.lat), lng: parseFloat(d.lng) };
 	            } else {
-	                return { lat: 51.556230, lng: -0.223796 };
+	                return { lat: 51.5080, lng: -0.1281 };
 	            }
 	        },
 	        markers: function markers() {
@@ -55698,32 +55702,13 @@
 	    }
 	  }, [_vm._l((_vm.markers), function(m, i) {
 	    return [_c('gmap-marker', {
-	      ref: "infow",
-	      refInFor: true,
 	      attrs: {
 	        "position": m,
 	        "clickable": false,
 	        "draggable": false,
 	        "label": m.label
-	      },
-	      on: {
-	        "click": function($event) {
-	          _vm.infomap(m, i)
-	        }
 	      }
 	    })]
-	  }), _vm._v(" "), _c('gmap-info-window', {
-	    attrs: {
-	      "options": _vm.infoOptions,
-	      "position": _vm.infoPos,
-	      "opened": _vm.infoVis,
-	      "content": _vm.infoContent
-	    },
-	    on: {
-	      "closeclick": function($event) {
-	        _vm.infoClose()
-	      }
-	    }
 	  }), _vm._v(" "), _c('gmap-polygon', {
 	    attrs: {
 	      "path": _vm.geofence

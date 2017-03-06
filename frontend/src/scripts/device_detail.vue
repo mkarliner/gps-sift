@@ -109,8 +109,8 @@ export default {
     },
     data() {
         return {
-            positions: [],
-            geofence: [],
+            // positions: [],
+            // geofence: [],
             test: "this is a test"
         }
     },
@@ -139,6 +139,7 @@ export default {
                 return dev_id == id;
             })
             this.$data.positions = filtered_pos.map(p => format(JSON.parse(p.value))).reverse();
+            console.log("PSSSS ", this.$data.positions)
             return filtered_pos.map(p => format(JSON.parse(p.value))).reverse();
         },
         geofence() {

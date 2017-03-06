@@ -41,11 +41,13 @@ export default {
     //   console.log("MOUNTED ", this.$refs)
     // },
     //Handle gmap repaint.
-    // watch: {
-    //     '$route' (to, from) {
-    //         // Call resizePreserveCenter() on all maps
-    //         Vue.$gmapDefaultResizeBus.$emit('resize')
-    //     },
+    watch: {
+        '$route' (to, from) {
+            console.log("WATCH ", to, from)
+            // Call resizePreserveCenter() on all maps
+            //Vue.$gmapDefaultResizeBus.$emit('resize')
+        }
+    },
     //     markers: function () {
     //       console.log("MARKERS!!!!")
     //     }
@@ -78,8 +80,8 @@ export default {
                 }
             } else {
                 return {
-                    lat: 51.556230,
-                    lng: -0.223796
+                    lat: 51.5080,
+                    lng: 0.1281
                 }
             }
         },
@@ -97,10 +99,10 @@ export default {
                     id: dev.key
                 }
             })
-            let bounds = new google.maps.LatLngBounds();
-            devs.map(d=>{
-              bounds.extend({lat: parseFloat(d.lat), lng: parseFloat(d.lng)})
-            })
+            // let bounds = new google.maps.LatLngBounds();
+            // devs.map(d=>{
+            //   bounds.extend({lat: parseFloat(d.lat), lng: parseFloat(d.lng)})
+            // })
             console.log("DEVS: ", this.$refs, this.$store.state.devices)
             //Zoom map to fit markers
             //this.$children[0].$mapObject.fitBounds();
@@ -119,7 +121,7 @@ export default {
             })
             console.log("DEVS: ", this.$store.state.devices)
             return devs
-        },
+        }
     }
 }
 </script>

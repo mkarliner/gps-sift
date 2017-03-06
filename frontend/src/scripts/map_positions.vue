@@ -10,10 +10,9 @@
       <div class="map">
         <gmap-map :center="center" map-type-id="terrain" :zoom="12" style="width: 100%; height: 100%">
           <template v-for="(m,i) in markers">
-          <gmap-marker  @click="infomap(m,i)" ref="infow" :position="m" :clickable="false" :draggable="false" :label="m.label">
+          <gmap-marker  :position="m" :clickable="false" :draggable="false" :label="m.label">
           </gmap-marker>
         </template>
-          <gmap-info-window  @closeclick="infoClose()":options="infoOptions" :position="infoPos" :opened="infoVis" :content="infoContent"></gmap-info-window>
           <!-- <gmap-circle :center="center" :radius="100" :options="{editable: true}"></gmapcircle> -->
           <gmap-polygon :path="geofence"></gmap-polygon>
         </gmap-map>
@@ -26,25 +25,25 @@
 
 
 export default {
-    data() {
-      return {
- 
-      }
-
-    },
+    // data() {
+    //   return {
+    //
+    //   }
+    //
+    // },
     props: ['positions', 'test', 'geofence'],
         methods: {
 
         },
         computed: {
             center() {
-	      if(this.positions.length > 0) {
-              	let firstDev = this.positions[0];
-              	let d = firstDev;
-              	return {lat: parseFloat(d.lat), lng: parseFloat(d.lng)}
-     	      } else {
-		return {lat: 51.556230, lng: -0.223796}
-	      }
+	             if(this.positions.length > 0) {
+              	  let firstDev = this.positions[0];
+              	   let d = firstDev;
+              	    return {lat: parseFloat(d.lat), lng: parseFloat(d.lng)}
+     	         } else {
+		               return { lat: 51.5080, lng: -0.1281}
+	             }
             },
             markers() {
                     console.log("Before big bang", this,  this.positions)
