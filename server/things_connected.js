@@ -15,49 +15,54 @@
 module.exports = function (got) {
   const inData = got.in;
 
-  // console.log('OTRACKS: data received:', inData);
+  //console.log('TCONN: data received:', inData);
   //
   // console.log("OTRX: ", inData.data[0].key, inData.data[0].value.toString())
 
   const hookData = inData.data.map(d => JSON.parse(d.value));
-
  //Normalize the data from Owntracks to the internal device format
+ let ts = Math.floor(Date.now() / 1000);
 
   let devData = hookData.reduce((na, d)=>{
+
+    let latlng = d.position.split(',');
+    let lat = parseFloat(latlng[0]);
+    let lng = parseFloat(latlng[1]);
+    console.log("TCONJ ", latlng)
     na.push( {
       name: "devices",
-      key: d.tid,
+      key: d.deviceId,
       value: {
-        type: "Owntracks",
-        lat: d.lat,
-        lng: d.lon,
-        time: d.tst
+        type: "ThingsConnected",
+        lat: lat,
+        lng: lng,
+        time: ts
       }
     }),
     na.push( {
       name: "device_events",
-      key: d.tid,
+      key: d.deviceId,
       value: {
-        type: "Owntracks",
-        lat: d.lat,
-        lng: d.lon,
-        time: d.tst
+        type: "ThingsConnected",
+        lat: lat,
+        lng: lng,
+        time: ts
       }
     })
     na.push({
       name: "positions",
-      key: d.tid + "/" + d.tst,
+      key: d.deviceId + "/" + ts,
       value: {
-        lat: d.lat,
-        lng: d.lon,
-        time: d.tst
+        lat: lat,
+        lng: lng,
+        time: ts
       }
     })
     return na;
   }, []);
 
 
-  console.log("OTRACKS ", devData )
+  console.log("TCONN ", devData )
 
   return  devData;
 };

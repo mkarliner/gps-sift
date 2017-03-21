@@ -34,6 +34,12 @@
             "uri": "ot",
             "jsonPath": "{\"key\": \"$.body.tid\", \"value\": $.body}"
           }
+        },
+        "things_connected": {
+          "inbound": {
+            "uri": "tc",
+            "jsonPath": "{\"key\": \"$.body.deviceId\", \"value\": $.body}"
+          }
         }
       }
     },
@@ -67,14 +73,28 @@
         }
       },
       {
+        "#": "ThingsConnected",
+        "input": {
+          "bucket": "things_connected"
+        },
+        "implementation": {
+          "javascript": "server/things_connected.js"
+        },
+        "outputs": {
+          "device_events": {},
+          "positions": {},
+          "devices": {}
+        }
+      },
+      {
         "#": "Bin Positions",
         "input": {
           "bucket": "device_events",
           "select": "$deviceId",
-          "lookup": [{
+          "with": {
             "bucket": "binned_positions",
-            "key": "$deviceId/*/*"
-          }]
+            "select": "$deviceId"
+          }
         },
         "implementation": {
           "javascript": "server/binner.js"
@@ -84,16 +104,33 @@
         }
       },
       {
+        "#": "Monitor Positions",
+        "input": {
+          "bucket": "device_events",
+          "select": "$deviceId",
+          "with": {
+            "bucket": "geofence_s",
+            "select": "$deviceId"
+          }
+        },
+        "implementation": {
+          "javascript": "server/pos_monitor.js"
+        },
+        "outputs": {
+          "marked_positions": {}
+        }
+      },
+      {
         "#": "Convex Hull",
         "input": {
-          "bucket": "binned_positions",
-          "select": "mk/*/*"
+          "bucket": "binned_positions"
         },
         "implementation": {
           "javascript": "server/convex_hull.js"
         },
         "outputs": {
-          "geofence": {}
+          "geofence": {},
+          "geofence_s": {}
         }
       }
     ],
@@ -103,7 +140,11 @@
         "ttl": 86400
       },
       "binned_positions": {
-        "key$schema": "string/string/string",
+        "key$schema": "string",
+        "ttl": 864000
+      },
+      "geofence_s": {
+        "key$schema": "string",
         "ttl": 864000
       }
     },
@@ -118,6 +159,10 @@
         },
         "geofence": {
           "key$schema": "string"
+        },
+        "marked_positions": {
+          "key$schema": "string/string",
+          "ttl": 86400
         }
       }
     }

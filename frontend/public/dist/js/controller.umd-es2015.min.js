@@ -100,7 +100,7 @@
 	    value: function loadView(state) {
 	      console.log('hello-sift: loadView', state);
 	      // Register for storage update events on the "x" bucket so we can update the UI
-	      this.storage.subscribe(['devices', 'positions', 'geofence'], this._suHandler);
+	      this.storage.subscribe(['devices', 'marked_positions', 'geofence'], this._suHandler);
 	      var wh = this.getWebhooks();
 	      var devs = this.getDevices();
 	      var pos = this.getPositions();
@@ -112,6 +112,7 @@
 	          return {
 	            passiveeyeUri: values[0][0].value,
 	            owntracksUri: values[0][1].value,
+	            things_connectedUri: values[0][2].value,
 	            devices: values[1].devices,
 	            positions: values[2].positions,
 	            geofence: values[3].geofence };
@@ -155,7 +156,7 @@
 	    value: function getWebhooks() {
 	      return this.storage.get({
 	        bucket: '_redsift',
-	        keys: ['webhooks/passiveeye', 'webhooks/owntracks']
+	        keys: ['webhooks/passiveeye', 'webhooks/owntracks', 'webhooks/things_connected']
 	      });
 	    }
 	  }, {
@@ -173,7 +174,7 @@
 	    key: 'getPositions',
 	    value: function getPositions() {
 	      return this.storage.getAll({
-	        bucket: 'positions'
+	        bucket: 'marked_positions'
 	      }).then(function (values) {
 	        return {
 	          positions: values
@@ -184,9 +185,9 @@
 	    key: 'getGeofence',
 	    value: function getGeofence() {
 	      return this.storage.getAll({
-	        bucket: 'geofence',
-	        key: 'mk'
+	        bucket: 'geofence'
 	      }).then(function (values) {
+	        console.log("GETGEO ", values);
 	        return {
 	          geofence: values
 	        };

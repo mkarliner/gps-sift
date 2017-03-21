@@ -16,31 +16,60 @@ let ConvexHullGrahamScan = require('graham_scan');
 
 
 module.exports = function(got) {
-    const inData = got.in.data;
-    console.log("CHID: ", inData);
+    const inData = got.in.data[0].value;
+    //console.log("CHID: ", got);
 
     let convexHull = new ConvexHullGrahamScan();
-    //Generate Convex Hull.
-    for(let loc of inData) {
-      let val = JSON.parse(loc.value);
-      console.log("CHHD: ", val);
-      convexHull.addPoint(val.lat, val.lng)
+    let bd = JSON.parse(inData);
+    console.log("BININ ", bd);
+    //Filter out binned positions visited less than twice
+    let filtered_positions = {};
+    for(let p in bd) {
+      if(bd[p].visits > 1) {
+        filtered_positions[p] = bd[p]
+      }
     }
-    const xyhull = convexHull.getHull();
+    console.log("AFT FIL: ", filtered_positions)
+    let key = got.query[0];
+    for(let p in filtered_positions) {
+      convexHull.addPoint(filtered_positions[p].lat, filtered_positions[p].lng)
+    }
+    let xyhull = convexHull.getHull();
+    //Hull returns [undefined] on failure
+    xyhull = xyhull.length >3 ? xyhull : [];
     const hull = xyhull.map(p => {
-      return {
+      return { 
         lat: p.x,
         lng: p.y
       }
     })
-
-    console.log("GS: ", hull )
-    //const hull = ch(points)
-    //console.log("CHMAP: ", hull);
-
-    return {
-      name: 'geofence',
-      key: 'mk',
+    console.log("HULL: ", hull);
+    if(hull.length > 2){
+      return [
+        {
+        name: 'geofence',
+        key: key,
+        value: hull
+      },
+      {
+      name: 'geofence_s',
+      key: key,
       value: hull
     }
+    ]
+    } else {
+      return [
+        {
+        name: 'geofence',
+        key: key,
+        value: []
+      },
+      {
+      name: 'geofence_s',
+      key: key,
+      value: []
+    }
+    ]
+    }
+
 };

@@ -92,20 +92,36 @@ export default {
             // }
             let devs = this.$store.state.devices.map((dev, index) => {
                 let d = JSON.parse(dev.value)
+                let label = "U";
+                switch(d.type) {
+                  case "PassiveEye":
+                    label = "P";
+                    break;
+                  case "Owntracks":
+                    label = "O";
+                    break;
+                  case "ThingsConnected":
+                    label = "T";
+                }
                 return {
                     lat: parseFloat(d.lat),
                     lng: parseFloat(d.lng),
-                    label: d.type == "PassiveEye" ? "P" : "O",
+                    label: label,
                     id: dev.key
                 }
             })
-            // let bounds = new google.maps.LatLngBounds();
-            // devs.map(d=>{
-            //   bounds.extend({lat: parseFloat(d.lat), lng: parseFloat(d.lng)})
-            // })
+
+            // if(this.$refs.mmm) {
+            //   console.log("BMD: ", this.$refs, this.$store.state.devices)
+            //   let bounds = new google.maps.LatLngBounds();
+            //   devs.map(d=>{
+            //     bounds.extend({lat: parseFloat(d.lat), lng: parseFloat(d.lng)})
+            //   })
+            //   //Zoom map to fit markers
+            //   this.$children[0].$mapObject.fitBounds();
+            // }
+
             console.log("DEVS: ", this.$refs, this.$store.state.devices)
-            //Zoom map to fit markers
-            //this.$children[0].$mapObject.fitBounds();
             return devs
         },
         devices() {

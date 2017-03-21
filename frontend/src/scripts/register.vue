@@ -29,6 +29,16 @@
         <br/>
       </div>
     </div>
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">Things Connected</h3>
+      </div>
+      <div class="panel-body">
+        <h5>Things Connected devices should send data to this uri:</h5>
+        <div class="copy-uri">{{things_connectedUri}}</div>
+        <br/>
+      </div>
+    </div>
 
   </div>
 </template>
@@ -54,7 +64,8 @@ export default {
     return {
       qrcode: qr.createImgTag(),
       passiveeyeUri: this.$store.state.passiveeyeUri,
-      owntracksUri: this.$store.state.owntracksUri
+      owntracksUri: this.$store.state.owntracksUri,
+      things_connectedUri: this.$store.state.things_connectedUri
     }
   }
 }

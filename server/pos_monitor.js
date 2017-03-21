@@ -12,35 +12,45 @@
 // }
 // for more info have a look at:
 // http://docs.redsift.com/docs/server-code-implementation
+
+let inside = require('point-in-polygon');
+
 module.exports = function(got) {
-    console.log("BINNER: ", got);
+    console.log("POSMON: ", got);
     const inData = got.in.data;
     const deviceId = got.query[0];
     let withData = got.with.data;
-    console.log("WITHDATA ", withData)
+
     //console.log("IW: ",  inData, deviceId, withData)
     let val = JSON.parse(inData[0].value);
     let wd = withData.length > 0 ? JSON.parse(withData[0].value) : {};
 
     console.log("VAL: ", val);
-    console.log("WD: ", wd);
-    let shortLat = val.lat.toFixed(3);
-    let shortLng = val.lng.toFixed(3)
-    let latlng = `${shortLat}${shortLng}`
-    console.log("LL ", latlng)
-    if (wd[latlng]) {
-        console.log("OLDDATA ", wd)
-        wd[latlng].visits += 1;
-    } else {
-        wd[latlng] = val;
-        wd[latlng].visits = 1;
-        console.log("NEWDATA ", wd)
+    console.log("PMWD: ", wd);
+    let point = [val.lat, val.lng];
+    console.log("LL ", point)
+    //If there is no geofence, stop here.
+    if(!wd) {
+      return {
+        name: marked_positions,
+        key: "foo",
+        value: null
+      }
     }
-    wd[latlng].lat = shortLat;
-    wd[latlng].lng = shortLng;
+    // Convert arrary of lat lng objects to array of points
+    let polygon = wd.map(p=>{
+      return [parseFloat(p.lat), parseFloat(p.lng)]
+    })
+
+    if(inside(point, polygon)) {
+      val.inside = true;
+    } else {
+      val.inside = false;
+    }
+    console.log("MARKED POS ", val)
     return {
-        name: "binned_positions",
-        key: deviceId,
-        value: wd
+        name: "marked_positions",
+        key: `${deviceId}/${val.time}`,
+        value: val
     }
 };

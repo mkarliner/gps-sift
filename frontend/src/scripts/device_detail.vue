@@ -68,17 +68,20 @@
             </tr>
         </tbody>
     </table>
+    <h1>Geofence</h1>
     <table class="table table-responsive table-bordered table-striped table-hover">
         <thead>
             <tr>
                 <th>Latitude</th>
                 <th>Longitude</th>
+                <th>Visits</th>
             </tr>
         </thead>
         <tbody>
             <tr v-for="gf in geofence">
                 <td>{{gf.lat}}</td>
                 <td>{{gf.lng}}</td>
+                <td>{{gf.visits}}</td>
             </tr>
         </tbody>
     </table>
@@ -145,17 +148,24 @@ export default {
         geofence() {
             let id = this.$store.state.route.params.id;
             let geojson = this.$store.state.geofence;
-            console.log("GEOJSON: ", geojson)
-            if(!geojson[0]) {
-              return [];
-            }
-            let parsed = JSON.parse(geojson[0].value)
-            let gf = parsed.map(g => {
-            return {
-                lat: parseFloat(g.lat),
-                lng: parseFloat(g.lng)
-            }
-        })
+            // Find my device amoung the others
+            let mydev = geojson.filter(d=>{
+              return d.key == id;
+            })[0];
+            console.log("MYDEV", mydev)
+            //If I can't find my device, abort
+            if(!mydev) {
+              return null;
+            } else {
+              console.log("GEOJSON: ", id, mydev)
+              let parsed = JSON.parse(mydev.value)
+              var gf = parsed.map(g => {
+              return {
+                  lat: parseFloat(g.lat),
+                  lng: parseFloat(g.lng)
+                }
+              })
+          }
         console.log("GEOFENCEVV ", gf)
         // let filtered_pos =  posns.filter(p=>{
         //   let dev_id = p.key.split('/')[0];

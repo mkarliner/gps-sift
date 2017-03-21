@@ -14,7 +14,7 @@ export default class MyController extends SiftController {
   loadView(state) {
     console.log('hello-sift: loadView', state);
     // Register for storage update events on the "x" bucket so we can update the UI
-    this.storage.subscribe(['devices', 'positions', 'geofence'], this._suHandler);
+    this.storage.subscribe(['devices', 'marked_positions', 'geofence'], this._suHandler);
     let wh = this.getWebhooks();
     let devs = this.getDevices();
     let pos = this.getPositions();
@@ -27,6 +27,7 @@ export default class MyController extends SiftController {
       return {
                 passiveeyeUri: values[0][0].value,
                 owntracksUri: values[0][1].value,
+                things_connectedUri: values[0][2].value,
                 devices: values[1].devices,
                 positions: values[2].positions,
                 geofence: values[3].geofence}
@@ -64,7 +65,7 @@ export default class MyController extends SiftController {
   getWebhooks() {
      return this.storage.get({
        bucket: '_redsift',
-       keys: [ 'webhooks/passiveeye', 'webhooks/owntracks' ]
+       keys: [ 'webhooks/passiveeye', 'webhooks/owntracks', 'webhooks/things_connected' ]
      });
    }
 
@@ -80,7 +81,7 @@ export default class MyController extends SiftController {
 
   getPositions() {
    return this.storage.getAll({
-     bucket: 'positions'
+     bucket: 'marked_positions'
    }).then((values) => {
      return {
          positions: values
@@ -90,9 +91,9 @@ export default class MyController extends SiftController {
 
  getGeofence() {
   return this.storage.getAll({
-    bucket: 'geofence',
-    key: 'mk'
+    bucket: 'geofence'
   }).then((values) => {
+    console.log("GETGEO ", values)
     return {
         geofence: values
     };

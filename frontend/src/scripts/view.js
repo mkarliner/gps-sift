@@ -46,6 +46,7 @@ router.replace('/');
   state: {
     owntracksUri: "nouriyet",
     passiveeyeUri: "nopeyet",
+    things_connectedUri: "unset",
     devices: [],
     positions: [],
     geofence: [],
@@ -57,6 +58,9 @@ router.replace('/');
     },
     setPassiveEyeUri(state, uri){
       state.passiveeyeUri = uri;
+    },
+    setThingsConnectedUri(state, uri){
+      state.things_connectedUri = uri;
     },
     setDevices(state, devices){
       state.devices = devices;
@@ -104,6 +108,7 @@ export default class MyView extends SiftView {
     console.log('PRESENTVIEW: ', value);
     store.commit('setOwntracksUri', value.data.owntracksUri);
     store.commit('setPassiveEyeUri', value.data.passiveeyeUri);
+    store.commit('setThingsConnectedUri', value.data.things_connectedUri);
     store.commit('setDevices', value.data.devices);
     store.commit('setPositions', value.data.positions);
     store.commit('setGeofence', value.data.geofence);
